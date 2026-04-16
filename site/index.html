@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Gloversal, Inc. — Healthcare Strategy, Technology, and Execution</title>
+  <meta name="description" content="医療・ヘルスケア事業開発 / DX / 医療AI支援。Gloversal, Inc. は、医療・ヘルスケアの構想を、事業と実装へつなぐ戦略アドバイザリーです。" />
+  <meta name="theme-color" content="#0A165E" />
+  <meta property="og:title" content="Gloversal, Inc. — Healthcare Strategy, Technology, and Execution" />
+  <meta property="og:description" content="医療・ヘルスケアの構想を、事業と実装へ。Strategic advisory for healthcare, medical technology, and business development." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+JP:wght@400&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/png" href="assets/images/gloversal-mark.png" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<!-- System bar -->
+<div class="sysbar" role="status" aria-label="System status">
+  <div class="sysbar__left">
+    <span data-i18n="sysbar.platform">GLOVERSAL_CORE_v2026</span>
+    <span class="sysbar__sep">|</span>
+    <span data-i18n="sysbar.status">HEALTHCARE_STRATEGY // ACTIVE</span>
+  </div>
+  <div class="sysbar__right">
+    <span data-i18n="sysbar.locale">TOKYO / GLOBAL</span>
+    <span class="sysbar__sep">|</span>
+    <span class="sysbar__blink" data-i18n="sysbar.sync">● LIVE</span>
+  </div>
+</div>
+
+<!-- Navigation -->
+<header class="nav" role="banner">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="Gloversal home">
+      <span class="nav__logo-mark">G</span>
+      <span>Gloversal<sup>™</sup></span>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav__menu" role="list">
+        <li><a href="index.html" class="nav__link" data-i18n="nav.home">Home</a></li>
+        <li><a href="about.html" class="nav__link" data-i18n="nav.about">About</a></li>
+        <li><a href="services.html" class="nav__link" data-i18n="nav.services">Services</a></li>
+        <li><a href="case-studies.html" class="nav__link" data-i18n="nav.cases">Case Studies</a></li>
+        <li><a href="insights.html" class="nav__link" data-i18n="nav.insights">Insights</a></li>
+        <li><a href="speaking.html" class="nav__link" data-i18n="nav.speaking">Activities</a></li>
+        <li><a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav__right">
+      <button class="lang-toggle" type="button" aria-label="Toggle language">
+        <span class="lang-toggle__current">JA</span>
+        <span>/</span>
+        <span class="lang-toggle__alt">EN</span>
+      </button>
+      <button class="theme-toggle" type="button" aria-label="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <a href="contact.html" class="btn btn--primary" data-i18n="nav.cta">相談する</a>
+      <button class="nav__hamburger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile overlay nav -->
+<div class="nav-overlay" aria-hidden="true">
+  <a href="index.html" data-i18n="nav.home">Home</a>
+  <a href="about.html" data-i18n="nav.about">About</a>
+  <a href="services.html" data-i18n="nav.services">Services</a>
+  <a href="case-studies.html" data-i18n="nav.cases">Case Studies</a>
+  <a href="insights.html" data-i18n="nav.insights">Insights</a>
+  <a href="speaking.html" data-i18n="nav.speaking">Activities</a>
+  <a href="contact.html" data-i18n="nav.contact">Contact</a>
+  <div class="nav-overlay__footer">
+    <span>Gloversal™ 2026</span>
+    <span>info@gloversal.com</span>
+  </div>
+</div>
+
+<main>
+
+<!-- ═══════════════════════════════
+     HERO
+     ═══════════════════════════════ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__grid-bg" aria-hidden="true"></div>
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--2" aria-hidden="true"></div>
+
+  <div class="container container-wide hero__inner">
+    <div class="hero__copy">
+      <p class="hero__tag reveal" data-i18n="hero.tag">[ HEALTHCARE × TECHNOLOGY × EXECUTION ]</p>
+      <h1 id="hero-title" class="hero__headline reveal reveal--d1">
+        <span data-i18n="hero.headlineA">医療・ヘルスケアの</span><br>
+        <span data-i18n="hero.headlineB">構想を、事業と</span><br>
+        <em data-i18n="hero.headlineC">実装へ。</em>
+      </h1>
+      <p class="hero__sub reveal reveal--d2" data-i18n="hero.sub">Healthcare Strategy, Technology, and Execution.</p>
+      <p class="hero__body reveal reveal--d2" data-i18n="hero.body">
+        医療・ヘルスケア領域における事業開発、アライアンス、DX、医療AI、遠隔医療、海外連携を、戦略立案から実装・運用設計まで一気通貫で支援します。
+      </p>
+      <div class="hero__cta reveal reveal--d3">
+        <a href="contact.html" class="btn btn--primary btn--lg">
+          <span data-i18n="hero.ctaPrimary">相談する</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="services.html" class="btn btn--secondary btn--lg" data-i18n="hero.ctaSecondary">支援領域を見る</a>
+      </div>
+      <div class="hero__stats reveal reveal--d4">
+        <div class="hero__stat">
+          <span class="hero__stat-value">22+</span>
+          <span class="hero__stat-label" data-i18n="hero.stat1Label">活動年次</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-value">08</span>
+          <span class="hero__stat-label" data-i18n="hero.stat2Label">専門領域</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-value">JA/EN</span>
+          <span class="hero__stat-label" data-i18n="hero.stat3Label">対応言語</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-value">2</span>
+          <span class="hero__stat-label" data-i18n="hero.stat4Label">オフィス</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__visual reveal reveal--d2">
+      <div class="hero__visual-label">
+        <span data-i18n="hero.visualTagL">[ GLV_CORE / 2026 ]</span>
+        <span data-i18n="hero.visualTagR">[ STRATEGY → EXECUTION ]</span>
+      </div>
+      <video autoplay muted loop playsinline preload="metadata" poster="assets/images/calactor-hero.png">
+        <source src="assets/video/hero-loop.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- Rotating marquee -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span class="marquee__item">Humanizing Healthcare<span class="marquee__dot"></span></span>
+    <span class="marquee__item marquee__item--outline">医療・ヘルスケアの構想を、事業と実装へ<span class="marquee__dot marquee__dot--teal"></span></span>
+    <span class="marquee__item">Strategy → Execution<span class="marquee__dot marquee__dot--terra"></span></span>
+    <span class="marquee__item marquee__item--outline">Bridging clinical reality and technology<span class="marquee__dot"></span></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     WHAT I DO
+     ═══════════════════════════════ -->
+<section class="section" aria-labelledby="what-title">
+  <div class="container container-wide">
+    <div class="s-head reveal">
+      <div class="s-head__body">
+        <span class="edge-label s-head__eyebrow" data-i18n="whatIDo.eyebrow">What I Do</span>
+        <h2 id="what-title" class="t-display" data-i18n="whatIDo.title">私が支援すること</h2>
+      </div>
+      <span class="s-head__meta">/01</span>
+    </div>
+    <div class="what-grid">
+      <div class="reveal">
+        <p class="t-body" data-i18n="whatIDo.body">
+          医療・ヘルスケアの現場理解とテクノロジー実装の両方を土台に、企業・医療機関・事業責任者の構想を、具体的な事業・製品・提携・運用へつなぐ支援を行っています。支援テーマは、たとえば以下です。
+        </p>
+      </div>
+      <ul class="what-grid__list reveal">
+        <li class="what-grid__item"><span class="what-grid__num">01</span><span class="what-grid__text" data-i18n="whatIDo.item1">医療AI・医療SaaSの事業戦略策定</span></li>
+        <li class="what-grid__item"><span class="what-grid__num">02</span><span class="what-grid__text" data-i18n="whatIDo.item2">遠隔医療・画像診断・医療データ活用の事業開発</span></li>
+        <li class="what-grid__item"><span class="what-grid__num">03</span><span class="what-grid__text" data-i18n="whatIDo.item3">海外ヘルステック企業の日本展開支援</span></li>
+        <li class="what-grid__item"><span class="what-grid__num">04</span><span class="what-grid__text" data-i18n="whatIDo.item4">医療機関とのアライアンス設計</span></li>
+        <li class="what-grid__item"><span class="what-grid__num">05</span><span class="what-grid__text" data-i18n="whatIDo.item5">プロダクト要件整理、PoC設計、導入オペレーション整備</span></li>
+        <li class="what-grid__item"><span class="what-grid__num">06</span><span class="what-grid__text" data-i18n="whatIDo.item6">事業説明資料、提案資料、ホワイトペーパーの設計</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     WHY ME
+     ═══════════════════════════════ -->
+<section class="section section--alt" aria-labelledby="why-title">
+  <div class="container container-wide">
+    <div class="s-head reveal">
+      <div class="s-head__body">
+        <span class="edge-label s-head__eyebrow" data-i18n="whyMe.eyebrow">Why Me</span>
+        <h2 id="why-title" class="t-display" data-i18n="whyMe.title">私の強み</h2>
+        <p class="t-lead" style="margin-top:1.5rem;max-width:640px" data-i18n="whyMe.body">
+          医療現場と事業の両方がわかること、抽象論で終わらせないこと、海外と日本の翻訳者になれること。この3つを核にしています。
+        </p>
+      </div>
+      <span class="s-head__meta">/02</span>
+    </div>
+    <div class="why-grid">
+      <article class="why-card reveal">
+        <div class="why-card__num">01</div>
+        <svg class="why-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <h3 class="why-card__title" data-i18n="whyMe.c1Title">医療現場と事業の両方がわかる</h3>
+        <p class="why-card__body" data-i18n="whyMe.c1Body">
+          医療制度・臨床現場・業務運用と、事業開発・提携・販売設計を切り離さずに考えます。
+        </p>
+      </article>
+      <article class="why-card reveal reveal--d1">
+        <div class="why-card__num">02</div>
+        <svg class="why-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+        <h3 class="why-card__title" data-i18n="whyMe.c2Title">抽象論で終わらせない</h3>
+        <p class="why-card__body" data-i18n="whyMe.c2Body">
+          構想・整理・提案だけでなく、要件化、導入設計、運用像の具体化まで踏み込みます。
+        </p>
+      </article>
+      <article class="why-card reveal reveal--d2">
+        <div class="why-card__num">03</div>
+        <svg class="why-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        <h3 class="why-card__title" data-i18n="whyMe.c3Title">海外と日本の翻訳者になれる</h3>
+        <p class="why-card__body" data-i18n="whyMe.c3Body">
+          海外ソリューションを日本の医療文脈に合わせて再設計し、逆に日本の現場要件を事業言語で整理できます。
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     SERVICE AREAS
+     ═══════════════════════════════ -->
+<section class="section" aria-labelledby="svc-title">
+  <div class="container container-wide">
+    <div class="s-head reveal">
+      <div class="s-head__body">
+        <span class="edge-label s-head__eyebrow" data-i18n="serviceAreas.eyebrow">Service Areas</span>
+        <h2 id="svc-title" class="t-display" data-i18n="serviceAreas.title">支援領域</h2>
+      </div>
+      <span class="s-head__meta" data-i18n="serviceAreas.meta">01 — 08</span>
+    </div>
+    <div class="services-grid">
+      <a class="service-tile reveal" href="services.html">
+        <span class="service-tile__num">01</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s1">Strategic<br>Advisory</h3>
+        <span class="service-tile__meta">[ Strategy · Growth ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d1" href="services.html">
+        <span class="service-tile__num">02</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s2">Business<br>Development</h3>
+        <span class="service-tile__meta">[ Alliances · Partnerships ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d2" href="services.html">
+        <span class="service-tile__num">03</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s3">Medical<br>DX / AI</h3>
+        <span class="service-tile__meta">[ DX · Implementation ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d3" href="services.html">
+        <span class="service-tile__num">04</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s4">Remote Healthcare<br>&amp; Imaging</h3>
+        <span class="service-tile__meta">[ Tele · Imaging ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal" href="services.html">
+        <span class="service-tile__num">05</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s5">Market Entry<br>Support</h3>
+        <span class="service-tile__meta">[ Global → Japan ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d1" href="services.html">
+        <span class="service-tile__num">06</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s6">Content &amp;<br>Messaging</h3>
+        <span class="service-tile__meta">[ Narrative · Decks ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d2" href="services.html">
+        <span class="service-tile__num">07</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s7">AI Agent /<br>Org Design</h3>
+        <span class="service-tile__meta">[ LangGraph · CrewAI ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a class="service-tile reveal reveal--d3" href="services.html">
+        <span class="service-tile__num">08</span>
+        <h3 class="service-tile__title" data-i18n="serviceAreas.s8">Interactive<br>AI Avatar</h3>
+        <span class="service-tile__meta">[ Realtime · Browser ]</span>
+        <svg class="service-tile__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     SELECTED THEMES
+     ═══════════════════════════════ -->
+<section class="section section--alt" aria-labelledby="themes-title">
+  <div class="container container-wide">
+    <div class="s-head reveal">
+      <div class="s-head__body">
+        <span class="edge-label s-head__eyebrow" data-i18n="themes.eyebrow">Selected Themes</span>
+        <h2 id="themes-title" class="t-display" data-i18n="themes.title">代表的な関与テーマ</h2>
+        <p class="t-lead" style="margin-top:1.5rem;max-width:640px" data-i18n="themes.body">
+          テーマごとに、構想整理から実装設計まで横断的に関与しています。
+        </p>
+      </div>
+      <span class="s-head__meta">/03</span>
+    </div>
+    <ul class="theme-list reveal">
+      <li><span class="theme-list__num">T1</span><span data-i18n="themes.t1">遠隔画像診断・医療画像ワークフローの設計</span></li>
+      <li><span class="theme-list__num">T2</span><span data-i18n="themes.t2">医療AIプロダクトの導入・実装支援</span></li>
+      <li><span class="theme-list__num">T3</span><span data-i18n="themes.t3">ヘルスケアSaaSの市場整理とポジショニング</span></li>
+      <li><span class="theme-list__num">T4</span><span data-i18n="themes.t4">マルチエージェント(LangGraph, CrewAI等)を活用したAI組織・自動化の構築</span></li>
+      <li><span class="theme-list__num">T5</span><span data-i18n="themes.t5">Webブラウザ上で動作するインタラクティブなリアルタイムAIアバターの開発</span></li>
+      <li><span class="theme-list__num">T6</span><span data-i18n="themes.t6">医療機関向け提案ストーリーと営業設計</span></li>
+      <li><span class="theme-list__num">T7</span><span data-i18n="themes.t7">海外企業の日本進出における戦略・提携支援</span></li>
+      <li><span class="theme-list__num">T8</span><span data-i18n="themes.t8">医療データ、制度、運用の接続設計</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     CASE STUDIES TEASER
+     ═══════════════════════════════ -->
+<section class="section" aria-labelledby="cases-teaser-title">
+  <div class="container container-wide">
+    <div class="s-head reveal">
+      <div class="s-head__body">
+        <span class="edge-label s-head__eyebrow" data-i18n="casesTeaser.eyebrow">Case Studies</span>
+        <h2 id="cases-teaser-title" class="t-display" data-i18n="casesTeaser.title">支援事例</h2>
+        <p class="t-lead" style="margin-top:1.5rem;max-width:640px" data-i18n="casesTeaser.body">
+          構想整理、提携支援、プロダクト企画、医療機関連携、資料設計など、テーマごとの支援事例を匿名化してご紹介します。
+        </p>
+      </div>
+      <a href="case-studies.html" class="btn btn--ghost" data-i18n="casesTeaser.cta">すべての事例を見る</a>
+    </div>
+    <div class="case-grid">
+      <article class="case-card reveal">
+        <span class="case-card__tag" data-i18n="cases.c1Tag">Market Entry</span>
+        <span class="case-card__num" data-i18n="cases.c1Num">Case 01</span>
+        <h3 class="case-card__title" data-i18n="cases.c1Title">海外ヘルステック企業の<br>日本市場展開支援</h3>
+        <dl class="case-card__meta">
+          <dt data-i18n="cases.labelIssue">課題</dt><dd data-i18n="cases.c1Issue">日本市場の導入ハードルが高く、訴求先と価値提案が曖昧。</dd>
+          <dt data-i18n="cases.labelWork">支援内容</dt><dd data-i18n="cases.c1Work">市場整理、提携仮説設計、訴求再定義、面談論点整理。</dd>
+          <dt data-i18n="cases.labelResult">成果</dt><dd data-i18n="cases.c1Result">営業ストーリーの明確化、提携候補との対話前進。</dd>
+        </dl>
+      </article>
+      <article class="case-card reveal reveal--d1">
+        <span class="case-card__tag" data-i18n="cases.c2Tag">Business Development</span>
+        <span class="case-card__num" data-i18n="cases.c2Num">Case 02</span>
+        <h3 class="case-card__title" data-i18n="cases.c2Title">医療画像関連サービスの<br>事業整理と提案設計</h3>
+        <dl class="case-card__meta">
+          <dt data-i18n="cases.labelIssue">課題</dt><dd data-i18n="cases.c2Issue">サービスの価値が伝わりにくく、説明資料が分散していた。</dd>
+          <dt data-i18n="cases.labelWork">支援内容</dt><dd data-i18n="cases.c2Work">構造整理、訴求軸再設計、資料ストーリー化。</dd>
+          <dt data-i18n="cases.labelResult">成果</dt><dd data-i18n="cases.c2Result">顧客説明の一貫性向上、営業会話の短縮。</dd>
+        </dl>
+      </article>
+      <article class="case-card reveal reveal--d2">
+        <span class="case-card__tag" data-i18n="cases.c3Tag">Medical AI</span>
+        <span class="case-card__num" data-i18n="cases.c3Num">Case 03</span>
+        <h3 class="case-card__title" data-i18n="cases.c3Title">医療AIプロダクトの<br>導入構想支援</h3>
+        <dl class="case-card__meta">
+          <dt data-i18n="cases.labelIssue">課題</dt><dd data-i18n="cases.c3Issue">技術はあるが、導入現場のフローと役割分担が見えない。</dd>
+          <dt data-i18n="cases.labelWork">支援内容</dt><dd data-i18n="cases.c3Work">運用整理、PoC設計、導入論点の可視化。</dd>
+          <dt data-i18n="cases.labelResult">成果</dt><dd data-i18n="cases.c3Result">検討フェーズから実装フェーズへの移行を支援。</dd>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     ABOUT TEASER
+     ═══════════════════════════════ -->
+<section class="section section--alt" aria-labelledby="about-teaser-title">
+  <div class="container container-wide">
+    <div class="about-hero">
+      <div class="reveal">
+        <span class="edge-label s-head__eyebrow" data-i18n="aboutTeaser.eyebrow">About</span>
+        <h2 id="about-teaser-title" class="t-display" data-i18n="aboutTeaser.title">About Me</h2>
+        <p class="t-body" style="margin-top:2rem" data-i18n="aboutTeaser.body">
+          医療・ヘルスケアとテクノロジーの接点で、現場、事業、プロダクト、パートナーシップを横断して支援しています。複雑なテーマを整理し、前に進める役割を担います。
+        </p>
+        <div style="margin-top:2.5rem">
+          <a href="about.html" class="btn btn--ghost">
+            <span data-i18n="aboutTeaser.cta">プロフィールを見る</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="about-portrait reveal reveal--d1">
+        <span class="about-portrait__label">[ YOSHI FURUSAWA — FOUNDER ]</span>
+        <img src="assets/images/calactor.png" alt="Gloversal portrait placeholder" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     CTA BAND
+     ═══════════════════════════════ -->
+<section class="cta-band" aria-labelledby="cta-title">
+  <div class="container container-wide cta-band__grid">
+    <div class="reveal">
+      <span class="edge-label cta-band__eyebrow" data-i18n="ctaBand.eyebrow">Let's Talk</span>
+      <h2 id="cta-title" data-i18n="ctaBand.title">次の一手を、<br><em>一緒に言語化する。</em></h2>
+      <ul class="cta-band__list">
+        <li><span>L1</span><span data-i18n="ctaBand.l1">新規事業を形にしたい</span></li>
+        <li><span>L2</span><span data-i18n="ctaBand.l2">海外ソリューションの日本展開を進めたい</span></li>
+        <li><span>L3</span><span data-i18n="ctaBand.l3">医療現場に刺さる提案・サービス設計をしたい</span></li>
+        <li><span>L4</span><span data-i18n="ctaBand.l4">医療DXやAI活用を事業として成立させたい</span></li>
+      </ul>
+    </div>
+    <div class="cta-band__cta reveal reveal--d1">
+      <a href="contact.html" class="btn btn--on-dark btn--lg">
+        <span data-i18n="ctaBand.ctaPrimary">お問い合わせ</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <a href="services.html" class="btn btn--ghost btn--lg" style="border-color:rgba(255,255,255,.3);color:#fff" data-i18n="ctaBand.ctaSecondary">支援領域を見る</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════
+     FOOTER
+     ═══════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="container container-wide">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <h3 data-i18n="footer.brandTitle">Gloversal, Inc.</h3>
+        <p data-i18n="footer.brandBody">医療・ヘルスケアの構想を、事業と実装へ。Healthcare strategy, medical technology, and business development.</p>
+      </div>
+      <div class="footer__col">
+        <h4 data-i18n="footer.navTitle">Navigation</h4>
+        <ul>
+          <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+          <li><a href="about.html" data-i18n="nav.about">About</a></li>
+          <li><a href="services.html" data-i18n="nav.services">Services</a></li>
+          <li><a href="case-studies.html" data-i18n="nav.cases">Case Studies</a></li>
+          <li><a href="insights.html" data-i18n="nav.insights">Insights</a></li>
+          <li><a href="speaking.html" data-i18n="nav.speaking">Activities</a></li>
+          <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4 data-i18n="footer.contactTitle">Contact</h4>
+        <ul>
+          <li><a href="mailto:info@gloversal.com" data-i18n="footer.general">General: info@gloversal.com</a></li>
+          <li><a href="mailto:privacy@gloversal.com" data-i18n="footer.privacy">Privacy: privacy@gloversal.com</a></li>
+          <li><a href="mailto:recruit@gloversal.com" data-i18n="footer.recruit">Recruit: recruit@gloversal.com</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4 data-i18n="footer.addressTitle">Offices</h4>
+        <address>
+          <strong data-i18n="footer.hqLabel">HQ</strong><br>
+          <span data-i18n="footer.hqBody">113 Barksdale Professional Center<br>City of Newark, County of New Castle<br>Delaware 19711, USA</span>
+          <br><br>
+          <strong data-i18n="footer.jpLabel">Tokyo</strong><br>
+          <span data-i18n="footer.jpBody">〒150-0043<br>東京都渋谷区道玄坂一丁目10番8号<br>渋谷道玄坂東急ビル 2F-C</span>
+        </address>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span data-i18n="footer.copyright">© 2026 Gloversal, Inc. — STRATEGIC ADVISORY & EXECUTION</span>
+      <div class="footer__legal">
+        <a href="legal/privacy.html" data-i18n="footer.legalPrivacy">Privacy Policy</a>
+        <a href="legal/cookies.html" data-i18n="footer.legalCookies">Cookie Policy</a>
+        <a href="legal/terms.html" data-i18n="footer.legalTerms">Terms of Use</a>
+        <a href="legal/disclaimer.html" data-i18n="footer.legalDisclaimer">Disclaimer</a>
+        <a href="legal/notice.html" data-i18n="footer.legalNotice">Legal Notice</a>
+        <a href="legal/recruitment.html" data-i18n="footer.legalRecruit">Recruitment Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

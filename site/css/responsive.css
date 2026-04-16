@@ -1,0 +1,50 @@
+/* =============================================================
+   Responsive — breakpoint overrides only, no new classes
+   ============================================================= */
+@media (max-width:1200px){
+  .hero__inner{grid-template-columns:1fr;gap:var(--sp-12)}
+  .hero__stats{grid-template-columns:repeat(4,1fr)}
+  .hero__visual{max-width:520px;margin-inline:auto;aspect-ratio:16/10}
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+  .service-tile:nth-child(2n):not(:last-child){border-right:none}
+  .insights-grid{grid-template-columns:repeat(2,1fr)}
+  .case-grid{grid-template-columns:repeat(2,1fr)}
+  .footer__grid{grid-template-columns:1fr 1fr;gap:var(--sp-12)}
+  .legal-layout{grid-template-columns:1fr;padding-block:var(--sp-10)}
+  .legal-toc{position:static;order:-1}
+}
+@media (max-width:960px){
+  .nav__menu{display:none}
+  .nav__hamburger{display:block}
+  .what-grid,.about-hero,.contact-grid,.cta-band__grid,.profile-blocks{grid-template-columns:1fr;gap:var(--sp-10)}
+  .why-grid{grid-template-columns:1fr;border-top:1px solid var(--border-default)}
+  .why-card{border-right:none}
+  .theme-list{grid-template-columns:1fr}
+  .theme-list li:nth-child(odd){border-right:none}
+  .service-block{grid-template-columns:1fr;gap:var(--sp-6)}
+  .service-block__label{position:static}
+  .service-block__detail{grid-template-columns:1fr;gap:var(--sp-1) 0}
+  .service-block__detail dt{margin-top:var(--sp-3)}
+  .s-head{grid-template-columns:1fr;gap:var(--sp-4)}
+  .form{grid-template-columns:1fr;padding:var(--sp-6)}
+  .stance{grid-template-columns:1fr;padding:var(--sp-10) var(--sp-8)}
+  .activity-item{grid-template-columns:1fr;gap:var(--sp-3)}
+  .activity-item__tag{justify-self:start}
+}
+@media (max-width:720px){
+  :root{--nav-height:64px}
+  .sysbar{display:none}
+  .nav__logo span:not(.nav__logo-mark){display:none}
+  .nav__right .btn{display:none}
+  .hero__stats{grid-template-columns:repeat(2,1fr)}
+  .page-hero__inner{grid-template-columns:1fr}
+  .insights-grid,.case-grid{grid-template-columns:1fr}
+  .footer__grid{grid-template-columns:1fr;gap:var(--sp-8)}
+  .footer__bottom{flex-direction:column;align-items:flex-start;gap:var(--sp-4)}
+  .cursor-dot,.cursor-ring{display:none}
+}
+@media (max-width:480px){
+  .container{padding-inline:1.1rem}
+  .btn{padding:1rem 1.4rem;font-size:var(--fs-2xs)}
+  .hero__tag{font-size:9px;padding:.4rem .8rem}
+}

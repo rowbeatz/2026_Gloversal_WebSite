@@ -1,0 +1,129 @@
+/* =============================================================
+   Gloversal Strategic Light Palette — Design Tokens
+   Light-mode-first. Editorial consulting expression.
+   v1.0  2026-04-15
+   ============================================================= */
+:root {
+  /* Core brand */
+  --glv-indigo-50:#EBECF2; --glv-indigo-100:#D8DAE5; --glv-indigo-200:#B1B4CB;
+  --glv-indigo-300:#848AAE; --glv-indigo-400:#4F578B; --glv-indigo-500:#273271;
+  --glv-indigo-600:#0A165E; --glv-indigo-700:#091350; --glv-indigo-800:#071145;
+  --glv-indigo-900:#060D3A;
+
+  --glv-teal-50:#EBFCF7; --glv-teal-100:#D7F8F0; --glv-teal-200:#AFF2E1;
+  --glv-teal-300:#82EAD0; --glv-teal-400:#4CE1BB; --glv-teal-500:#24DBAB;
+  --glv-teal-600:#06D6A0; --glv-teal-700:#05BC8D; --glv-teal-800:#049E77;
+  --glv-teal-900:#037B5D;
+
+  --glv-terra-50:#FCF8F4; --glv-terra-100:#F8F0E9; --glv-terra-200:#F1E2D2;
+  --glv-terra-300:#EAD1B9; --glv-terra-400:#E0BD9A; --glv-terra-500:#D9AE84;
+  --glv-terra-600:#D4A373; --glv-terra-700:#B98B62; --glv-terra-800:#997451;
+  --glv-terra-900:#795A3E;
+
+  --glv-neutral-50:#FBFCFD; --glv-neutral-100:#F5F7FA; --glv-neutral-200:#E8ECF2;
+  --glv-neutral-300:#D7DDE6; --glv-neutral-400:#B6BFCC; --glv-neutral-500:#8A96A8;
+  --glv-neutral-600:#5F6B7C; --glv-neutral-700:#404B5A; --glv-neutral-800:#273142;
+  --glv-neutral-900:#111827;
+
+  --glv-semantic-success:#4CBB17;
+  --glv-semantic-warning:#EED202;
+  --glv-semantic-error:#A6192E;
+  --glv-semantic-info:#0A165E;
+
+  /* System tokens — Light */
+  --bg-canvas:#F9FAFC;
+  --bg-surface:#FFFFFF;
+  --bg-surface-alt:#F5F7FA;
+  --bg-subtle:#E8ECF2;
+
+  --text-primary:#111827;
+  --text-secondary:#404B5A;
+  --text-muted:#5F6B7C;
+  --text-inverse:#F9FAFC;
+
+  --border-default:#D7DDE6;
+  --border-strong:#B6BFCC;
+
+  --brand-primary:#0A165E;
+  --brand-primary-hover:#091350;
+  --brand-secondary:#06D6A0;
+  --brand-accent:#D4A373;
+
+  --link-default:#1F4ED8;
+  --link-hover:#173DA9;
+
+  --cta-primary-bg:#0A165E;
+  --cta-primary-text:#FFFFFF;
+  --cta-secondary-bg:#FFFFFF;
+  --cta-secondary-text:#0A165E;
+  --cta-secondary-border:#B1B4CB;
+
+  --card-shadow:#11182714;
+
+  /* Typography */
+  --font-sans:"Inter","Helvetica Neue",Helvetica,Arial,system-ui,-apple-system,
+    "Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  --font-serif:"Instrument Serif","Cormorant Garamond",Georgia,"Times New Roman",
+    "Yu Mincho","Hiragino Mincho ProN",serif;
+  --font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+
+  /* Type scale */
+  --fs-2xs:.625rem;  --fs-xs:.75rem;   --fs-sm:.875rem;
+  --fs-base:1rem;    --fs-lg:1.125rem; --fs-xl:1.25rem;
+  --fs-2xl:1.5rem;   --fs-3xl:1.875rem;--fs-4xl:2.5rem;
+  --fs-5xl:3.5rem;   --fs-6xl:5rem;    --fs-7xl:7rem;
+
+  /* Spacing */
+  --sp-1:.25rem; --sp-2:.5rem; --sp-3:.75rem; --sp-4:1rem;
+  --sp-5:1.25rem; --sp-6:1.5rem; --sp-8:2rem; --sp-10:2.5rem;
+  --sp-12:3rem; --sp-16:4rem; --sp-20:5rem; --sp-24:6rem;
+  --sp-32:8rem; --sp-40:10rem;
+
+  /* Layout */
+  --container-max:1440px;
+  --container-wide:1600px;
+  --container-text:720px;
+  --nav-height:76px;
+
+  /* Motion */
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --ease-studio:cubic-bezier(.22,1,.36,1);
+  --dur-fast:180ms; --dur-base:320ms; --dur-slow:620ms; --dur-xslow:1100ms;
+
+  /* Shape */
+  --radius-none:0;
+  --radius-sm:2px;
+  --radius-md:4px;
+  --radius-full:9999px;
+
+  /* Shadow */
+  --shadow-sm:0 1px 2px rgba(17,24,39,.05);
+  --shadow-md:0 8px 28px rgba(17,24,39,.08);
+  --shadow-lg:0 24px 64px rgba(17,24,39,.10);
+
+  /* Z-index */
+  --z-base:0; --z-above:10; --z-sticky:100; --z-overlay:300; --z-modal:400; --z-cursor:9999;
+}
+
+[data-theme="dark"] {
+  --bg-canvas:#0B1020;
+  --bg-surface:#121A2E;
+  --bg-surface-alt:#1A2338;
+  --bg-subtle:#273142;
+  --text-primary:#F3F4F6;
+  --text-secondary:#D7DDE6;
+  --text-muted:#B6BFCC;
+  --text-inverse:#111827;
+  --border-default:#2A3449;
+  --border-strong:#404B5A;
+  --brand-primary:#D8DAE5;
+  --brand-secondary:#24DBAB;
+  --brand-accent:#E0BD9A;
+  --cta-primary-bg:#D8DAE5;
+  --cta-primary-text:#0A165E;
+  --cta-secondary-bg:transparent;
+  --cta-secondary-text:#F3F4F6;
+  --cta-secondary-border:#404B5A;
+  --card-shadow:#00000055;
+}

@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+used_keys.txt
+
+# Source/workspace docs (not for deployment)
+*.zip
+site_assets_raw/
+202604_Renewal_Gloversal.md
+gloversal_site_refresh_master_2026-04-15.md
+gloversal_strategic_light_palette_2026-04-15.docx.md
+gloversal_strategic_light_palette_2026-04-15.docx.pdf
+gloversal_website_legal_pack_2026-04-16.md
+gloversal_palette_tokens_2026-04-15.css
+gloversal_palette_tokens_2026-04-15.json
+G.png
+Gloversal_Logo_SML*.png
