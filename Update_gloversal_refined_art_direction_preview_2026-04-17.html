@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gloversal Refined Art Direction Preview</title>
+<style>
+:root{
+  --indigo:#0a165e; --indigo2:#132284; --teal:#048366; --teal-bg:#eef8f5;
+  --n0:#ffffff; --n1:#fbfcfe; --n2:#f6f8fb; --n3:#e7ecf2; --n4:#d5dde8; --n5:#687385; --n7:#33404c; --n9:#111827;
+  --shadow:0 18px 60px rgba(10,22,94,.08); --radius:22px; --container:1220px;
+  --font-ui: Inter, "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-en: Inter, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+  --font-editorial-jp: "BIZ UDPGothic", "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-editorial-en: "IBM Plex Sans", Inter, "Segoe UI", Arial, sans-serif;
+  --font-serif-en: "Iowan Old Style", Georgia, serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#fcfdff 0%,#f7f9fc 100%);color:var(--n9);font-family:var(--font-ui);line-height:1.7}
+.wrap{width:min(var(--container),calc(100% - 40px));margin:0 auto;padding:28px 0 64px}
+.kicker{display:inline-block;padding:8px 13px;border-radius:999px;background:var(--teal-bg);color:var(--teal);font-weight:700;font-size:13px;letter-spacing:.05em}
+h1{margin:16px 0 10px;color:var(--indigo);font-size:clamp(36px,5.2vw,68px);line-height:1.03;letter-spacing:-.035em}
+.lead{max-width:900px;color:var(--n5);font-size:18px;margin:0}
+.section{margin-top:26px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--n0);border:1px solid var(--n3);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}
+.card h2{margin:0 0 10px;color:var(--indigo);font-size:28px;line-height:1.15;letter-spacing:-.025em}
+.sub{color:var(--n5);font-size:14px;margin-bottom:14px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#27408b;font-size:12px;font-weight:700;letter-spacing:.04em;margin:0 8px 8px 0}
+.list{margin:12px 0 0;padding-left:18px}
+.list li{margin:8px 0;color:var(--n7)}
+.rule-table{width:100%;border-collapse:collapse;font-size:14px}
+.rule-table th,.rule-table td{border-top:1px solid var(--n3);padding:13px 10px;text-align:left;vertical-align:top}
+.rule-table th{width:24%;color:var(--indigo);background:#fcfdff;font-weight:700}
+.sample-surface{border:1px solid var(--n3);background:linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%);border-radius:20px;overflow:hidden}
+.preview-header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 22px;border-bottom:1px solid var(--n3);background:rgba(255,255,255,.92)}
+.brand{display:flex;align-items:center;gap:14px;color:var(--indigo);font-weight:700}
+.logo{width:38px;height:38px;display:grid;place-items:center;background:var(--indigo);color:#fff;font-family:var(--font-serif-en);font-style:italic;font-size:24px}
+.brand-name{font-family:var(--font-serif-en);font-style:italic;font-size:24px;letter-spacing:-.02em}
+.nav{display:flex;gap:24px;flex-wrap:wrap;font-size:15px;color:var(--n7);font-weight:600}
+.preview-body{padding:28px 22px 18px}
+.hero-tag{display:inline-block;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:#243369;border:1px solid var(--n4);padding:10px 14px;background:var(--n0)}
+.hero-headline{margin:22px 0 10px;max-width:860px;color:var(--indigo);line-height:.98}
+.hero-headline .serif{display:block;font-family:var(--font-serif-en);font-size:clamp(58px,6vw,96px);font-style:italic;font-weight:500;letter-spacing:-.05em;color:#18213b}
+.hero-headline .sans{display:block;margin-top:6px;font-family:var(--font-en);font-size:clamp(42px,4.5vw,72px);font-weight:700;letter-spacing:-.045em;color:var(--indigo2)}
+.hero-jp{margin-top:18px;font-family:var(--font-jp);color:var(--n5);font-size:15px;letter-spacing:.02em}
+.hero-copy{margin-top:20px;max-width:680px;font-size:17px;color:var(--n5);line-height:1.9}
+.btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 26px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.16em;text-transform:uppercase;border:1px solid transparent}
+.btn-primary{background:#0f1d86;color:#fff}
+.btn-secondary{background:#fff;border-color:var(--n4);color:var(--indigo)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:28px;border:1px solid var(--n4)}
+.stat{padding:18px 18px 16px;background:#fff;border-right:1px solid var(--n4)}
+.stat:last-child{border-right:none}
+.num{font-family:var(--font-en);font-size:38px;font-weight:700;color:var(--indigo);letter-spacing:-.04em;line-height:1}
+.label{margin-top:10px;font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:var(--n5);font-weight:700}
+.sample-box{border:1px solid var(--n3);border-radius:18px;background:#fbfcfe;padding:18px;margin-top:14px}
+.jp-display{font-family:var(--font-jp);font-weight:700;color:var(--indigo);font-size:38px;line-height:1.22;letter-spacing:-.03em;margin-bottom:8px}
+.jp-editorial{font-family:var(--font-editorial-jp);font-weight:700;color:var(--indigo);font-size:34px;line-height:1.24;letter-spacing:-.02em;margin-bottom:8px}
+.jp-body{font-family:var(--font-jp);font-size:16px;line-height:1.85;color:var(--n7);margin-bottom:14px}
+.en-display{font-family:var(--font-en);font-weight:700;color:var(--indigo);font-size:38px;line-height:1.08;letter-spacing:-.04em;margin-bottom:8px}
+.en-editorial{font-family:var(--font-editorial-en);font-weight:700;color:var(--indigo);font-size:34px;line-height:1.12;letter-spacing:-.03em;margin-bottom:8px}
+.en-body{font-family:var(--font-en);font-size:16px;line-height:1.82;color:var(--n7)}
+.mono{margin-top:10px;background:#f3f6fa;border:1px solid var(--n3);border-radius:12px;padding:12px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:#344054;white-space:pre-wrap;overflow:auto}
+@media (max-width:980px){.grid-2,.grid-3{grid-template-columns:1fr}.preview-header{flex-direction:column;align-items:flex-start}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:none}}
+@media (max-width:680px){.stats{grid-template-columns:1fr}.stat{border-right:none;border-bottom:1px solid var(--n4)}.stat:last-child{border-bottom:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Gloversal / Refined Art Direction / Less Elegant, More Strategic</div>
+  <h1>修正版アートディレクション指示書<br>＋ JP/EN フォントサンプル</h1>
+  <p class="lead">いまの方向性を壊さずに、エレガンスを少しだけ引いて、戦略性・実務感・現代性を足すための修正版です。下のプレビューは「美しい」から「静かに強い」へ寄せるための具体形です。</p>
+
+  <section class="section grid-2">
+    <div class="card">
+      <h2>アートディレクション結論</h2>
+      <div class="sub">大枠の方向性は維持。調整するのは、主にタイポグラフィと構造の強さです。</div>
+      <div class="badge">Elegant Editorial → Strategic Editorial</div>
+      <div class="badge">Serif 主導 → Serif 限定使用</div>
+      <div class="badge">感性優先 → 感性 + 論理</div>
+      <ul class="list">
+        <li>ヒーロー見出しは、<strong>全面 serif / italic</strong> をやめて、<strong>serif + sans の混成</strong> にする。</li>
+        <li>日本語見出しは sans 基調にして、英語の一部だけにエディトリアル感を残す。</li>
+        <li>CTA は丸みと字間を少し締め、<strong>高級ブランド感</strong>より<strong>意思決定の強さ</strong>を優先する。</li>
+        <li>数字カードは serif 数字を避け、<strong>Inter などの sans 数字</strong>にして分析的に見せる。</li>
+        <li>背景演出は静かに保ちつつ、セクション境界や情報階層で構造を見せる。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>デザイン修正優先順位</h2>
+      <div class="sub">これを上から直すと、印象がきれいに変わります。</div>
+      <table class="rule-table">
+        <tr><th>最優先</th><td>ヒーロー見出しの serif / italic 比率を下げる</td></tr>
+        <tr><th>次点</th><td>CTA の角丸・字間・大文字感を調整する</td></tr>
+        <tr><th>次点</th><td>数字カードの数字を sans 化し、罫線を少し強くする</td></tr>
+        <tr><th>中位</th><td>ナビのウェイトを少し上げ、下線をシャープにする</td></tr>
+        <tr><th>補助</th><td>背景テクスチャを弱め、レイアウト構造をやや明確にする</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>トップ画面 修正版プレビュー</h2>
+    <div class="sub">ヒーロー見出しは serif を「主役」ではなく「アクセント」に格下げし、sans の実行感を前に出しています。</div>
+    <div class="sample-surface">
+      <div class="preview-header">
+        <div class="brand"><div class="logo">G</div><div class="brand-name">Gloversal</div></div>
+        <div class="nav"><div>Home</div><div>Profile</div><div>Services</div><div>Case Studies</div><div>Insights</div><div>Speaking</div></div>
+      </div>
+      <div class="preview-body">
+        <div class="hero-tag">Healthcare × Technology × Execution</div>
+        <div class="hero-headline"><span class="serif">Healthcare strategy,</span><span class="sans">into execution.</span></div>
+        <div class="hero-jp">医療・ヘルスケアの構想を、事業と実装へ。</div>
+        <div class="hero-copy">Gloversal bridges healthcare strategy, medical technology, alliances, DX, medical AI, remote healthcare, and cross-border partnerships — from concept through implementation and operations.</div>
+        <div class="btns"><a class="btn btn-primary" href="#">Start a conversation</a><a class="btn btn-secondary" href="#">See service areas</a></div>
+        <div class="stats">
+          <div class="stat"><div class="num">22+</div><div class="label">Years Active</div></div>
+          <div class="stat"><div class="num">08</div><div class="label">Core Domains</div></div>
+          <div class="stat"><div class="num">JA / EN</div><div class="label">Languages</div></div>
+          <div class="stat"><div class="num">2</div><div class="label">Offices</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section grid-2">
+    <div class="card">
+      <h2>フォントセット A</h2>
+      <div class="sub">本命。Web本体・会社紹介・サービスページ向け。</div>
+      <table class="rule-table">
+        <tr><th>日本語</th><td>Noto Sans JP</td></tr>
+        <tr><th>英語</th><td>Inter</td></tr>
+        <tr><th>役割</th><td>最も安定。清潔感、知性、読みやすさ、実装性のバランスが良い。</td></tr>
+      </table>
+      <div class="sample-box">
+        <div class="jp-display">医療の構想を、事業と実装へ。</div>
+        <div class="jp-body">医療・ヘルスケア領域における事業開発、アライアンス、医療DX、医療AI、遠隔医療、海外連携を、戦略立案から実装・運用設計まで一気通貫で支援します。</div>
+        <div class="en-display">Healthcare Strategy, Technology, and Execution.</div>
+        <div class="en-body">We support healthcare business development, partnerships, AI adoption, remote care, and market entry from strategy through implementation.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>フォントセット B</h2>
+      <div class="sub">少しだけ思想・記事・人物感を足したいときの補助案。</div>
+      <table class="rule-table">
+        <tr><th>日本語見出し</th><td>BIZ UDPGothic / Zen Kaku Gothic New</td></tr>
+        <tr><th>日本語本文</th><td>Noto Sans JP</td></tr>
+        <tr><th>英語見出し</th><td>IBM Plex Sans</td></tr>
+        <tr><th>英語本文</th><td>Inter</td></tr>
+      </table>
+      <div class="sample-box">
+        <div class="jp-editorial">日本の医療文脈を、事業言語に翻訳する。</div>
+        <div class="jp-body">制度、臨床運用、医療機関特有の意思決定構造を踏まえながら、事業戦略や提携、営業設計へ接続します。</div>
+        <div class="en-editorial">Translating healthcare reality into business language.</div>
+        <div class="en-body">This pairing adds an editorial edge while keeping the brand grounded, modern, and credible.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section grid-3">
+    <div class="card"><h2>ヒーロー見出し ルール</h2><ul class="list"><li>1行目だけ serif も可</li><li>2行目は sans で締める</li><li>italic は全面禁止。使うなら限定的に</li><li>和文は sans で安定させる</li></ul></div>
+    <div class="card"><h2>CTA ルール</h2><ul class="list"><li>角丸 8〜12px 程度</li><li>全大文字は使いすぎない</li><li>字間は強すぎない</li><li>「相談する」が想像できる文言にする</li></ul></div>
+    <div class="card"><h2>統計カード ルール</h2><ul class="list"><li>数字は sans / bold</li><li>罫線は少し強め</li><li>飾りより分析感</li><li>実態に近い指標だけ出す</li></ul></div>
+  </section>
+
+  <section class="section grid-2">
+    <div class="card">
+      <h2>実装用フォントスタック</h2>
+      <div class="mono">Primary UI
+font-family: Inter, "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+Japanese
+font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+Editorial Heading JP
+font-family: "BIZ UDPGothic", "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+Editorial Heading EN
+font-family: "IBM Plex Sans", Inter, "Segoe UI", Arial, sans-serif;</div>
+    </div>
+    <div class="card">
+      <h2>タイプスケール推奨</h2>
+      <table class="rule-table">
+        <tr><th>Display</th><td>48–64px / 700 / -0.03em</td></tr>
+        <tr><th>H1</th><td>38–52px / 700 / -0.025em</td></tr>
+        <tr><th>H2</th><td>28–34px / 700 / -0.02em</td></tr>
+        <tr><th>Body L</th><td>18px / 400–500 / 1.8</td></tr>
+        <tr><th>Body</th><td>16px / 400–500 / 1.75</td></tr>
+        <tr><th>Caption</th><td>13–14px / 600 / uppercase 少なめ</td></tr>
+      </table>
+    </div>
+  </section>
+</div>
+</body>
+</html>

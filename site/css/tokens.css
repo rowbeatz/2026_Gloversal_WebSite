@@ -60,11 +60,15 @@
 
   --card-shadow:#11182714;
 
-  /* Typography */
-  --font-sans:"Inter","Helvetica Neue",Helvetica,Arial,system-ui,-apple-system,
-    "Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
-  --font-serif:"Instrument Serif","Cormorant Garamond",Georgia,"Times New Roman",
-    "Yu Mincho","Hiragino Mincho ProN",serif;
+  /* Typography — Set A (primary) */
+  --font-sans:Inter,"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-jp:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-en:Inter,"SF Pro Display","Segoe UI",Arial,sans-serif;
+  /* Typography — Set B (editorial accents) */
+  --font-editorial-jp:"BIZ UDPGothic","Zen Kaku Gothic New","Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-editorial-en:"IBM Plex Sans",Inter,"Segoe UI",Arial,sans-serif;
+  /* Serif — reserved for minimal decorative use */
+  --font-serif:"Instrument Serif","Iowan Old Style",Georgia,serif;
   --font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 
   /* Type scale */

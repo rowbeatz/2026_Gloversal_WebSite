@@ -31,7 +31,7 @@ Gloversal, Inc. のコーポレートサイト。医療・ヘルスケア領域�
 | マークアップ | HTML5 | セマンティック要素、BEM命名 |
 | スタイル | CSS3 Custom Properties | デザイントークン、ライト/ダーク対応 |
 | スクリプト | Vanilla JavaScript (ES2020+) | IIFE モジュールパターン、依存ゼロ |
-| フォント | Google Fonts (4ファミリー) | Instrument Serif, Inter, JetBrains Mono, Noto Serif JP |
+| フォント | Google Fonts (6ファミリー) | Inter, Noto Sans JP, BIZ UDPGothic, IBM Plex Sans, JetBrains Mono, Instrument Serif (装飾用最小限) |
 | ホスティング | Cloudflare Pages | 静的サイト、CDN配信 |
 | ビルドツール | Python スクリプト (生成用) | 本番デプロイにはビルド不要 |
 
@@ -53,17 +53,21 @@ Gloversal, Inc. のコーポレートサイト。医療・ヘルスケア領域�
 | Canvas (Background) | `#F9FAFC` | ライトモード背景 |
 | Charcoal (Text) | `#1A1D2E` | 本文テキスト |
 
-### タイポグラフィ
+### タイポグラフィ（2026-04-17 リファイン済み）
 
-| 用途 | フォント | ウェイト |
-|------|---------|---------|
-| ディスプレイ見出し | Instrument Serif (italic) | 400 |
-| 本文・UI | Inter | 300–700 |
-| ラベル・コード | JetBrains Mono | 400–500 |
-| 日本語セリフ | Noto Serif JP | 400 |
+**トーン**: Elegant Editorial → **Strategic Editorial Healthcare** へ転換。
+
+| セット | 用途 | フォント | ウェイト |
+|--------|------|---------|---------|
+| Set A (主軸) | 英語 UI・見出し | Inter | 300–700 |
+| Set A (主軸) | 日本語全般 | Noto Sans JP | 400–700 |
+| Set B (記事・人物) | 日本語見出し | BIZ UDPGothic | 400–700 |
+| Set B (記事・人物) | 英語見出し | IBM Plex Sans | 400–600 |
+| 装飾 | ヒーロー `<em>` 等 最小限 | Instrument Serif (italic) | 400 |
+| ラベル・コード | モノスペース | JetBrains Mono | 400–500 |
 
 ### デザイントーン
-- **エディトリアル・コンサルティング**: シャープなボーダー（border-radius: 0）、豊富なホワイトスペース、セリフイタリック見出し、モノスペース大文字ラベル
+- **ストラテジック・エディトリアル**: シャープなボーダー、豊富なホワイトスペース、**サンセリフ主導の見出し**、CTA角丸(10px)、モノスペースラベル
 - カスタムカーソル（`mix-blend-mode: difference`）
 - IntersectionObserver ベースのスクロールリビールアニメーション
 
