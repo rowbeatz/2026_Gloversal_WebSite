@@ -1023,3 +1023,124 @@
 .case-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(10,22,94,.08)}
 .activity-item{cursor:pointer}
 .activity-item:hover{background:var(--bg-surface-alt)}
+
+/* =============================================================
+   Partner Solutions page
+   ============================================================= */
+.partner-bridge{padding:var(--sp-6) 0}
+
+.partner-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:var(--sp-6);margin-bottom:var(--sp-8);flex-wrap:wrap
+}
+.partner-eyebrow{display:block;margin-bottom:var(--sp-3);font-size:var(--fs-xs)}
+.partner-title{margin-top:0}
+.partner-site-btn{display:inline-flex;align-items:center;gap:.3rem;white-space:nowrap}
+
+.partner-overview{margin-bottom:var(--sp-8)}
+.partner-overview__text{max-width:700px}
+
+/* ---- iframe browser window ---- */
+.partner-iframe-wrapper{
+  border:1px solid var(--border-default);
+  border-radius:12px;overflow:hidden;
+  margin-bottom:var(--sp-10);
+  box-shadow:0 8px 40px rgba(0,0,0,.15);
+  background:var(--bg-surface)
+}
+.partner-iframe-bar{
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:.75rem 1rem;
+  background:var(--bg-surface-alt);
+  border-bottom:1px solid var(--border-default)
+}
+.partner-iframe-dots{display:flex;gap:.35rem;flex-shrink:0}
+.partner-iframe-dots span{
+  width:12px;height:12px;border-radius:50%;display:block
+}
+.partner-iframe-dots span:nth-child(1){background:#ff5f57}
+.partner-iframe-dots span:nth-child(2){background:#ffbd2e}
+.partner-iframe-dots span:nth-child(3){background:#28c840}
+.partner-iframe-url{
+  flex:1;padding:.3rem .75rem;
+  background:var(--bg-base);
+  border-radius:6px;
+  font-family:var(--font-mono);font-size:var(--fs-xs);
+  color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.partner-iframe-ext{
+  color:var(--brand-secondary);opacity:.8;
+  transition:opacity var(--dur-fast) ease;flex-shrink:0
+}
+.partner-iframe-ext:hover{opacity:1}
+
+.partner-iframe-body{position:relative;height:580px}
+.partner-iframe-body iframe{
+  width:100%;height:100%;border:none;display:block;
+  background:var(--bg-surface)
+}
+.partner-iframe-notice{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:var(--sp-3) var(--sp-4);
+  background:rgba(var(--bg-surface-alt-rgb,248,249,252),.92);
+  border-top:1px solid var(--border-default);
+  backdrop-filter:blur(4px)
+}
+.partner-iframe-notice p{
+  display:flex;align-items:center;gap:.5rem;
+  margin:0;font-size:var(--fs-xs);color:var(--text-muted)
+}
+
+/* ---- product lineup grid ---- */
+.partner-lineup{margin-bottom:var(--sp-10)}
+.partner-lineup__title{
+  font-size:var(--fs-sm);font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-muted);
+  margin-bottom:var(--sp-6);padding-bottom:var(--sp-3);
+  border-bottom:1px solid var(--border-default)
+}
+.partner-lineup__grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4)
+}
+.partner-product{
+  padding:var(--sp-5);
+  background:var(--bg-surface);
+  border:1px solid var(--border-default);
+  border-radius:8px;
+  transition:border-color var(--dur-fast) ease,box-shadow var(--dur-fast) ease
+}
+.partner-product:hover{
+  border-color:var(--brand-secondary);
+  box-shadow:0 4px 20px rgba(0,198,167,.08)
+}
+.partner-product__name{
+  font-family:var(--font-mono);font-size:var(--fs-sm);font-weight:600;
+  color:var(--brand-secondary);margin-bottom:var(--sp-2)
+}
+.partner-product__feat{
+  font-size:var(--fs-sm);color:var(--text-muted);
+  line-height:1.65;margin:0
+}
+
+/* ---- inquiry strip ---- */
+.partner-inquiry{
+  display:flex;align-items:center;gap:var(--sp-6);
+  padding:var(--sp-6) var(--sp-8);
+  background:var(--bg-surface);
+  border:1px solid var(--border-default);
+  border-radius:10px;flex-wrap:wrap
+}
+.partner-inquiry__label{
+  flex:1;margin:0;font-size:var(--fs-base);font-weight:500;color:var(--text-default)
+}
+
+@media(max-width:960px){
+  .partner-header{flex-direction:column;gap:var(--sp-4)}
+  .partner-lineup__grid{grid-template-columns:repeat(2,1fr)}
+  .partner-iframe-body{height:420px}
+}
+@media(max-width:640px){
+  .partner-lineup__grid{grid-template-columns:1fr}
+  .partner-inquiry{flex-direction:column;align-items:flex-start}
+  .partner-iframe-body{height:320px}
+}
