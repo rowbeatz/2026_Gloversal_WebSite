@@ -855,3 +855,171 @@
   text-transform:uppercase;letter-spacing:.3em;color:var(--brand-primary);
   background:rgba(255,255,255,.92);padding:.4rem .7rem;
 }
+
+/* ---- Detail page ---- */
+.detail-hero{
+  position:relative;padding:calc(var(--nav-height) + var(--sp-16)) 0 var(--sp-12);
+  background:var(--brand-primary);color:#fff;overflow:hidden;
+}
+.detail-hero__mesh{
+  position:absolute;inset:0;opacity:.18;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%,var(--brand-secondary),transparent),
+    radial-gradient(ellipse 50% 60% at 80% 60%,var(--brand-accent),transparent);
+  animation:mesh-drift 12s ease-in-out infinite alternate;
+}
+@keyframes mesh-drift{
+  0%{transform:scale(1) translate(0,0)}
+  100%{transform:scale(1.15) translate(-3%,4%)}
+}
+.detail-back{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-family:var(--font-mono);font-size:var(--fs-2xs);
+  text-transform:uppercase;letter-spacing:.2em;
+  color:rgba(255,255,255,.7);text-decoration:none;
+  margin-bottom:var(--sp-6);transition:color var(--dur-base) var(--ease-studio);
+}
+.detail-back:hover{color:#fff}
+.detail-tag{
+  display:inline-block;margin-bottom:var(--sp-4);
+  color:var(--brand-secondary);border-color:var(--brand-secondary);
+}
+.detail-title{
+  font-family:var(--font-editorial-jp);font-weight:700;
+  font-size:clamp(1.75rem,4vw,3rem);line-height:1.25;
+  margin-bottom:var(--sp-4);
+}
+.detail-meta{
+  display:flex;gap:var(--sp-6);align-items:center;
+  margin-bottom:var(--sp-4);
+}
+.detail-date{
+  font-family:var(--font-mono);font-size:var(--fs-2xs);
+  text-transform:uppercase;letter-spacing:.26em;
+  color:rgba(255,255,255,.6);
+}
+.detail-lead{
+  font-size:var(--fs-lg);line-height:1.7;
+  color:rgba(255,255,255,.85);max-width:680px;
+}
+.detail-body{
+  max-width:740px;margin-inline:auto;
+  padding:var(--sp-12) 0 var(--sp-16);
+  font-size:var(--fs-base);line-height:1.85;color:var(--text-secondary);
+}
+.detail-body h2{
+  font-family:var(--font-editorial-jp);font-weight:700;
+  font-size:var(--fs-2xl);color:var(--text-primary);
+  margin:var(--sp-10) 0 var(--sp-4);padding-bottom:var(--sp-2);
+  border-bottom:2px solid var(--brand-secondary);
+}
+.detail-body h3{
+  font-family:var(--font-jp);font-weight:700;
+  font-size:var(--fs-lg);color:var(--text-primary);
+  margin:var(--sp-8) 0 var(--sp-3);
+}
+.detail-body p{margin-bottom:var(--sp-4)}
+.detail-body ul,.detail-body ol{margin:var(--sp-4) 0;padding-left:1.6em}
+.detail-body li{margin-bottom:var(--sp-2)}
+.detail-body blockquote{
+  margin:var(--sp-6) 0;padding:var(--sp-4) var(--sp-6);
+  border-left:3px solid var(--brand-secondary);
+  background:var(--bg-surface-alt);color:var(--text-muted);
+  font-style:italic;
+}
+.detail-body strong{color:var(--text-primary);font-weight:600}
+.detail-body a{color:var(--brand-primary);text-decoration:underline}
+.detail-body hr{
+  border:none;border-top:1px solid var(--border-default);
+  margin:var(--sp-8) 0;
+}
+
+/* Detail prev/next navigation */
+.detail-nav{
+  border-top:1px solid var(--border-default);
+  padding:var(--sp-8) 0;
+}
+.detail-nav__inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-6);
+}
+.detail-nav__prev,.detail-nav__next{
+  display:flex;flex-direction:column;gap:.3rem;
+  text-decoration:none;padding:var(--sp-4);
+  border:1px solid var(--border-default);
+  transition:border-color var(--dur-base) var(--ease-studio),
+             background var(--dur-base) var(--ease-studio);
+}
+.detail-nav__prev:hover,.detail-nav__next:hover{
+  border-color:var(--brand-secondary);background:var(--bg-surface-alt);
+}
+.detail-nav__prev small,.detail-nav__next small{
+  font-family:var(--font-mono);font-size:var(--fs-2xs);
+  text-transform:uppercase;letter-spacing:.2em;color:var(--text-muted);
+}
+.detail-nav__prev span,.detail-nav__next span{
+  font-family:var(--font-jp);font-size:var(--fs-sm);
+  color:var(--text-primary);font-weight:500;line-height:1.4;
+}
+.detail-nav__next{text-align:right;align-items:flex-end}
+
+/* ---- Toast notifications ---- */
+.toast-container{
+  position:fixed;top:calc(var(--nav-height) + 1rem);right:1.5rem;
+  display:flex;flex-direction:column;gap:.6rem;z-index:9999;
+  pointer-events:none;
+}
+.toast{
+  padding:.9rem 1.4rem;
+  font-family:var(--font-jp);font-size:var(--fs-sm);
+  color:#fff;border-radius:8px;
+  transform:translateX(120%);opacity:0;
+  transition:transform .4s var(--ease-studio),opacity .4s var(--ease-studio);
+  pointer-events:auto;max-width:360px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15);
+}
+.toast.is-visible{transform:translateX(0);opacity:1}
+.toast--success{background:var(--brand-primary)}
+.toast--error{background:#c0392b}
+.toast--info{background:var(--brand-secondary);color:var(--brand-primary)}
+
+/* ---- Scroll progress bar ---- */
+.scroll-progress{
+  position:fixed;top:0;left:0;right:0;height:3px;
+  background:var(--brand-secondary);
+  transform-origin:left;transform:scaleX(0);
+  z-index:10001;transition:none;
+}
+
+/* ---- Animated gradient mesh backgrounds ---- */
+.page-hero__grid-bg{
+  position:absolute;inset:0;opacity:.06;
+  background:
+    radial-gradient(circle 400px at 15% 50%,var(--brand-secondary),transparent),
+    radial-gradient(circle 300px at 85% 30%,var(--brand-accent),transparent);
+  animation:mesh-drift 16s ease-in-out infinite alternate;
+}
+
+/* ---- Clickable card overlays ---- */
+.insight-card{position:relative}
+.insight-card__link{
+  position:absolute;inset:0;z-index:1;
+  text-decoration:none;color:inherit;
+}
+.activity-item{position:relative}
+.activity-item__link{
+  position:absolute;inset:0;z-index:1;
+  text-decoration:none;color:inherit;
+}
+.case-card{position:relative;cursor:pointer}
+.case-card__link{
+  position:absolute;inset:0;z-index:1;
+  text-decoration:none;color:inherit;
+}
+
+/* Enhanced hover for clickable cards */
+.insight-card{transition:transform var(--dur-base) var(--ease-studio),box-shadow var(--dur-base) var(--ease-studio)}
+.insight-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(10,22,94,.08)}
+.case-card{transition:transform var(--dur-base) var(--ease-studio),box-shadow var(--dur-base) var(--ease-studio)}
+.case-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(10,22,94,.08)}
+.activity-item{cursor:pointer}
+.activity-item:hover{background:var(--bg-surface-alt)}

@@ -30,6 +30,9 @@
   .stance{grid-template-columns:1fr;padding:var(--sp-10) var(--sp-8)}
   .activity-item{grid-template-columns:1fr;gap:var(--sp-3)}
   .activity-item__tag{justify-self:start}
+  .detail-nav__inner{grid-template-columns:1fr;gap:var(--sp-4)}
+  .detail-nav__next{text-align:left;align-items:flex-start}
+  .detail-body{padding:var(--sp-8) 0 var(--sp-12)}
 }
 @media (max-width:720px){
   :root{--nav-height:64px}

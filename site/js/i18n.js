@@ -339,6 +339,13 @@ window.__GLV_I18N__ = {
       mode4: "その他",
       submit: "送信する",
       formNotice: "お問い合わせフォーム送信時は、秘密性の高い情報、患者情報、機微情報、法令上特別の配慮を要する情報を、事前合意なく送信しないでください。必要に応じて、別途秘密保持契約その他の適切な手続をご案内します。"
+    },
+    detail: {
+      prev: "&larr; 前の記事",
+      next: "次の記事 &rarr;",
+      backInsights: "&larr; Insights 一覧へ",
+      backSpeaking: "&larr; Activities 一覧へ",
+      backCases: "&larr; Case Studies 一覧へ"
     }
   },
 
@@ -679,6 +686,13 @@ window.__GLV_I18N__ = {
       mode4: "Other",
       submit: "Send message",
       formNotice: "Please do not send confidential information, patient data, sensitive personal information, or data requiring special legal treatment through this form without prior agreement. Where confidentiality is required, we will arrange a suitable process separately."
+    },
+    detail: {
+      prev: "&larr; Previous",
+      next: "Next &rarr;",
+      backInsights: "&larr; Back to Insights",
+      backSpeaking: "&larr; Back to Activities",
+      backCases: "&larr; Back to Case Studies"
     }
   }
 };

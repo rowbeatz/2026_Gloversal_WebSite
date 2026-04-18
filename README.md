@@ -89,14 +89,22 @@ Gloversal_New_Web_2026/
 │   ├── 05_legal_notice_company_info_ja.md
 │   └── 06_recruitment_privacy_notice_ja.md
 │
+├── functions/                   ← Cloudflare Pages Functions（自動検出）
+│   └── api/
+│       ├── contact.js           # POST /api/contact — Resend API 経由メール送信
+│       └── notion.js            # GET /api/notion — Notion DB プロキシ（CMS）
+│
 └── site/                        ← デプロイ対象（Cloudflare Pages の Build output）
     ├── index.html               # Home（491行）
     ├── about.html               # About / Profile
     ├── services.html            # Services（6サービス詳細）
     ├── case-studies.html        # Case Studies（3ケース）
+    ├── case-detail.html         # Case Study 詳細ページ（動的レンダリング）
     ├── insights.html            # Insights / Articles（6記事）
+    ├── insight-detail.html      # Insight 詳細ページ（動的レンダリング）
     ├── speaking.html            # Speaking / Activities（6活動）
-    ├── contact.html             # Contact（フォーム付き）
+    ├── speaking-detail.html     # Activity 詳細ページ（動的レンダリング）
+    ├── contact.html             # Contact（実働フォーム付き）
     │
     ├── legal/
     │   ├── privacy.html         # プライバシーポリシー
@@ -109,12 +117,14 @@ Gloversal_New_Web_2026/
     ├── css/
     │   ├── tokens.css           # デザイントークン（カラー、タイプ、スペーシング、ダークモード）
     │   ├── base.css             # リセット、タイポグラフィ階層、レイアウトヘルパー、reveal
-    │   ├── main.css             # 全コンポーネントスタイル（857行）
+    │   ├── main.css             # 全コンポーネントスタイル
     │   └── responsive.css       # 4ブレークポイント（1200/960/720/480px）
     │
     ├── js/
-    │   ├── i18n.js              # JA/EN 辞書（277キー）— window.__GLV_I18N__
-    │   └── main.js              # Nav, Reveal, Cursor, Theme, I18n, Marquee, SmoothAnchors, ContactForm
+    │   ├── i18n.js              # JA/EN 辞書（290+キー）— window.__GLV_I18N__
+    │   ├── main.js              # Nav, Reveal, Cursor, Theme, I18n, Marquee, SmoothAnchors, ContactForm
+    │   ├── content-data.js      # 記事・活動・ケースの埋め込みデータ — window.__GLV_CONTENT__
+    │   └── content.js           # 詳細ページレンダラー、Toast、ScrollProgress、CountUp
     │
     └── assets/
         ├── images/
@@ -132,17 +142,20 @@ Gloversal_New_Web_2026/
 
 ## ページ一覧
 
-### メインページ（7ページ）
+### メインページ（10ページ）
 
 | ページ | ファイル | 内容 |
 |--------|---------|------|
 | Home | `index.html` | ヒーロー（動画+統計）、マーキー、What I Do、Why Me、サービス8タイル、テーマ、ケーススタディ抜粋、アバウト抜粋、CTAバンド |
 | About | `about.html` | ポートレート、提供価値、専門領域、対象クライアント、スタンス、ロール一覧 |
 | Services | `services.html` | 6サービスブロック（詳細+対象+アウトプット） |
-| Case Studies | `case-studies.html` | 3ケースカード（課題→実施→成果） |
-| Insights | `insights.html` | 6記事カード |
-| Activities | `speaking.html` | 6活動アイテム（講演・メディア・委員会等） |
-| Contact | `contact.html` | お問い合わせフォーム（テーマ・形態選択、プライバシー通知） |
+| Case Studies | `case-studies.html` | 3ケースカード（課題→実施→成果）→ 詳細クリック可 |
+| Case Detail | `case-detail.html` | ケーススタディ詳細（`?slug=xxx` で動的レンダリング） |
+| Insights | `insights.html` | 6記事カード → 詳細クリック可 |
+| Insight Detail | `insight-detail.html` | インサイト記事詳細（`?slug=xxx` で動的レンダリング） |
+| Activities | `speaking.html` | 6活動アイテム（講演・メディア・委員会等）→ 詳細クリック可 |
+| Activity Detail | `speaking-detail.html` | 活動詳細（`?slug=xxx` で動的レンダリング） |
+| Contact | `contact.html` | 実働お問い合わせフォーム（Resend API 経由メール送信） |
 
 ### 法的ページ（6ページ）
 
@@ -170,7 +183,39 @@ Gloversal_New_Web_2026/
 | `I18n` | ブラウザロケール自動検出、`data-i18n` テキストバインディング、`data-i18n-attr` 属性バインディング、localStorage 永続化 (`glv-lang`) |
 | `Marquee` | innerHTML 複製によるシームレスループ |
 | `SmoothAnchors` | `#` リンクのスムーススクロール（nav高さオフセット考慮） |
-| `ContactForm` | フォームの `submit` ハンドリング（現在はプレースホルダー `alert`） |
+| `ContactForm` | フォーム送信 → `POST /api/contact` → Toast 通知 |
+
+### `content.js` モジュール（詳細ページ用）
+
+| モジュール | 機能 |
+|-----------|------|
+| `Toast` | 通知トースト（success / error / info） |
+| `ScrollProgress` | ページスクロール進捗バー |
+| `CountUp` | 数値カウントアップアニメーション |
+| `ContentRenderer` | `?slug=` パラメータで `__GLV_CONTENT__` からコンテンツ描画 |
+
+---
+
+## Cloudflare Pages Functions（サーバーレスAPI）
+
+### POST `/api/contact`
+お問い合わせフォームの送信を処理し、Resend API 経由で通知メールを送信する。
+
+### GET `/api/notion`
+Notion データベースをプロキシし、Insights / Speaking / Cases のコンテンツを取得する。  
+クエリパラメータ: `type=insights|speaking|cases`, `slug=xxx`（任意）。  
+`NOTION_API_KEY` 未設定時は `{ ok: false, fallback: true }` を返し、クライアント側で埋め込みデータにフォールバックする。
+
+### 環境変数（Cloudflare Pages Settings → Environment variables）
+
+| 変数名 | 用途 | 必須 |
+|--------|------|------|
+| `RESEND_API_KEY` | Resend メール送信 API キー | Contact フォーム実働時 |
+| `CONTACT_TO_EMAIL` | 通知先メール（デフォルト: info@gloversal.com） | いいえ |
+| `NOTION_API_KEY` | Notion Integration トークン | CMS 連携時 |
+| `NOTION_DB_INSIGHTS` | Insights データベース ID | CMS 連携時 |
+| `NOTION_DB_SPEAKING` | Speaking データベース ID | CMS 連携時 |
+| `NOTION_DB_CASES` | Cases データベース ID | CMS 連携時 |
 
 ---
 
@@ -178,7 +223,7 @@ Gloversal_New_Web_2026/
 
 - **方式**: `data-i18n` 属性 + JavaScript 辞書
 - **辞書**: `js/i18n.js` に `window.__GLV_I18N__` として JA/EN 両方を定義
-- **キー数**: 277
+- **キー数**: 290+
 - **自動検出**: `navigator.language` から JA/EN を判定
 - **手動切替**: ナビゲーションバーの JA/EN トグルボタン
 - **永続化**: `localStorage` (`glv-lang`)
@@ -213,10 +258,18 @@ Gloversal_New_Web_2026/
 | **Root directory** | `/` _(デフォルト)_ |
 | **Build comments** | `Enabled` |
 
-> **重要**: このサイトはビルドステップ不要の静的サイトです。Build command は空欄のまま。`site` ディレクトリが直接デプロイされます。
+> **重要**: このサイトはビルドステップ不要の静的サイトです。Build command は空欄のまま。`site` ディレクトリが直接デプロイされます。`functions/` ディレクトリ内のファイルは Cloudflare Pages Functions として自動検出・デプロイされます。
 
-### 環境変数
-不要。
+### 環境変数（Cloudflare Pages Settings → Environment variables）
+
+| 変数名 | 用途 | 必須 |
+|--------|------|------|
+| `RESEND_API_KEY` | Resend メール送信 API キー | Contact フォーム実働時 |
+| `CONTACT_TO_EMAIL` | 通知先メール（デフォルト: info@gloversal.com） | いいえ |
+| `NOTION_API_KEY` | Notion Integration トークン | CMS 連携時 |
+| `NOTION_DB_INSIGHTS` | Insights データベース ID | CMS 連携時 |
+| `NOTION_DB_SPEAKING` | Speaking データベース ID | CMS 連携時 |
+| `NOTION_DB_CASES` | Cases データベース ID | CMS 連携時 |
 
 ### カスタムドメイン設定
 1. Cloudflare Pages プロジェクト → **Custom domains** → **Set up a custom domain**

@@ -202,18 +202,37 @@
     }
   }))();
 
-  /* ---------- Contact form (no-op validation) ---------- */
+  /* ---------- Contact form — POST /api/contact ---------- */
   const ContactForm = (() => ({
     init() {
       const form = document.querySelector('.form');
       if (!form) return;
-      form.addEventListener('submit', e => {
+      form.addEventListener('submit', async e => {
         e.preventDefault();
+        const btn = form.querySelector('.form__submit');
         const lang = document.documentElement.getAttribute('lang') || 'ja';
-        const msg = lang === 'ja'
-          ? 'お問い合わせを受け付けました。実運用では送信先と連携します。'
-          : 'Your message has been received. Production will wire this to the live endpoint.';
-        alert(msg);
+        btn.disabled = true;
+        btn.textContent = lang === 'ja' ? '送信中…' : 'Sending…';
+        try {
+          const data = Object.fromEntries(new FormData(form).entries());
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const json = await res.json();
+          if (json.ok) {
+            window.Toast?.show(lang === 'ja' ? 'お問い合わせを送信しました。' : 'Message sent successfully.', 'success');
+            form.reset();
+          } else {
+            window.Toast?.show(json.error || (lang === 'ja' ? '送信に失敗しました。' : 'Failed to send.'), 'error');
+          }
+        } catch {
+          window.Toast?.show(lang === 'ja' ? '通信エラーが発生しました。' : 'Network error occurred.', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = lang === 'ja' ? '送信する' : 'Send';
+        }
       });
     }
   }))();
