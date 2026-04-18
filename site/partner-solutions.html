@@ -33,7 +33,7 @@
         <li><a href="case-studies.html" class="nav__link" data-i18n="nav.cases">Case Studies</a></li>
         <li><a href="insights.html" class="nav__link" data-i18n="nav.insights">Insights</a></li>
         <li><a href="speaking.html" class="nav__link" data-i18n="nav.speaking">Activities</a></li>
-        <li><a href="partner-solutions.html" class="nav__link nav__link--active" data-i18n="nav.partners">パートナー</a></li>
+        <li><a href="partner-solutions.html" class="nav__link nav__link--active" data-i18n="nav.partners">Partners</a></li>
         <li><a href="contact.html" class="nav__link" data-i18n="nav.contact">Contact</a></li>
       </ul>
     </nav>
@@ -55,7 +55,7 @@
   <a href="case-studies.html" data-i18n="nav.cases">Case Studies</a>
   <a href="insights.html" data-i18n="nav.insights">Insights</a>
   <a href="speaking.html" data-i18n="nav.speaking">Activities</a>
-  <a href="partner-solutions.html" data-i18n="nav.partners">パートナー</a>
+  <a href="partner-solutions.html" data-i18n="nav.partners">Partners</a>
   <a href="contact.html" data-i18n="nav.contact">Contact</a>
   <div class="nav-overlay__footer"><span>Gloversal&trade; 2026</span><span>info@gloversal.com</span></div>
 </div>
@@ -105,9 +105,8 @@
         <h2 class="t-headline partner-title" data-i18n="partnerPage.p1Title">HealthHub Co., Ltd.</h2>
       </div>
       <a href="https://healthhub.kr" target="_blank" rel="noopener noreferrer" class="btn btn--ghost partner-site-btn">
-        <data-i18n="partnerPage.iframeOpenLabel">新しいタブで開く</data-i18n>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-left:.4rem"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         <span data-i18n="partnerPage.iframeOpenLabel">新しいタブで開く</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-left:.4rem"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
     </div>
 
@@ -318,7 +317,7 @@
           <li><a href="case-studies.html" data-i18n="nav.cases">Case Studies</a></li>
           <li><a href="insights.html" data-i18n="nav.insights">Insights</a></li>
           <li><a href="speaking.html" data-i18n="nav.speaking">Activities</a></li>
-          <li><a href="partner-solutions.html" data-i18n="nav.partners">パートナー</a></li>
+          <li><a href="partner-solutions.html" data-i18n="nav.partners">Partners</a></li>
           <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
         </ul>
       </div>
@@ -355,5 +354,48 @@
 </footer>
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
+<script>
+/* Partner iframe load detection
+   X-Frame-Options cannot be caught in JS, but when a site blocks embedding
+   the iframe fires load with an empty document — height stays 0.
+   We reveal the fallback notice as a full-overlay card if that is detected. */
+(function () {
+  document.querySelectorAll('.partner-iframe-body').forEach(function (body) {
+    var iframe = body.querySelector('iframe');
+    var notice = body.querySelector('.partner-iframe-notice');
+    if (!iframe || !notice) return;
+
+    var timer = setTimeout(function () {
+      /* If we still cannot read the iframe's document after 4 s,
+         treat it as blocked and surface the fallback prominently */
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || doc.body === null || doc.body.innerHTML.trim() === '') {
+          showFallback();
+        }
+      } catch (e) {
+        /* Cross-origin read error — iframe content present but sandboxed: ok */
+      }
+    }, 4000);
+
+    iframe.addEventListener('load', function () {
+      clearTimeout(timer);
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || doc.title === '' || doc.body === null) {
+          showFallback();
+        }
+      } catch (e) {
+        /* Cross-origin but loaded — iframe is showing content, all good */
+      }
+    });
+
+    function showFallback() {
+      notice.classList.add('partner-iframe-notice--prominent');
+      iframe.style.opacity = '0.15';
+    }
+  });
+})();
+</script>
 </body>
 </html>

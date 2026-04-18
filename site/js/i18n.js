@@ -20,7 +20,7 @@ window.__GLV_I18N__ = {
       cases: "Case Studies",
       insights: "Insights",
       speaking: "Activities",
-      partners: "パートナー",
+      partners: "Partners",
       contact: "Contact",
       cta: "相談する"
     },
