@@ -1,12 +1,39 @@
 /**
  * Cloudflare Pages Function — POST /api/contact
- * Receives form data and sends notification email via Resend API.
+ * Receives form data, forwards a copy to Google Forms (Google Sheets backend)
+ * and sends a notification email via Resend.
  */
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+// Google Forms — HP_Gloversal.com_Inquiry
+const GFORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdmCHnwP4nviPY7uulga33_D9MPixLjBwKfveHMeiK_BE4Wew/formResponse';
+const GFORM_FIELDS = {
+  name:    'entry.1612910629',
+  company: 'entry.625800518',
+  email:   'entry.240604762',
+  topic:   'entry.404643856',
+  mode:    'entry.1151100041',
+  url:     'entry.300341744',
+  body:    'entry.2132782855',
+};
+const TOPIC_LABELS = {
+  newbiz:  '新規事業開発',
+  entry:   '海外展開・Market Entry',
+  dxai:    '医療DX / AI導入',
+  remote:  '遠隔医療 / 画像診断',
+  content: '資料設計・メッセージング',
+  other:   'その他',
+};
+const MODE_LABELS = {
+  talk:     'まずは相談したい',
+  project:  'プロジェクト伴走を検討したい',
+  alliance: '提携・アライアンスを相談したい',
+  other:    'その他',
 };
 
 function json(data, status = 200) {
@@ -18,6 +45,31 @@ function json(data, status = 200) {
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function forwardToGoogleForm(fields) {
+  const params = new URLSearchParams();
+  params.set(GFORM_FIELDS.name,    fields.name    || '');
+  params.set(GFORM_FIELDS.company, fields.company || '');
+  params.set(GFORM_FIELDS.email,   fields.email   || '');
+  params.set(GFORM_FIELDS.topic,   TOPIC_LABELS[fields.topic] || fields.topic || '');
+  params.set(GFORM_FIELDS.mode,    MODE_LABELS[fields.mode]   || fields.mode  || '');
+  params.set(GFORM_FIELDS.url,     fields.url     || '');
+  params.set(GFORM_FIELDS.body,    fields.body    || '');
+
+  try {
+    const res = await fetch(GFORM_ACTION, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+    });
+    // Google returns 200 on success. Any 4xx/5xx means something changed on their side.
+    if (!res.ok) {
+      console.error('[contact] Google Form responded', res.status);
+    }
+  } catch (err) {
+    console.error('[contact] Google Form forward failed:', err);
+  }
 }
 
 export async function onRequestOptions() {
@@ -42,7 +94,6 @@ export async function onRequestPost(context) {
 
     const { name, company, email, topic, mode, url, body } = data;
 
-    // Validate required fields
     const errors = [];
     if (!name || !name.trim()) errors.push('name');
     if (!email || !email.trim()) errors.push('email');
@@ -56,27 +107,38 @@ export async function onRequestPost(context) {
       return json({ ok: false, error: 'Invalid email address' }, 400);
     }
 
-    // Build email
+    const clean = {
+      name:    name.trim(),
+      company: company?.trim() || '',
+      email:   email.trim(),
+      topic:   topic || '',
+      mode:    mode  || '',
+      url:     url?.trim() || '',
+      body:    body.trim(),
+    };
+
+    // Forward to Google Forms in the background so the client response is not blocked.
+    context.waitUntil(forwardToGoogleForm(clean));
+
     const RESEND_API_KEY = env.RESEND_API_KEY;
     const TO_EMAIL = env.CONTACT_TO_EMAIL || 'info@gloversal.com';
 
     if (!RESEND_API_KEY) {
-      // In development / without API key, return success to indicate structure is correct
-      console.log('[contact] RESEND_API_KEY not set — logging form data');
-      console.log(JSON.stringify({ name, company, email, topic, mode, url, body: body.substring(0, 200) }));
+      console.log('[contact] RESEND_API_KEY not set — relying on Google Form forwarding only');
+      console.log(JSON.stringify({ ...clean, body: clean.body.substring(0, 200) }));
       return json({ ok: true, dev: true });
     }
 
     const emailBody = [
-      `Name: ${name.trim()}`,
-      company ? `Company: ${company.trim()}` : null,
-      `Email: ${email.trim()}`,
-      topic ? `Topic: ${topic}` : null,
-      mode ? `Mode: ${mode}` : null,
-      url ? `URL: ${url.trim()}` : null,
+      `Name: ${clean.name}`,
+      clean.company ? `Company: ${clean.company}` : null,
+      `Email: ${clean.email}`,
+      clean.topic ? `Topic: ${TOPIC_LABELS[clean.topic] || clean.topic}` : null,
+      clean.mode  ? `Mode: ${MODE_LABELS[clean.mode]   || clean.mode}`  : null,
+      clean.url   ? `URL: ${clean.url}` : null,
       '',
       '--- Message ---',
-      body.trim(),
+      clean.body,
     ].filter(Boolean).join('\n');
 
     const res = await fetch('https://api.resend.com/emails', {
@@ -88,8 +150,8 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         from: 'Gloversal Contact <noreply@gloversal.com>',
         to: [TO_EMAIL],
-        reply_to: email.trim(),
-        subject: `[Gloversal Contact] ${name.trim()} — ${topic || 'General inquiry'}`,
+        reply_to: clean.email,
+        subject: `[Gloversal Contact] ${clean.name} — ${TOPIC_LABELS[clean.topic] || clean.topic || 'General inquiry'}`,
         text: emailBody,
       }),
     });
@@ -97,6 +159,7 @@ export async function onRequestPost(context) {
     if (!res.ok) {
       const err = await res.text();
       console.error('[contact] Resend error:', err);
+      // Google Form already queued via waitUntil — still report failure to the user for email notification.
       return json({ ok: false, error: 'Failed to send email. Please try again later.' }, 502);
     }
 
