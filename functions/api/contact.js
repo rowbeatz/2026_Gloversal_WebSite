@@ -60,15 +60,19 @@ async function forwardToGoogleForm(fields) {
   try {
     const res = await fetch(GFORM_ACTION, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (compatible; GloversalContactProxy/1.0)',
+      },
       body: params.toString(),
     });
-    // Google returns 200 on success. Any 4xx/5xx means something changed on their side.
     if (!res.ok) {
       console.error('[contact] Google Form responded', res.status);
     }
+    return { ok: res.ok, status: res.status };
   } catch (err) {
     console.error('[contact] Google Form forward failed:', err);
+    return { ok: false, status: 0, error: String(err?.message || err) };
   }
 }
 
@@ -117,8 +121,9 @@ export async function onRequestPost(context) {
       body:    body.trim(),
     };
 
-    // Forward to Google Forms in the background so the client response is not blocked.
-    context.waitUntil(forwardToGoogleForm(clean));
+    // Await the Google Form forward so its result can be surfaced in the response
+    // (diagnostic-friendly; round-trip to docs.google.com is ~200–500ms).
+    const gformResult = await forwardToGoogleForm(clean);
 
     const RESEND_API_KEY = env.RESEND_API_KEY;
     const TO_EMAIL = env.CONTACT_TO_EMAIL || 'info@gloversal.com';
@@ -126,7 +131,7 @@ export async function onRequestPost(context) {
     if (!RESEND_API_KEY) {
       console.log('[contact] RESEND_API_KEY not set — relying on Google Form forwarding only');
       console.log(JSON.stringify({ ...clean, body: clean.body.substring(0, 200) }));
-      return json({ ok: true, dev: true });
+      return json({ ok: true, dev: true, gform: gformResult });
     }
 
     const emailBody = [
@@ -159,11 +164,10 @@ export async function onRequestPost(context) {
     if (!res.ok) {
       const err = await res.text();
       console.error('[contact] Resend error:', err);
-      // Google Form already queued via waitUntil — still report failure to the user for email notification.
-      return json({ ok: false, error: 'Failed to send email. Please try again later.' }, 502);
+      return json({ ok: false, error: 'Failed to send email. Please try again later.', gform: gformResult }, 502);
     }
 
-    return json({ ok: true });
+    return json({ ok: true, gform: gformResult });
   } catch (err) {
     console.error('[contact] Unexpected error:', err);
     return json({ ok: false, error: 'Internal server error' }, 500);
