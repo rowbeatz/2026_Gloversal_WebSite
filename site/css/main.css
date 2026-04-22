@@ -443,7 +443,8 @@
   width:100%;
   max-width:min(460px, 38vw);
 }
-.why-hero__figure img{
+.why-hero__figure img,
+.why-hero__figure video{
   display:block;width:100%;height:auto;
   aspect-ratio:1 / 1;object-fit:cover;
   border-radius:4px;
