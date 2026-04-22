@@ -410,7 +410,40 @@
 }
 .what-grid__text{font-size:var(--fs-lg);color:var(--text-primary);line-height:1.5}
 
-/* ---- Why Me — 3 column ---- */
+/* ---- Why Me — hero (heading + portrait) then 3-column grid ---- */
+.why-hero{
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:var(--sp-16);align-items:center;
+  margin-bottom:var(--sp-16);
+}
+.why-hero .s-head--in-hero{
+  margin-bottom:0;
+}
+.why-hero__figure{
+  margin:0;
+  justify-self:end;
+  width:100%;
+  max-width:min(460px, 38vw);
+}
+.why-hero__figure img{
+  display:block;width:100%;height:auto;
+  aspect-ratio:1 / 1;object-fit:cover;
+  border-radius:4px;
+  box-shadow:0 10px 30px var(--card-shadow);
+}
+@media (max-width: 900px){
+  .why-hero{
+    grid-template-columns:1fr;
+    gap:var(--sp-10);
+    margin-bottom:var(--sp-12);
+  }
+  .why-hero__figure{
+    justify-self:center;
+    max-width:min(320px, 70vw);
+    order:-1; /* image above text on narrow screens */
+  }
+}
+
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;
   border-top:1px solid var(--border-default)}
 .why-card{
