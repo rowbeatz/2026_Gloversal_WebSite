@@ -285,6 +285,24 @@
 .hero__visual img,.hero__visual video{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
 }
+
+/* ---- Hero slideshow (cycles through videos + stills) ---- */
+.hero-slideshow{
+  position:absolute;inset:0;z-index:2;
+}
+.hero-slideshow__slide{
+  position:absolute;inset:0;
+  opacity:0;
+  transition:opacity .6s var(--ease-out);
+  pointer-events:none;
+}
+.hero-slideshow__slide.is-active{
+  opacity:1;
+}
+.hero-slideshow__slide img,
+.hero-slideshow__slide video{
+  display:block;width:100%;height:100%;object-fit:cover;
+}
 .hero__visual-label{
   position:absolute;top:1rem;left:1rem;right:1rem;
   display:flex;justify-content:space-between;z-index:3;

@@ -320,6 +320,118 @@
     };
   })();
 
+  /* ---------- HERO SLIDESHOW (cycles videos + stills) ---------- */
+  const HeroSlideshow = (() => {
+    const IMAGE_DURATION_MS = 5000;
+
+    return {
+      init() {
+        const root = document.querySelector('.hero-slideshow');
+        if (!root) return;
+        const slides = Array.from(root.querySelectorAll('.hero-slideshow__slide'));
+        if (slides.length < 2) {
+          // Single slide — just play it if it's a video.
+          const v = slides[0] && slides[0].querySelector('video');
+          if (v) { v.loop = true; const p = v.play(); if (p && p.catch) p.catch(()=>{}); }
+          return;
+        }
+
+        let current = 0;
+        let advanceTimer = null;
+        let currentVideo = null;
+        let currentEndedHandler = null;
+        let alive = true;
+
+        const reduced = window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const cleanup = () => {
+          if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+          if (currentVideo && currentEndedHandler) {
+            currentVideo.removeEventListener('ended', currentEndedHandler);
+          }
+          if (currentVideo) {
+            try { currentVideo.pause(); } catch (_) {}
+          }
+          currentVideo = null;
+          currentEndedHandler = null;
+        };
+
+        const preloadNextVideo = idx => {
+          const n = slides[(idx + 1) % slides.length];
+          const v = n && n.querySelector('video');
+          if (v && v.readyState < 2) { try { v.load(); } catch (_) {} }
+        };
+
+        const playSlide = idx => {
+          cleanup();
+          slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+          const slide = slides[idx];
+          const type = slide.dataset.type;
+
+          if (type === 'video') {
+            const v = slide.querySelector('video');
+            if (!v) { scheduleAdvance(IMAGE_DURATION_MS); return; }
+            try { v.currentTime = 0; } catch (_) {}
+            v.muted = true;
+            v.playsInline = true;
+            v.loop = false;
+            const onEnded = () => { if (alive) advance(); };
+            currentVideo = v;
+            currentEndedHandler = onEnded;
+            v.addEventListener('ended', onEnded);
+            const p = v.play();
+            if (p && p.catch) {
+              // Autoplay blocked — fall back to image-style timed advance.
+              p.catch(() => scheduleAdvance(IMAGE_DURATION_MS));
+            }
+          } else {
+            const d = parseInt(slide.dataset.duration, 10) || IMAGE_DURATION_MS;
+            scheduleAdvance(d);
+          }
+
+          preloadNextVideo(idx);
+        };
+
+        const scheduleAdvance = ms => {
+          if (advanceTimer) clearTimeout(advanceTimer);
+          advanceTimer = setTimeout(advance, ms);
+        };
+
+        const advance = () => {
+          if (!alive) return;
+          current = (current + 1) % slides.length;
+          playSlide(current);
+        };
+
+        if (reduced) {
+          // Respect reduced-motion: show the first slide only, paused.
+          slides[0].classList.add('is-active');
+          return;
+        }
+
+        playSlide(0);
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+            if (currentVideo) { try { currentVideo.pause(); } catch (_) {} }
+          } else {
+            const slide = slides[current];
+            if (!slide) return;
+            if (slide.dataset.type === 'video') {
+              const v = slide.querySelector('video');
+              if (v) { const p = v.play(); if (p && p.catch) p.catch(()=>{}); }
+            } else {
+              const d = parseInt(slide.dataset.duration, 10) || IMAGE_DURATION_MS;
+              scheduleAdvance(d);
+            }
+          }
+        });
+      }
+    };
+  })();
+
   /* ---------- EMAIL OBFUSCATION (bot-resistant) ----------
      Markup stores user + domain in data-* attributes, with a
      human-readable "[at]/[dot]" fallback in the text. This module
@@ -408,6 +520,7 @@
     Cursor.init();
     Theme.init();
     DecryptBanner.init();
+    HeroSlideshow.init();
     EmailObfuscator.init();
     SmoothAnchors.init();
     ContactForm.init();
