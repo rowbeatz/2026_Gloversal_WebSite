@@ -229,14 +229,19 @@
         timerIds.clear();
       };
 
-      const scrambleTimer = setInterval(() => {
-        if (!state.running) return;
-        for (let i = 0; i < n; i++) {
-          if (!revealed[i]) scrambled[i] = scrambleChar(chars[i]);
-        }
-        render(target, chars, revealed, scrambled);
-      }, scrambleMs);
-      track(scrambleTimer);
+      // In "reduced motion" mode, the scrambled glyphs are chosen once at
+      // the start and then left alone — only the reveal progresses. No
+      // continuous flicker, but the Decrypted Text aesthetic is preserved.
+      if (!opts.staticScramble) {
+        const scrambleTimer = setInterval(() => {
+          if (!state.running) return;
+          for (let i = 0; i < n; i++) {
+            if (!revealed[i]) scrambled[i] = scrambleChar(chars[i]);
+          }
+          render(target, chars, revealed, scrambled);
+        }, scrambleMs);
+        track(scrambleTimer);
+      }
 
       const revealNext = () => {
         if (!state.running) { track(setTimeout(revealNext, 120)); return; }
@@ -274,21 +279,35 @@
         if (!target) return;
 
         const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reduced) {
-          let i = 0;
-          target.textContent = ITEMS[0];
-          setInterval(() => {
-            i = (i + 1) % ITEMS.length;
-            target.textContent = ITEMS[i];
-          }, 4200);
-          return;
-        }
-
         const state = { running: !document.hidden, alive: true };
         document.addEventListener('visibilitychange', () => {
           state.running = !document.hidden;
         });
-        loop(target, state);
+
+        // Both modes still show the "Decrypted Text" reveal. Reduced-motion
+        // users get a single static scramble (no flicker) with a slower
+        // reveal cadence — the effect is preserved, the rapid glyph churn
+        // is not.
+        const gentleLoop = async () => {
+          let i = 0;
+          while (state.alive) {
+            const text = ITEMS[i % ITEMS.length];
+            const n = Array.from(text).length;
+            await cycleOne(target, text, {
+              initialHoldMs: 260,
+              revealMs: Math.min(2200, Math.max(900, n * 80)),
+              holdMs: 2800,
+              staticScramble: true,
+            }, state);
+            i++;
+          }
+        };
+
+        if (reduced) {
+          gentleLoop();
+        } else {
+          loop(target, state);
+        }
       }
     };
   })();
