@@ -259,38 +259,77 @@
   mix-blend-mode:difference;color:#fff;
 }
 
-/* ---- Curved Loop (SVG textPath, rAF-driven — no sub-pixel jitter) ---- */
-.curved-loop{
-  overflow:hidden;border-block:1px solid var(--border-default);
+/* ---- Decrypted Text banner (HTML-based, char-by-char reveal) ---- */
+.decrypt-banner{
   background:var(--bg-surface);
-  padding:var(--sp-4) 0;
+  border-block:1px solid var(--border-default);
+  padding:var(--sp-6) var(--sp-5);
+  display:flex;align-items:center;justify-content:center;
+  min-height:clamp(88px, 9vw, 128px);
+  overflow:hidden;
   user-select:none;-webkit-user-select:none;
-  contain:layout paint;
 }
-.curved-loop__svg{
-  display:block;width:100%;height:auto;
-  aspect-ratio:1440 / 200;
-  overflow:visible;
-  transform:translateZ(0);
-  backface-visibility:hidden;
-  touch-action:pan-y;
-}
-.curved-loop__text{
-  font-family:var(--font-en);font-weight:700;
-  font-size:96px;letter-spacing:.005em;
-  fill:var(--text-primary);
-  dominant-baseline:middle;
-}
-.curved-loop__fallback{
-  font-family:var(--font-en);font-weight:600;
-  font-size:clamp(1.1rem,2.4vw,1.6rem);line-height:1.4;
+.decrypt-banner__rail{
+  display:inline-flex;align-items:baseline;gap:.7em;
+  max-width:min(94vw, 1200px);
+  font-family:var(--font-mono);
+  font-weight:600;
+  font-size:clamp(1rem, 2.1vw, 1.55rem);
+  line-height:1.4;
+  letter-spacing:.03em;
   color:var(--text-primary);
-  text-align:center;padding:var(--sp-2) var(--sp-6);
-  white-space:normal;
+  white-space:nowrap;
+}
+.decrypt-banner__prompt{
+  color:var(--brand-primary);
+  font-family:var(--font-mono);
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-size:.68em;
+  flex-shrink:0;
+  opacity:.78;
+}
+.decrypt-banner__text{
+  display:inline-block;
+  min-height:1.4em;
+  color:var(--text-primary);
+}
+.decrypt-banner__char{
+  display:inline-block;
+  transition:color .12s linear;
+  will-change:color;
+}
+.decrypt-banner__char--scrambled{
+  color:var(--brand-secondary);
+}
+.decrypt-banner__cursor{
+  color:var(--brand-secondary);
+  font-weight:700;
+  flex-shrink:0;
+  animation:decrypt-caret 1.05s steps(2, start) infinite;
+  font-size:.95em;
+}
+@keyframes decrypt-caret{
+  to { opacity:0; }
+}
+@media (max-width: 720px){
+  .decrypt-banner{
+    padding:var(--sp-5) var(--sp-4);
+    min-height:clamp(84px, 18vw, 120px);
+  }
+  .decrypt-banner__rail{
+    white-space:normal;
+    text-align:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    row-gap:.15em;
+    font-size:clamp(.92rem, 3.6vw, 1.2rem);
+  }
 }
 @media (prefers-reduced-motion: reduce){
-  .curved-loop__svg{display:none}
-  .curved-loop__fallback{display:block}
+  .decrypt-banner__cursor{animation:none;opacity:1}
+  .decrypt-banner__char--scrambled{color:var(--text-primary)}
 }
 
 /* ---- Section header ---- */

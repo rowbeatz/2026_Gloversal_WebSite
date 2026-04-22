@@ -173,184 +173,122 @@
     };
   })();
 
-  /* ---------- CURVED LOOP banner (SVG textPath, rAF-driven) ---------- */
-  const CurvedLoop = (() => {
-    const NS  = 'http://www.w3.org/2000/svg';
-    const XLK = 'http://www.w3.org/1999/xlink';
-    const VB_W = 1440;
-    const VB_H = 200;
-
-    // Brand copy for the banner. Each item renders as: TEXT  •  (colored bullet)
+  /* ---------- DECRYPT BANNER (React Bits "Decrypted Text" style) ---------- */
+  const DecryptBanner = (() => {
     const ITEMS = [
-      { text: 'Humanizing Healthcare',                         dot: 'primary', outline: false },
-      { text: '技術の進化を、人にやさしい医療の流れへ',             dot: 'teal',    outline: true  },
-      { text: 'Strategy → Execution',                          dot: 'terra',   outline: false },
-      { text: 'Bridging clinical reality and technology',      dot: 'primary', outline: true  },
+      'Humanizing Healthcare',
+      '技術の進化を、人にやさしい医療の流れへ',
+      'Strategy → Execution',
+      'Bridging clinical reality and technology',
     ];
-    const DOT_COLOR = { primary: 'var(--brand-primary)', teal: 'var(--brand-secondary)', terra: 'var(--brand-accent)' };
-
-    const buildUnitFragment = () => {
-      const frag = document.createDocumentFragment();
-      ITEMS.forEach(item => {
-        const t = document.createElementNS(NS, 'tspan');
-        t.setAttribute('xml:space', 'preserve');
-        t.textContent = item.text;
-        if (item.outline) {
-          t.setAttribute('fill', 'transparent');
-          t.setAttribute('stroke', 'var(--brand-primary)');
-          t.setAttribute('stroke-width', '1');
-          t.setAttribute('paint-order', 'stroke');
-        }
-        frag.appendChild(t);
-
-        const sp1 = document.createElementNS(NS, 'tspan');
-        sp1.setAttribute('xml:space', 'preserve');
-        sp1.textContent = '  ';
-        frag.appendChild(sp1);
-
-        const d = document.createElementNS(NS, 'tspan');
-        d.textContent = '●';
-        d.setAttribute('fill', DOT_COLOR[item.dot] || DOT_COLOR.primary);
-        d.setAttribute('stroke', 'none');
-        frag.appendChild(d);
-
-        const sp2 = document.createElementNS(NS, 'tspan');
-        sp2.setAttribute('xml:space', 'preserve');
-        sp2.textContent = '   ';
-        frag.appendChild(sp2);
-      });
-      return frag;
+    const LATIN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?<>/\\=+-';
+    const KANA  = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    // Detect CJK / full-width glyphs so we can scramble with an appropriate pool.
+    const isJP = c => /[　-〿぀-ゟ゠-ヿ㐀-䶿一-鿿＀-￯]/.test(c);
+    const pick = pool => pool.charAt((Math.random() * pool.length) | 0);
+    const scrambleChar = c => {
+      if (c === ' ' || c === ' ' || c === '　') return c;
+      return isJP(c) ? pick(KANA) : pick(LATIN);
     };
+    const escapeHTML = s => s.replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
 
-    const build = (container) => {
-      const curve    = parseFloat(container.dataset.curve)    || 50;
-      const pxPerSec = parseFloat(container.dataset.pxPerSec) || 70;
-      const baseY = Math.round((VB_H - curve) / 2 + 8);
-      const pathD = `M-120,${baseY} Q${VB_W / 2},${baseY + curve} ${VB_W + 120},${baseY}`;
-      const pathId = 'curvedLoopPath-' + Math.random().toString(36).slice(2, 8);
-
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('class', 'curved-loop__svg');
-      svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
-      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-      svg.setAttribute('role', 'presentation');
-      svg.setAttribute('focusable', 'false');
-      svg.setAttribute('aria-hidden', 'true');
-
-      const defs = document.createElementNS(NS, 'defs');
-      const path = document.createElementNS(NS, 'path');
-      path.setAttribute('id', pathId);
-      path.setAttribute('d', pathD);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', 'transparent');
-      defs.appendChild(path);
-      svg.appendChild(defs);
-
-      // Hidden probe — used purely for getComputedTextLength() on one "unit".
-      const probe = document.createElementNS(NS, 'text');
-      probe.setAttribute('class', 'curved-loop__text');
-      probe.setAttribute('x', '0');
-      probe.setAttribute('y', '-9999');
-      probe.setAttribute('visibility', 'hidden');
-      probe.setAttribute('aria-hidden', 'true');
-      probe.setAttribute('xml:space', 'preserve');
-      probe.appendChild(buildUnitFragment());
-      svg.appendChild(probe);
-
-      // Visible curved text
-      const txt = document.createElementNS(NS, 'text');
-      txt.setAttribute('class', 'curved-loop__text');
-      txt.setAttribute('xml:space', 'preserve');
-
-      const tp = document.createElementNS(NS, 'textPath');
-      tp.setAttributeNS(XLK, 'xlink:href', '#' + pathId);
-      tp.setAttribute('href', '#' + pathId);
-      tp.setAttribute('startOffset', '0');
-      txt.appendChild(tp);
-      svg.appendChild(txt);
-
-      container.innerHTML = '';
-      container.appendChild(svg);
-
-      const state = { unitLen: 0, pxPerSec, tp, container };
-
-      const populate = () => {
-        while (tp.firstChild) tp.removeChild(tp.firstChild);
-        if (!state.unitLen) { tp.appendChild(buildUnitFragment()); return; }
-        const copies = Math.max(3, Math.ceil((VB_W + 400) * 2 / state.unitLen) + 1);
-        for (let i = 0; i < copies; i++) tp.appendChild(buildUnitFragment());
-      };
-
-      const measure = () => {
-        try {
-          const len = probe.getComputedTextLength ? probe.getComputedTextLength() : 0;
-          if (len && Math.abs(len - state.unitLen) > 0.5) {
-            state.unitLen = len;
-            populate();
-          } else if (!state.unitLen && len) {
-            state.unitLen = len;
-            populate();
-          }
-        } catch (_) { /* ignore */ }
-      };
-
-      measure();
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(measure).catch(() => {});
-      }
-      return { state, measure };
-    };
-
-    const drive = (instances) => {
-      if (!instances.length) return;
-      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced) return;
-
-      let last = performance.now();
-      let running = !document.hidden;
-      const offsets = instances.map(() => 0);
-
-      const tick = (now) => {
-        // Clamp dt so tab-blur doesn't produce a giant catch-up hop.
-        const dtMs = Math.min(64, now - last);
-        last = now;
-        if (running) {
-          const dtSec = dtMs / 1000;
-          for (let i = 0; i < instances.length; i++) {
-            const s = instances[i].state;
-            if (!s.unitLen) continue;
-            offsets[i] -= s.pxPerSec * dtSec;
-            if (offsets[i] <= -s.unitLen) offsets[i] += s.unitLen;
-            s.tp.setAttribute('startOffset', offsets[i].toFixed(2));
-          }
+    const render = (target, chars, revealed, scrambled) => {
+      let html = '';
+      for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
+        if (ch === ' ' || ch === ' ' || ch === '　') {
+          html += ch;
+          continue;
         }
-        requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          running = false;
+        if (revealed[i]) {
+          html += '<span class="decrypt-banner__char">' + escapeHTML(ch) + '</span>';
         } else {
-          last = performance.now();
-          running = true;
+          html += '<span class="decrypt-banner__char decrypt-banner__char--scrambled">'
+                + escapeHTML(scrambled[i]) + '</span>';
         }
-      });
+      }
+      target.innerHTML = html;
+    };
 
-      let rt;
-      window.addEventListener('resize', () => {
-        clearTimeout(rt);
-        rt = setTimeout(() => instances.forEach(x => x.measure()), 150);
-      }, { passive: true });
+    const cycleOne = (target, text, opts, state) => new Promise(resolve => {
+      const chars = Array.from(text);
+      const n = chars.length;
+      const revealed = new Array(n).fill(false);
+      const scrambled = chars.map(scrambleChar);
+      render(target, chars, revealed, scrambled);
+
+      const scrambleMs = opts.scrambleMs || 55;
+      const perChar = Math.max(32, (opts.revealMs || 1400) / Math.max(1, n));
+      let revealIdx = 0;
+      const timerIds = new Set();
+      const track = id => { timerIds.add(id); return id; };
+      const clearAll = () => {
+        timerIds.forEach(id => { clearTimeout(id); clearInterval(id); });
+        timerIds.clear();
+      };
+
+      const scrambleTimer = setInterval(() => {
+        if (!state.running) return;
+        for (let i = 0; i < n; i++) {
+          if (!revealed[i]) scrambled[i] = scrambleChar(chars[i]);
+        }
+        render(target, chars, revealed, scrambled);
+      }, scrambleMs);
+      track(scrambleTimer);
+
+      const revealNext = () => {
+        if (!state.running) { track(setTimeout(revealNext, 120)); return; }
+        if (revealIdx >= n) {
+          for (let i = 0; i < n; i++) revealed[i] = true;
+          render(target, chars, revealed, scrambled);
+          track(setTimeout(() => { clearAll(); resolve(); }, opts.holdMs || 2200));
+          return;
+        }
+        revealed[revealIdx++] = true;
+        render(target, chars, revealed, scrambled);
+        track(setTimeout(revealNext, perChar));
+      };
+      track(setTimeout(revealNext, opts.initialHoldMs || 420));
+    });
+
+    const loop = async (target, state) => {
+      let i = 0;
+      while (state.alive) {
+        const text = ITEMS[i % ITEMS.length];
+        const n = Array.from(text).length;
+        await cycleOne(target, text, {
+          initialHoldMs: 420,
+          revealMs: Math.min(1500, Math.max(700, n * 55)),
+          holdMs: 2200,
+          scrambleMs: 55,
+        }, state);
+        i++;
+      }
     };
 
     return {
       init() {
-        const containers = document.querySelectorAll('.curved-loop');
-        if (!containers.length) return;
-        const instances = [];
-        containers.forEach(c => instances.push(build(c)));
-        drive(instances);
+        const target = document.querySelector('.decrypt-banner__text');
+        if (!target) return;
+
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) {
+          let i = 0;
+          target.textContent = ITEMS[0];
+          setInterval(() => {
+            i = (i + 1) % ITEMS.length;
+            target.textContent = ITEMS[i];
+          }, 4200);
+          return;
+        }
+
+        const state = { running: !document.hidden, alive: true };
+        document.addEventListener('visibilitychange', () => {
+          state.running = !document.hidden;
+        });
+        loop(target, state);
       }
     };
   })();
@@ -416,7 +354,7 @@
     Reveal.init();
     Cursor.init();
     Theme.init();
-    CurvedLoop.init();
+    DecryptBanner.init();
     SmoothAnchors.init();
     ContactForm.init();
     if (window.__GLV_I18N__) I18n.init(window.__GLV_I18N__);
