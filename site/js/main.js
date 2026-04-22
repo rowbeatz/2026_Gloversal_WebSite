@@ -312,6 +312,32 @@
     };
   })();
 
+  /* ---------- EMAIL OBFUSCATION (bot-resistant) ----------
+     Markup stores user + domain in data-* attributes, with a
+     human-readable "[at]/[dot]" fallback in the text. This module
+     rewrites the visible text and href at runtime so the raw address
+     never appears in the HTML source that bots crawl. */
+  const EmailObfuscator = (() => ({
+    init() {
+      document.querySelectorAll('a.email-link').forEach(a => {
+        const u = a.dataset.user;
+        const d = a.dataset.domain;
+        if (!u || !d) return;
+        const addr = u + '@' + d;
+        a.setAttribute('href', 'mailto:' + addr);
+        a.setAttribute('rel', 'nofollow');
+        const slot = a.querySelector('.email-link__text');
+        (slot || a).textContent = addr;
+      });
+      document.querySelectorAll('span.email-inline').forEach(s => {
+        const u = s.dataset.user;
+        const d = s.dataset.domain;
+        if (!u || !d) return;
+        s.textContent = u + '@' + d;
+      });
+    }
+  }))();
+
   /* ---------- Smooth anchor scrolling ---------- */
   const SmoothAnchors = (() => ({
     init() {
@@ -374,6 +400,7 @@
     Cursor.init();
     Theme.init();
     DecryptBanner.init();
+    EmailObfuscator.init();
     SmoothAnchors.init();
     ContactForm.init();
     if (window.__GLV_I18N__) I18n.init(window.__GLV_I18N__);

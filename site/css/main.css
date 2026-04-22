@@ -259,6 +259,14 @@
   mix-blend-mode:difference;color:#fff;
 }
 
+/* ---- Obfuscated email links ---- */
+.email-link{
+  color:inherit;text-decoration:underline;text-decoration-thickness:1px;
+  text-underline-offset:2px;word-break:break-all;
+}
+.email-link:hover{color:var(--link-hover,var(--brand-primary))}
+.email-inline{color:inherit;word-break:break-all}
+
 /* ---- Decrypted Text banner (HTML-based, char-by-char reveal) ---- */
 .decrypt-banner{
   background:var(--bg-surface);

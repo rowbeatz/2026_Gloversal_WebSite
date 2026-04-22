@@ -126,7 +126,7 @@ export async function onRequestPost(context) {
     const gformResult = await forwardToGoogleForm(clean);
 
     const RESEND_API_KEY = env.RESEND_API_KEY;
-    const TO_EMAIL = env.CONTACT_TO_EMAIL || 'info@gloversal.com';
+    const TO_EMAIL = env.CONTACT_TO_EMAIL || 'inquiry@gloversal.com';
 
     if (!RESEND_API_KEY) {
       console.log('[contact] RESEND_API_KEY not set — relying on Google Form forwarding only');
