@@ -33,7 +33,7 @@ window.__GLV_I18N__ = {
       body: "進化するテクノロジーを、現場に自然に馴染むワークフローへ。人を中心に、医療・ヘルスケアのオペレーションを再設計します。",
       ctaPrimary: "相談する",
       ctaSecondary: "支援領域を見る",
-      stat1Label: "2004年設立（Years active）",
+      stat1Label: "2004年設立",
       stat2Label: "専門領域",
       stat3Label: "対応言語",
       stat4Label: "オフィス",
