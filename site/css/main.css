@@ -96,6 +96,40 @@
 [data-theme="dark"] .theme-toggle .icon-moon{display:none}
 .theme-toggle .icon-sun{display:none}
 
+/* ---- Dark-mode nav contrast fixes ---- */
+/* The default nav uses a hardcoded light translucent background so the
+   blur/glass effect stays clean over the light page. In dark mode we
+   swap to the dark canvas color so nav text (which uses --text-primary
+   = near-white) is actually legible, and the "相談する" CTA (which uses
+   a light-grey surface in dark mode) has contrast against the bar. */
+[data-theme="dark"] .nav{
+  background:rgba(11,16,32,.86);
+}
+[data-theme="dark"] .nav.is-scrolled{
+  background:rgba(11,16,32,.96);
+  border-bottom-color:var(--border-default);
+}
+[data-theme="dark"] .nav__logo-mark{
+  color:var(--cta-primary-text);
+}
+[data-theme="dark"] .nav__link::after{
+  background:var(--brand-secondary);
+}
+[data-theme="dark"] .lang-toggle:hover,
+[data-theme="dark"] .theme-toggle:hover{
+  background:var(--brand-secondary);
+  border-color:var(--brand-secondary);
+  color:#0A165E;
+}
+[data-theme="dark"] .lang-toggle:hover .lang-toggle__current{
+  color:#0A165E;
+}
+[data-theme="dark"] .btn--primary:hover{
+  background:var(--brand-secondary);
+  border-color:var(--brand-secondary);
+  color:#0A165E;
+}
+
 .nav__hamburger{
   display:none;width:38px;height:38px;
   border:1px solid var(--border-default);position:relative;

@@ -151,6 +151,14 @@
           if (val != null) el.setAttribute(attr.trim(), val);
         });
       });
+      // Dual-language block visibility.
+      // Elements with [data-lang="ja"] or [data-lang="en"] are shown only
+      // when the current language matches. Used on long-form legal pages
+      // where putting every paragraph in the i18n dictionary is unwieldy.
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        const want = el.getAttribute('data-lang');
+        if (want === 'ja' || want === 'en') el.hidden = (want !== lang);
+      });
       // Toggle current indicator
       document.querySelectorAll('.lang-toggle__current').forEach(el => {
         el.textContent = lang.toUpperCase();
