@@ -385,6 +385,19 @@
               // Autoplay blocked — fall back to image-style timed advance.
               p.catch(() => scheduleAdvance(IMAGE_DURATION_MS));
             }
+            // Belt-and-suspenders: some browsers don't fire `ended`
+            // reliably for short muted clips. Schedule a timer based on
+            // the video's own duration as a backup. Whichever fires first
+            // wins; cleanup() clears the other.
+            const scheduleFromDuration = () => {
+              const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 8;
+              scheduleAdvance(Math.round(d * 1000) + 600);
+            };
+            if (v.readyState >= 1) {
+              scheduleFromDuration();
+            } else {
+              v.addEventListener('loadedmetadata', scheduleFromDuration, { once: true });
+            }
           } else {
             const d = parseInt(slide.dataset.duration, 10) || IMAGE_DURATION_MS;
             scheduleAdvance(d);
