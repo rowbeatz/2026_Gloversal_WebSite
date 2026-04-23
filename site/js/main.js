@@ -342,8 +342,12 @@
         let currentEndedHandler = null;
         let alive = true;
 
-        const reduced = window.matchMedia &&
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // Note: we used to early-return under prefers-reduced-motion, but
+        // the slideshow isn't flashy or vestibular-heavy — it's rotating
+        // informational content with 600ms opacity fades, 8-10s per clip.
+        // Users with reduced motion still deserve to see all three videos
+        // cycle, otherwise the hero looks permanently frozen on whichever
+        // clip ran last via the HTML `autoplay` attribute.
 
         const cleanup = () => {
           if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
@@ -416,12 +420,6 @@
           current = (current + 1) % slides.length;
           playSlide(current);
         };
-
-        if (reduced) {
-          // Respect reduced-motion: show the first slide only, paused.
-          slides[0].classList.add('is-active');
-          return;
-        }
 
         // All <video> elements in the HTML now carry `autoplay`, which is
         // what some strict browsers (MEI-governed Chrome/Edge) need to

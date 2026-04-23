@@ -8,12 +8,12 @@
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 
-# CSS / JS can be cached longer — we ship them rarely and filenames carry
-# intent. If content changes we rename.
+# CSS / JS: always revalidate so fixes roll out immediately. 304 responses
+# are cheap; 24-hour stale JS during active development is not.
 /css/*
-  Cache-Control: public, max-age=86400, must-revalidate
+  Cache-Control: public, no-cache, must-revalidate
 /js/*
-  Cache-Control: public, max-age=86400, must-revalidate
+  Cache-Control: public, no-cache, must-revalidate
 
 # Static binary assets (images, video, fonts) are keyed by filename, so
 # aggressive caching is safe.
