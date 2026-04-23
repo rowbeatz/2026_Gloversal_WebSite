@@ -410,6 +410,17 @@
           return;
         }
 
+        // All <video> elements in the HTML now carry `autoplay`, which is
+        // what some strict browsers (MEI-governed Chrome/Edge) need to
+        // permit playback at all. That means every slide's video kicks off
+        // on page load — pause the non-active ones so we don't decode three
+        // streams simultaneously.
+        slides.forEach((s, i) => {
+          if (i === 0) return;
+          const v = s.querySelector('video');
+          if (v) { try { v.pause(); v.currentTime = 0; } catch (_) {} }
+        });
+
         playSlide(0);
 
         document.addEventListener('visibilitychange', () => {
