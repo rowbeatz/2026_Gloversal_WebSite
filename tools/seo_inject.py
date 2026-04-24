@@ -17,7 +17,7 @@ import json
 
 SITE_ROOT = pathlib.Path("site")
 ORIGIN = "https://gloversal.com"
-OG_IMAGE = f"{ORIGIN}/assets/images/gloversal-logo.png"
+OG_IMAGE = f"{ORIGIN}/assets/images/gloversal-og.png"
 SITE_NAME = "Gloversal, Inc."
 
 # ---------------------------------------------------------------------------
@@ -309,11 +309,11 @@ def seo_block(path, title, desc, is_legal):
   <meta property="og:title" content="{t_esc}" />
   <meta property="og:description" content="{d_esc}" />
   <meta property="og:image" content="{OG_IMAGE}" />
-  <meta property="og:image:width" content="512" />
-  <meta property="og:image:height" content="512" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Gloversal, Inc. logo" />
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{t_esc}" />
   <meta name="twitter:description" content="{d_esc}" />
   <meta name="twitter:image" content="{OG_IMAGE}" />"""
