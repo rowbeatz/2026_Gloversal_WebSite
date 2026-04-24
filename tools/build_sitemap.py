@@ -32,11 +32,11 @@ TOP_PAGES = [
     ("/contact.html", "monthly", "0.8"),
 ]
 
-# Detail templates and their priority bands
-DETAIL_TEMPLATES = {
-    "insights": ("/insight-detail.html", "monthly", "0.6"),
-    "speaking": ("/speaking-detail.html", "monthly", "0.5"),
-    "cases": ("/case-detail.html", "monthly", "0.6"),
+# Detail directory layout (static per-slug pages live under these prefixes).
+DETAIL_DIRS = {
+    "insights": ("/insights", "monthly", "0.6"),
+    "speaking": ("/speaking", "monthly", "0.5"),
+    "cases": ("/case-studies", "monthly", "0.6"),
 }
 
 
@@ -45,7 +45,7 @@ def harvest_slugs():
         return {}
     text = DATA.read_text(encoding="utf-8")
     out = {}
-    for section in DETAIL_TEMPLATES:
+    for section in DETAIL_DIRS:
         m = re.search(rf"{section}:\s*\[(.*?)\n  \]", text, flags=re.DOTALL)
         out[section] = re.findall(r'slug:\s*"([^"]+)"', m.group(1)) if m else []
     return out
@@ -70,9 +70,9 @@ def main():
     for loc, freq, prio in TOP_PAGES:
         parts.append(url_entry(loc, freq, prio))
     slugs = harvest_slugs()
-    for section, (template, freq, prio) in DETAIL_TEMPLATES.items():
+    for section, (prefix, freq, prio) in DETAIL_DIRS.items():
         for s in slugs.get(section, []):
-            parts.append(url_entry(f"{template}?slug={s}", freq, prio))
+            parts.append(url_entry(f"{prefix}/{s}.html", freq, prio))
     parts.append("</urlset>")
     out = SITE / "sitemap.xml"
     out.write_text("\n".join(parts) + "\n", encoding="utf-8")

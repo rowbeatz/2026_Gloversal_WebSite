@@ -39,7 +39,14 @@ for rel, needle in ROOT_FILES:
     else:
         print(f"[OK]   {rel}")
 
-for html_path in sorted(list(SITE.glob("*.html")) + list(SITE.glob("legal/*.html"))):
+html_files = (
+    list(SITE.glob("*.html"))
+    + list(SITE.glob("legal/*.html"))
+    + list(SITE.glob("insights/*.html"))
+    + list(SITE.glob("case-studies/*.html"))
+    + list(SITE.glob("speaking/*.html"))
+)
+for html_path in sorted(html_files):
     rel = html_path.relative_to(SITE).as_posix()
     txt = html_path.read_text(encoding="utf-8")
     missing = []

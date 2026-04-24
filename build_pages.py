@@ -407,7 +407,7 @@ cases_body = f"""
   <div class="container container-wide">
     <div class="case-grid">
       <article class="case-card reveal">
-        <a class="case-card__link" href="case-detail.html?slug=global-healthtech-japan-entry" aria-label="Case 01 詳細を見る: 海外ヘルステック企業の日本市場展開支援"></a>
+        <a class="case-card__link" href="case-studies/global-healthtech-japan-entry.html" aria-label="Case 01 詳細を見る: 海外ヘルステック企業の日本市場展開支援"></a>
         <span class="case-card__tag" data-i18n="cases.c1Tag">Market Entry</span>
         <span class="case-card__num" data-i18n="cases.c1Num">Case 01</span>
         <h3 class="case-card__title" data-i18n="cases.c1Title">海外ヘルステック企業の<br>日本市場展開支援</h3>
@@ -418,7 +418,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d1">
-        <a class="case-card__link" href="case-detail.html?slug=medical-imaging-service-framing" aria-label="Case 02 詳細を見る: 医療画像関連サービスの事業整理と提案設計"></a>
+        <a class="case-card__link" href="case-studies/medical-imaging-service-framing.html" aria-label="Case 02 詳細を見る: 医療画像関連サービスの事業整理と提案設計"></a>
         <span class="case-card__tag" data-i18n="cases.c2Tag">Business Development</span>
         <span class="case-card__num" data-i18n="cases.c2Num">Case 02</span>
         <h3 class="case-card__title" data-i18n="cases.c2Title">医療画像関連サービスの<br>事業整理と提案設計</h3>
@@ -429,7 +429,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d2">
-        <a class="case-card__link" href="case-detail.html?slug=medical-ai-implementation-planning" aria-label="Case 03 詳細を見る: 医療AIプロダクトの導入構想支援"></a>
+        <a class="case-card__link" href="case-studies/medical-ai-implementation-planning.html" aria-label="Case 03 詳細を見る: 医療AIプロダクトの導入構想支援"></a>
         <span class="case-card__tag" data-i18n="cases.c3Tag">Medical AI</span>
         <span class="case-card__num" data-i18n="cases.c3Num">Case 03</span>
         <h3 class="case-card__title" data-i18n="cases.c3Title">医療AIプロダクトの<br>導入構想支援</h3>
@@ -458,7 +458,7 @@ def insight(slug, date_key, label_key, title_key, excerpt_key, date_txt, label_t
     plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
       <article class="insight-card reveal{dc}">
-        <a class="insight-card__link" href="insight-detail.html?slug={slug}" aria-label="記事を読む: {plain_title}"></a>
+        <a class="insight-card__link" href="insights/{slug}.html" aria-label="記事を読む: {plain_title}"></a>
         <div class="insight-card__image" data-label="{label_txt}">
           <img src="assets/images/insights/{image}" alt="{alt_txt}" loading="lazy" decoding="async" />
         </div>
@@ -505,7 +505,7 @@ def activity(slug, date_key, title_key, body_key, tag_key, date_txt, title_txt, 
     plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
     <div class="activity-item reveal">
-      <a class="activity-item__link" href="speaking-detail.html?slug={slug}" aria-label="詳細を見る: {plain_title}"></a>
+      <a class="activity-item__link" href="speaking/{slug}.html" aria-label="詳細を見る: {plain_title}"></a>
       <span class="activity-item__date" data-i18n="speakingPage.{date_key}">{date_txt}</span>
       <div class="activity-item__body">
         <h3 data-i18n="speakingPage.{title_key}">{title_txt}</h3>
@@ -684,6 +684,12 @@ print("\nAll 6 inner pages created.")
 # Verify every card slug references a real entry in content-data.js so
 # clicking a card always lands on real content rather than "Content not found".
 verify_slugs_against_data()
+
+# Generate one fully-static HTML page per slug so each detail URL has unique
+# server-rendered SEO + Article schema (no JS hydration required for crawlers
+# or social cards).
+print("Building per-slug static detail pages...")
+subprocess.run([sys.executable, "tools/build_detail_pages.py"], check=True)
 
 # Regenerate sitemap.xml so new card slugs become indexable URLs.
 print("Rebuilding sitemap.xml...")
