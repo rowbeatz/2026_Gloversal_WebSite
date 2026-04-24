@@ -86,7 +86,8 @@
       document.querySelector('.detail-date').textContent = t(item.dateLabel) || item.date || '';
       const titleEl = document.querySelector('.detail-title');
       titleEl.innerHTML = t(item.title);
-      document.title = titleEl.textContent + ' | Gloversal, Inc.';
+      const fullTitle = titleEl.textContent + ' | Gloversal, Inc.';
+      document.title = fullTitle;
 
       if (item.excerpt) {
         const lead = document.querySelector('.detail-lead');
@@ -94,6 +95,23 @@
       }
 
       body.innerHTML = t(item.body);
+
+      // Update SEO meta to reflect this specific slug (canonical, OG, Twitter)
+      // so each detail URL has unique metadata even though it shares an HTML template.
+      const url = `${location.origin}${location.pathname}?slug=${slug}`;
+      const plainExcerpt = (t(item.excerpt) || '').replace(/<[^>]+>/g, '').trim();
+      const setMeta = (selector, attr, value) => {
+        const el = document.querySelector(selector);
+        if (el && value) el.setAttribute(attr, value);
+      };
+      setMeta('link[rel="canonical"]', 'href', url);
+      setMeta('link[rel="alternate"][hreflang="ja"]', 'href', url);
+      setMeta('link[rel="alternate"][hreflang="x-default"]', 'href', url);
+      setMeta('meta[property="og:url"]', 'content', url);
+      setMeta('meta[property="og:title"]', 'content', fullTitle);
+      setMeta('meta[property="og:description"]', 'content', plainExcerpt);
+      setMeta('meta[name="twitter:title"]', 'content', fullTitle);
+      setMeta('meta[name="twitter:description"]', 'content', plainExcerpt);
 
       // nav prev/next
       const idx = items.indexOf(item);

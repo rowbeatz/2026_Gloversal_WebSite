@@ -1,12 +1,74 @@
 """Generate all inner HTML pages for Gloversal site.
 
-After generating the pages, tools/seo_inject.py is automatically invoked to
-re-apply SEO/AEO head tags and JSON-LD schema, since regeneration would
-otherwise strip them.
+Architecture for cards & detail pages
+-------------------------------------
+Each card on /insights, /case-studies, /speaking links to a single shared
+detail template (insight-detail.html / case-detail.html / speaking-detail.html)
+with a ?slug= query string. Detail-page content lives in
+site/js/content-data.js (full JA/EN body) and is rendered client-side by
+site/js/content.js based on the slug + body[data-content-type] attribute.
+
+To register a NEW card + detail page:
+  1. Open site/js/content-data.js. Add a new entry to the appropriate
+     array (insights / cases / speaking) with a unique slug, dates,
+     tag, title, excerpt, and full body in both ja and en.
+  2. In this file (build_pages.py), add a corresponding insight() /
+     activity() / case-card block referencing the SAME slug.
+  3. Run python build_pages.py. The build step verifies every card
+     slug exists in content-data.js and aborts with a helpful error
+     if not.
+  4. (Insights only) Drop a 4:3 image at
+     site/assets/images/insights/<filename>.png and pass it as the
+     image arg.
+  5. Run python tools/build_sitemap.py if you want sitemap.xml to
+     include the new ?slug= URL.
+
+After generating the pages, tools/seo_inject.py is automatically invoked
+to re-apply SEO/AEO head tags and JSON-LD schema, since regeneration
+would otherwise strip them.
 """
-import pathlib, subprocess, sys
+import pathlib, re, subprocess, sys
 
 out = pathlib.Path("site")
+
+# ---------------------------------------------------------------------------
+# Slug registry — collected during card rendering, then verified against
+# site/js/content-data.js at build end. Catches typos / missing detail
+# entries before they ship as broken links.
+# ---------------------------------------------------------------------------
+_REGISTERED_SLUGS = {"insights": [], "speaking": [], "cases": []}
+
+
+def register_slug(content_type, slug):
+    _REGISTERED_SLUGS[content_type].append(slug)
+
+
+def verify_slugs_against_data():
+    data_path = pathlib.Path("site/js/content-data.js")
+    if not data_path.exists():
+        print("  [!] content-data.js not found — skipping slug verification.")
+        return
+    text = data_path.read_text(encoding="utf-8")
+    available = {}
+    for section in ("insights", "speaking", "cases"):
+        m = re.search(rf"{section}:\s*\[(.*?)\n  \]", text, flags=re.DOTALL)
+        if not m:
+            available[section] = set()
+            continue
+        available[section] = set(re.findall(r'slug:\s*"([^"]+)"', m.group(1)))
+    missing = []
+    for ctype, slugs in _REGISTERED_SLUGS.items():
+        for s in slugs:
+            if s not in available.get(ctype, set()):
+                missing.append((ctype, s))
+    if missing:
+        print("\n[!] Slug verification FAILED:")
+        for ctype, slug in missing:
+            print(f"    {ctype}: '{slug}' is referenced by a card but absent from content-data.js")
+        print("    → Add the entry to site/js/content-data.js or fix the slug in build_pages.py.")
+        sys.exit(1)
+    total = sum(len(v) for v in _REGISTERED_SLUGS.values())
+    print(f"  [+] Slug verification passed ({total} cards / detail entries matched).")
 
 # Shared shell parts
 HEAD = """<!DOCTYPE html>
@@ -322,6 +384,11 @@ services_body = f"""
 # =================================================================
 # CASE STUDIES PAGE
 # =================================================================
+# Case cards are inline HTML below (no helper). Register their slugs
+# explicitly so the slug verifier catches drift from content-data.js.
+for _s in ("global-healthtech-japan-entry", "medical-imaging-service-framing", "medical-ai-implementation-planning"):
+    register_slug("cases", _s)
+
 cases_body = f"""
 <section class="page-hero">
   <div class="page-hero__grid-bg" aria-hidden="true"></div>
@@ -340,7 +407,7 @@ cases_body = f"""
   <div class="container container-wide">
     <div class="case-grid">
       <article class="case-card reveal">
-        <a class="case-card__link" href="case-detail.html?id=1" aria-label="Case 01 詳細を見る: 海外ヘルステック企業の日本市場展開支援"></a>
+        <a class="case-card__link" href="case-detail.html?slug=global-healthtech-japan-entry" aria-label="Case 01 詳細を見る: 海外ヘルステック企業の日本市場展開支援"></a>
         <span class="case-card__tag" data-i18n="cases.c1Tag">Market Entry</span>
         <span class="case-card__num" data-i18n="cases.c1Num">Case 01</span>
         <h3 class="case-card__title" data-i18n="cases.c1Title">海外ヘルステック企業の<br>日本市場展開支援</h3>
@@ -351,7 +418,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d1">
-        <a class="case-card__link" href="case-detail.html?id=2" aria-label="Case 02 詳細を見る: 医療画像関連サービスの事業整理と提案設計"></a>
+        <a class="case-card__link" href="case-detail.html?slug=medical-imaging-service-framing" aria-label="Case 02 詳細を見る: 医療画像関連サービスの事業整理と提案設計"></a>
         <span class="case-card__tag" data-i18n="cases.c2Tag">Business Development</span>
         <span class="case-card__num" data-i18n="cases.c2Num">Case 02</span>
         <h3 class="case-card__title" data-i18n="cases.c2Title">医療画像関連サービスの<br>事業整理と提案設計</h3>
@@ -362,7 +429,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d2">
-        <a class="case-card__link" href="case-detail.html?id=3" aria-label="Case 03 詳細を見る: 医療AIプロダクトの導入構想支援"></a>
+        <a class="case-card__link" href="case-detail.html?slug=medical-ai-implementation-planning" aria-label="Case 03 詳細を見る: 医療AIプロダクトの導入構想支援"></a>
         <span class="case-card__tag" data-i18n="cases.c3Tag">Medical AI</span>
         <span class="case-card__num" data-i18n="cases.c3Num">Case 03</span>
         <h3 class="case-card__title" data-i18n="cases.c3Title">医療AIプロダクトの<br>導入構想支援</h3>
@@ -384,13 +451,14 @@ cases_body = f"""
 # =================================================================
 # INSIGHTS PAGE
 # =================================================================
-def insight(num, date_key, label_key, title_key, excerpt_key, date_txt, label_txt, title_txt, excerpt_txt, image, alt_txt, delay=""):
+def insight(slug, date_key, label_key, title_key, excerpt_key, date_txt, label_txt, title_txt, excerpt_txt, image, alt_txt, delay=""):
+    """Render a single insight card. `slug` MUST match an entry in site/js/content-data.js insights[]."""
+    register_slug("insights", slug)
     dc = f' reveal--d{delay}' if delay else ''
-    # Strip <br> from title for accessible link / image alt text.
     plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
       <article class="insight-card reveal{dc}">
-        <a class="insight-card__link" href="insight-detail.html?id={num}" aria-label="記事を読む: {plain_title}"></a>
+        <a class="insight-card__link" href="insight-detail.html?slug={slug}" aria-label="記事を読む: {plain_title}"></a>
         <div class="insight-card__image" data-label="{label_txt}">
           <img src="assets/images/insights/{image}" alt="{alt_txt}" loading="lazy" decoding="async" />
         </div>
@@ -416,12 +484,12 @@ insights_body = f"""
 <section class="section">
   <div class="container container-wide">
     <div class="insights-grid">
-{insight('1','a1Date','a1Label','a1Title','a1Excerpt','2026 &middot; 04','Medical AI','医療AIは<br>「精度」だけでは導入されない','導入現場で起きる&ldquo;精度と運用のズレ&rdquo;を整理し、PoCを本番運用に橋渡しするためのチェックポイントを解説します。','1_medical_ai.png','医療AI導入の現場イメージ')}
-{insight('2','a2Date','a2Label','a2Title','a2Excerpt','2026 &middot; 03','Market Entry','海外ヘルステック企業が<br>日本でつまずく5つの論点','価格設計、商習慣、医療機関との関係性、制度理解、現場運用。海外発サービスが日本で詰まりやすい5つの論点を整理。','2_market_entry.png','海外ヘルステック企業の日本市場参入','1')}
-{insight('3','a3Date','a3Label','a3Title','a3Excerpt','2026 &middot; 03','Business Development','医療機関向け新規事業は、<br>なぜPoC止まりになるのか','PoCを事業化に進めるには、検討主体、評価指標、現場合意形成の3点を初期から設計する必要があります。','3_business_dev.png','医療機関向け新規事業開発','2')}
-{insight('4','a4Date','a4Label','a4Title','a4Excerpt','2026 &middot; 02','Remote Healthcare','遠隔医療・画像診断領域で<br>事業を作るときに最初に整理すべきこと','読影フロー、医療機関側の導入責任、保険・費用構造、画像データ連携の4つの軸で事業仮説を組むアプローチ。','4_remote_health.png','遠隔医療・画像診断のワークフロー')}
-{insight('5','a5Date','a5Label','a5Title','a5Excerpt','2026 &middot; 01','Healthcare Data','医療現場と開発チームのあいだにある<br>&ldquo;見えない翻訳コスト&rdquo;','要件定義で見落とされやすい臨床ワークフロー・業務フロー・制度前提を、翻訳者として埋めるための視点。','5_health_data.png','医療データと開発の翻訳コスト','1')}
-{insight('6','a6Date','a6Label','a6Title','a6Excerpt','2025 &middot; 12','Alliance','医療機関とスタートアップの<br>協業で起きる典型的な3つの失敗','意思決定の主体、成果物の責任、関係者合意の順序。協業初期で最も躓きやすい論点を整理します。','6_alliance.png','医療機関とスタートアップの協業','2')}
+{insight('medical-ai-accuracy-gap','a1Date','a1Label','a1Title','a1Excerpt','2026 &middot; 04','Medical AI','医療AIは<br>「精度」だけでは導入されない','導入現場で起きる&ldquo;精度と運用のズレ&rdquo;を整理し、PoCを本番運用に橋渡しするためのチェックポイントを解説します。','1_medical_ai.png','医療AI導入の現場イメージ')}
+{insight('global-healthtech-japan-stalls','a2Date','a2Label','a2Title','a2Excerpt','2026 &middot; 03','Market Entry','海外ヘルステック企業が<br>日本でつまずく5つの論点','価格設計、商習慣、医療機関との関係性、制度理解、現場運用。海外発サービスが日本で詰まりやすい5つの論点を整理。','2_market_entry.png','海外ヘルステック企業の日本市場参入','1')}
+{insight('poc-stall-hospital-business','a3Date','a3Label','a3Title','a3Excerpt','2026 &middot; 03','Business Development','医療機関向け新規事業は、<br>なぜPoC止まりになるのか','PoCを事業化に進めるには、検討主体、評価指標、現場合意形成の3点を初期から設計する必要があります。','3_business_dev.png','医療機関向け新規事業開発','2')}
+{insight('remote-healthcare-imaging-business','a4Date','a4Label','a4Title','a4Excerpt','2026 &middot; 02','Remote Healthcare','遠隔医療・画像診断領域で<br>事業を作るときに最初に整理すべきこと','読影フロー、医療機関側の導入責任、保険・費用構造、画像データ連携の4つの軸で事業仮説を組むアプローチ。','4_remote_health.png','遠隔医療・画像診断のワークフロー')}
+{insight('invisible-translation-cost','a5Date','a5Label','a5Title','a5Excerpt','2026 &middot; 01','Healthcare Data','医療現場と開発チームのあいだにある<br>&ldquo;見えない翻訳コスト&rdquo;','要件定義で見落とされやすい臨床ワークフロー・業務フロー・制度前提を、翻訳者として埋めるための視点。','5_health_data.png','医療データと開発の翻訳コスト','1')}
+{insight('hospital-startup-alliance-failures','a6Date','a6Label','a6Title','a6Excerpt','2025 &middot; 12','Alliance','医療機関とスタートアップの<br>協業で起きる典型的な3つの失敗','意思決定の主体、成果物の責任、関係者合意の順序。協業初期で最も躓きやすい論点を整理します。','6_alliance.png','医療機関とスタートアップの協業','2')}
     </div>
   </div>
 </section>
@@ -431,11 +499,13 @@ insights_body = f"""
 # =================================================================
 # SPEAKING PAGE
 # =================================================================
-def activity(date_key, title_key, body_key, tag_key, date_txt, title_txt, body_txt, tag_txt):
+def activity(slug, date_key, title_key, body_key, tag_key, date_txt, title_txt, body_txt, tag_txt):
+    """Render a single speaking/activity row. `slug` MUST match site/js/content-data.js speaking[]."""
+    register_slug("speaking", slug)
     plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
     <div class="activity-item reveal">
-      <a class="activity-item__link" href="speaking-detail.html" aria-label="詳細を見る: {plain_title}"></a>
+      <a class="activity-item__link" href="speaking-detail.html?slug={slug}" aria-label="詳細を見る: {plain_title}"></a>
       <span class="activity-item__date" data-i18n="speakingPage.{date_key}">{date_txt}</span>
       <div class="activity-item__body">
         <h3 data-i18n="speakingPage.{title_key}">{title_txt}</h3>
@@ -461,12 +531,12 @@ speaking_body = f"""
 <section class="section">
   <div class="container container-wide">
     <div class="activity-list">
-{activity('i1Date','i1Title','i1Body','i1Tag','2026 &middot; 04','医療AIのビジネス実装カンファレンス 基調講演','医療AIの社会実装に向けた論点整理と、PoCから事業化へのステップを講演。','Keynote')}
-{activity('i2Date','i2Title','i2Body','i2Tag','2026 &middot; 03','グローバル医療機器事業の日本展開ウェビナー','海外ヘルステック企業向けに、日本市場の特殊性と参入戦略を解説。','Webinar')}
-{activity('i3Date','i3Title','i3Body','i3Tag','2026 &middot; 02','ヘルステック業界誌 インタビュー寄稿','医療とテクノロジーの翻訳者としての役割、アライアンス設計の実例を紹介。','Article')}
-{activity('i4Date','i4Title','i4Body','i4Tag','2026 &middot; 01','大学病院&times;スタートアップ 合同ワークショップ','臨床現場の課題からプロダクト要件を抽出するセッションを設計・ファシリテート。','Workshop')}
-{activity('i5Date','i5Title','i5Body','i5Tag','2025 &middot; 12','経営者向けAIエージェント活用セミナー','LangGraph/CrewAI等を用いた自律型AI組織の可能性と実装上の論点を共有。','Seminar')}
-{activity('i6Date','i6Title','i6Body','i6Tag','2025 &middot; 11','海外スタートアップ向けメンター活動','日本進出を検討する海外ヘルステック企業のピッチ支援と戦略アドバイザリー。','Mentor')}
+{activity('medical-ai-business-keynote','i1Date','i1Title','i1Body','i1Tag','2026 &middot; 04','医療AIのビジネス実装カンファレンス 基調講演','医療AIの社会実装に向けた論点整理と、PoCから事業化へのステップを講演。','Keynote')}
+{activity('global-medtech-japan-webinar','i2Date','i2Title','i2Body','i2Tag','2026 &middot; 03','グローバル医療機器事業の日本展開ウェビナー','海外ヘルステック企業向けに、日本市場の特殊性と参入戦略を解説。','Webinar')}
+{activity('healthtech-magazine-interview','i3Date','i3Title','i3Body','i3Tag','2026 &middot; 02','ヘルステック業界誌 インタビュー寄稿','医療とテクノロジーの翻訳者としての役割、アライアンス設計の実例を紹介。','Article')}
+{activity('university-hospital-startup-workshop','i4Date','i4Title','i4Body','i4Tag','2026 &middot; 01','大学病院&times;スタートアップ 合同ワークショップ','臨床現場の課題からプロダクト要件を抽出するセッションを設計・ファシリテート。','Workshop')}
+{activity('ai-agent-executive-seminar','i5Date','i5Title','i5Body','i5Tag','2025 &middot; 12','経営者向けAIエージェント活用セミナー','LangGraph/CrewAI等を用いた自律型AI組織の可能性と実装上の論点を共有。','Seminar')}
+{activity('overseas-startup-mentorship','i6Date','i6Title','i6Body','i6Tag','2025 &middot; 11','海外スタートアップ向けメンター活動','日本進出を検討する海外ヘルステック企業のピッチ支援と戦略アドバイザリー。','Mentor')}
     </div>
     <p class="t-body-sm reveal" style="margin-top:2rem;padding:1.5rem;background:var(--bg-surface-alt);border-left:3px solid var(--brand-accent)" data-i18n="speakingPage.note">
       ※ 現在公開できる範囲での抜粋です。個別の登壇・取材・寄稿のご相談は Contact よりお寄せください。
@@ -610,6 +680,14 @@ for filename, (title, desc, body) in pages_to_write.items():
     print(f"  Created {filename}")
 
 print("\nAll 6 inner pages created.")
+
+# Verify every card slug references a real entry in content-data.js so
+# clicking a card always lands on real content rather than "Content not found".
+verify_slugs_against_data()
+
+# Regenerate sitemap.xml so new card slugs become indexable URLs.
+print("Rebuilding sitemap.xml...")
+subprocess.run([sys.executable, "tools/build_sitemap.py"], check=True)
 
 # Re-apply SEO/AEO head + JSON-LD after regeneration.
 print("Running SEO injector...")
