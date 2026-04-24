@@ -623,8 +623,14 @@
   background-image:linear-gradient(135deg,var(--glv-indigo-50),var(--glv-teal-50));
   position:relative;overflow:hidden;
 }
+.insight-card__image img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:transform var(--dur-base) var(--ease-studio);
+}
+.insight-card:hover .insight-card__image img{transform:scale(1.04)}
 .insight-card__image::after{
-  content:attr(data-label);position:absolute;bottom:1rem;left:1rem;
+  content:attr(data-label);position:absolute;bottom:1rem;left:1rem;z-index:2;
   font-family:var(--font-mono);font-size:var(--fs-2xs);
   text-transform:uppercase;letter-spacing:.25em;color:var(--brand-primary);
   background:rgba(255,255,255,.88);padding:.35rem .6rem;

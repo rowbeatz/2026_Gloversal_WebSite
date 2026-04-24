@@ -340,6 +340,7 @@ cases_body = f"""
   <div class="container container-wide">
     <div class="case-grid">
       <article class="case-card reveal">
+        <a class="case-card__link" href="case-detail.html?id=1" aria-label="Case 01 詳細を見る: 海外ヘルステック企業の日本市場展開支援"></a>
         <span class="case-card__tag" data-i18n="cases.c1Tag">Market Entry</span>
         <span class="case-card__num" data-i18n="cases.c1Num">Case 01</span>
         <h3 class="case-card__title" data-i18n="cases.c1Title">海外ヘルステック企業の<br>日本市場展開支援</h3>
@@ -350,6 +351,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d1">
+        <a class="case-card__link" href="case-detail.html?id=2" aria-label="Case 02 詳細を見る: 医療画像関連サービスの事業整理と提案設計"></a>
         <span class="case-card__tag" data-i18n="cases.c2Tag">Business Development</span>
         <span class="case-card__num" data-i18n="cases.c2Num">Case 02</span>
         <h3 class="case-card__title" data-i18n="cases.c2Title">医療画像関連サービスの<br>事業整理と提案設計</h3>
@@ -360,6 +362,7 @@ cases_body = f"""
         </dl>
       </article>
       <article class="case-card reveal reveal--d2">
+        <a class="case-card__link" href="case-detail.html?id=3" aria-label="Case 03 詳細を見る: 医療AIプロダクトの導入構想支援"></a>
         <span class="case-card__tag" data-i18n="cases.c3Tag">Medical AI</span>
         <span class="case-card__num" data-i18n="cases.c3Num">Case 03</span>
         <h3 class="case-card__title" data-i18n="cases.c3Title">医療AIプロダクトの<br>導入構想支援</h3>
@@ -381,11 +384,16 @@ cases_body = f"""
 # =================================================================
 # INSIGHTS PAGE
 # =================================================================
-def insight(num, date_key, label_key, title_key, excerpt_key, date_txt, label_txt, title_txt, excerpt_txt, delay=""):
+def insight(num, date_key, label_key, title_key, excerpt_key, date_txt, label_txt, title_txt, excerpt_txt, image, alt_txt, delay=""):
     dc = f' reveal--d{delay}' if delay else ''
+    # Strip <br> from title for accessible link / image alt text.
+    plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
       <article class="insight-card reveal{dc}">
-        <div class="insight-card__image" data-label="{label_txt}"></div>
+        <a class="insight-card__link" href="insight-detail.html?id={num}" aria-label="記事を読む: {plain_title}"></a>
+        <div class="insight-card__image" data-label="{label_txt}">
+          <img src="assets/images/insights/{image}" alt="{alt_txt}" loading="lazy" decoding="async" />
+        </div>
         <span class="insight-card__date" data-i18n="insightsPage.{date_key}">{date_txt}</span>
         <h3 class="insight-card__title" data-i18n="insightsPage.{title_key}">{title_txt}</h3>
         <p class="insight-card__excerpt" data-i18n="insightsPage.{excerpt_key}">{excerpt_txt}</p>
@@ -408,12 +416,12 @@ insights_body = f"""
 <section class="section">
   <div class="container container-wide">
     <div class="insights-grid">
-{insight('1','a1Date','a1Label','a1Title','a1Excerpt','2026 &middot; 04','Medical AI','医療AIは<br>「精度」だけでは導入されない','導入現場で起きる&ldquo;精度と運用のズレ&rdquo;を整理し、PoCを本番運用に橋渡しするためのチェックポイントを解説します。')}
-{insight('2','a2Date','a2Label','a2Title','a2Excerpt','2026 &middot; 03','Market Entry','海外ヘルステック企業が<br>日本でつまずく5つの論点','価格設計、商習慣、医療機関との関係性、制度理解、現場運用。海外発サービスが日本で詰まりやすい5つの論点を整理。','1')}
-{insight('3','a3Date','a3Label','a3Title','a3Excerpt','2026 &middot; 03','Business Development','医療機関向け新規事業は、<br>なぜPoC止まりになるのか','PoCを事業化に進めるには、検討主体、評価指標、現場合意形成の3点を初期から設計する必要があります。','2')}
-{insight('4','a4Date','a4Label','a4Title','a4Excerpt','2026 &middot; 02','Remote Healthcare','遠隔医療・画像診断領域で<br>事業を作るときに最初に整理すべきこと','読影フロー、医療機関側の導入責任、保険・費用構造、画像データ連携の4つの軸で事業仮説を組むアプローチ。')}
-{insight('5','a5Date','a5Label','a5Title','a5Excerpt','2026 &middot; 01','Healthcare Data','医療現場と開発チームのあいだにある<br>&ldquo;見えない翻訳コスト&rdquo;','要件定義で見落とされやすい臨床ワークフロー・業務フロー・制度前提を、翻訳者として埋めるための視点。','1')}
-{insight('6','a6Date','a6Label','a6Title','a6Excerpt','2025 &middot; 12','Alliance','医療機関とスタートアップの<br>協業で起きる典型的な3つの失敗','意思決定の主体、成果物の責任、関係者合意の順序。協業初期で最も躓きやすい論点を整理します。','2')}
+{insight('1','a1Date','a1Label','a1Title','a1Excerpt','2026 &middot; 04','Medical AI','医療AIは<br>「精度」だけでは導入されない','導入現場で起きる&ldquo;精度と運用のズレ&rdquo;を整理し、PoCを本番運用に橋渡しするためのチェックポイントを解説します。','1_medical_ai.png','医療AI導入の現場イメージ')}
+{insight('2','a2Date','a2Label','a2Title','a2Excerpt','2026 &middot; 03','Market Entry','海外ヘルステック企業が<br>日本でつまずく5つの論点','価格設計、商習慣、医療機関との関係性、制度理解、現場運用。海外発サービスが日本で詰まりやすい5つの論点を整理。','2_market_entry.png','海外ヘルステック企業の日本市場参入','1')}
+{insight('3','a3Date','a3Label','a3Title','a3Excerpt','2026 &middot; 03','Business Development','医療機関向け新規事業は、<br>なぜPoC止まりになるのか','PoCを事業化に進めるには、検討主体、評価指標、現場合意形成の3点を初期から設計する必要があります。','3_business_dev.png','医療機関向け新規事業開発','2')}
+{insight('4','a4Date','a4Label','a4Title','a4Excerpt','2026 &middot; 02','Remote Healthcare','遠隔医療・画像診断領域で<br>事業を作るときに最初に整理すべきこと','読影フロー、医療機関側の導入責任、保険・費用構造、画像データ連携の4つの軸で事業仮説を組むアプローチ。','4_remote_health.png','遠隔医療・画像診断のワークフロー')}
+{insight('5','a5Date','a5Label','a5Title','a5Excerpt','2026 &middot; 01','Healthcare Data','医療現場と開発チームのあいだにある<br>&ldquo;見えない翻訳コスト&rdquo;','要件定義で見落とされやすい臨床ワークフロー・業務フロー・制度前提を、翻訳者として埋めるための視点。','5_health_data.png','医療データと開発の翻訳コスト','1')}
+{insight('6','a6Date','a6Label','a6Title','a6Excerpt','2025 &middot; 12','Alliance','医療機関とスタートアップの<br>協業で起きる典型的な3つの失敗','意思決定の主体、成果物の責任、関係者合意の順序。協業初期で最も躓きやすい論点を整理します。','6_alliance.png','医療機関とスタートアップの協業','2')}
     </div>
   </div>
 </section>
@@ -424,8 +432,10 @@ insights_body = f"""
 # SPEAKING PAGE
 # =================================================================
 def activity(date_key, title_key, body_key, tag_key, date_txt, title_txt, body_txt, tag_txt):
+    plain_title = title_txt.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
     return f"""
     <div class="activity-item reveal">
+      <a class="activity-item__link" href="speaking-detail.html" aria-label="詳細を見る: {plain_title}"></a>
       <span class="activity-item__date" data-i18n="speakingPage.{date_key}">{date_txt}</span>
       <div class="activity-item__body">
         <h3 data-i18n="speakingPage.{title_key}">{title_txt}</h3>
