@@ -1,5 +1,10 @@
-"""Generate legal HTML pages from markdown sources."""
-import pathlib, re
+"""Generate legal HTML pages from markdown sources.
+
+After generating the pages, tools/seo_inject.py is automatically invoked to
+re-apply SEO/AEO head tags and JSON-LD schema, since regeneration would
+otherwise strip them.
+"""
+import pathlib, re, subprocess, sys
 
 md_dir = pathlib.Path("gloversal_legal_docs_markdown_2026-04-16")
 out_dir = pathlib.Path("site/legal")
@@ -171,3 +176,7 @@ for src, out_name, en, ja in pages:
     print(f"  Created {out_name}")
 
 print("All 6 legal pages created.")
+
+# Re-apply SEO/AEO head + JSON-LD after regeneration.
+print("Running SEO injector...")
+subprocess.run([sys.executable, "tools/seo_inject.py"], check=True)

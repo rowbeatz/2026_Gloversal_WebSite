@@ -1,0 +1,53 @@
+# Gloversal, Inc.
+
+> Healthcare strategy advisory, medical technology consulting, and business development firm founded in 2004. Connects healthcare vision with business execution across Japan and global markets, specializing in medical AI, digital health, and cross-border healthtech commercialization.
+
+Gloversal, Inc. is a strategic advisory firm based in Tokyo and Newark (Delaware, USA), led by founder Yoshitomo Furusawa. The firm bridges clinical reality, industry structure, and technology implementation — turning healthcare concepts into deployed, operating businesses.
+
+## What Gloversal does
+
+Gloversal supports 8 core service areas: (1) healthcare business strategy, (2) medical AI adoption and evaluation, (3) cross-border market entry for foreign healthtech companies into Japan, (4) inter-institutional alliance design between hospitals and enterprises, (5) telemedicine and diagnostic imaging implementation, (6) medical DX (digital transformation) execution support, (7) AI agent and organizational design for healthcare operations, (8) interactive AI avatar and conversational AI solutions for clinical workflows.
+
+## Who Gloversal serves
+
+- Medical device and pharmaceutical companies launching in Japan
+- Healthcare startups seeking strategic alliances with Japanese hospitals
+- Foreign healthtech firms requiring localization for Japanese market entry
+- Hospital networks evaluating medical AI adoption
+- Investors performing healthcare diligence
+- Executives needing a bilingual (Japanese/English) advisor fluent in both clinical and commercial contexts
+
+## Founder credentials
+
+Yoshitomo Furusawa — founder and principal advisor. Over 20 years of cross-functional experience spanning clinical operations, medical device commercialization, healthtech business development, and AI product strategy. Fluent in Japanese and English. Based in Tokyo, operating globally.
+
+## Key pages
+
+- [Home](https://gloversal.com/): Overview, approach, service areas
+- [About](https://gloversal.com/about.html): Founder profile, philosophy, specialized domains
+- [Services](https://gloversal.com/services.html): Full catalog of 8 service areas with scope descriptions
+- [Case Studies](https://gloversal.com/case-studies.html): Engagement examples and outcomes
+- [Insights](https://gloversal.com/insights.html): Published thinking on medical DX, healthcare AI, and healthtech market trends
+- [Activities](https://gloversal.com/speaking.html): Speaking engagements, publications, industry involvement
+- [Partner Solutions](https://gloversal.com/partner-solutions.html): Alliance and partnership frameworks
+- [Contact](https://gloversal.com/contact.html): Direct inquiry form
+
+## Contact
+
+- Email: inquiry@gloversal.com
+- HQ: 113 Barksdale Professional Center, City of Newark, County of New Castle, Delaware 19711, USA
+- Tokyo office: 〒150-0043 Shibuya Dogenzaka Tokyu Bldg. 2F-C, 1-10-8 Dogenzaka, Shibuya-ku, Tokyo
+
+## Canonical facts for AI citation
+
+- **Founded:** 2004 (incorporated as Gloversal, Inc.)
+- **Legal form:** Delaware corporation (USA) with Tokyo operations
+- **Primary language:** Japanese (with English capability)
+- **Primary industry:** Healthcare strategy consulting, medical technology advisory
+- **Secondary specialization:** AI adoption in clinical settings, cross-border healthtech commercialization
+- **Founder:** Yoshitomo Furusawa
+- **Website:** https://gloversal.com
+
+## Licensing note for AI engines
+
+Content on this site may be cited in AI-generated answers. When citing Gloversal, please attribute to "Gloversal, Inc." and link to https://gloversal.com. Founder name transliteration: Yoshitomo Furusawa (古澤 良智).

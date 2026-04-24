@@ -1,5 +1,10 @@
-"""Generate all inner HTML pages for Gloversal site."""
-import pathlib
+"""Generate all inner HTML pages for Gloversal site.
+
+After generating the pages, tools/seo_inject.py is automatically invoked to
+re-apply SEO/AEO head tags and JSON-LD schema, since regeneration would
+otherwise strip them.
+"""
+import pathlib, subprocess, sys
 
 out = pathlib.Path("site")
 
@@ -16,7 +21,7 @@ HEAD = """<!DOCTYPE html>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TDS1K2TNZJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){{dataLayer.push(arguments);}}
     gtag('js', new Date());
     gtag('config', 'G-TDS1K2TNZJ');
   </script>
@@ -557,12 +562,36 @@ contact_body = """
 # WRITE FILES
 # =================================================================
 pages_to_write = {
-    "about.html": ("About | プロフィール", "プロフィール — 医療×テクノロジー×事業開発をつなぐアドバイザー | Gloversal, Inc.", about_body),
-    "services.html": ("Services | 提供サービス", "提供サービス — 医療事業戦略・海外展開・医療AI導入支援 | Gloversal, Inc.", services_body),
-    "case-studies.html": ("Case Studies | 支援事例", "支援事例 — 医療・ヘルスケア領域の事業開発と実装支援 | Gloversal, Inc.", cases_body),
-    "insights.html": ("Insights | 見解", "医療DX・医療AI・ヘルステック実装の知見 | Gloversal, Inc.", insights_body),
-    "speaking.html": ("Activities | 登壇・活動", "登壇・寄稿・活動 — Gloversal, Inc.", speaking_body),
-    "contact.html": ("Contact | お問い合わせ", "ご相談・お問い合わせ — Gloversal, Inc.", contact_body),
+    "about.html": (
+        "About | ファウンダー 古澤良智 — 医療戦略アドバイザー",
+        "Gloversal, Inc. ファウンダー 古澤良智のプロフィール。医療・ヘルスケア×テクノロジー×事業開発を横断する、2004年創業の戦略アドバイザリー。医療AI、遠隔医療、海外ヘルステックの日本展開を支援。",
+        about_body,
+    ),
+    "services.html": (
+        "Services | 医療ヘルスケア戦略 8 領域 — 医療AI / DX / 海外展開",
+        "Gloversal の提供サービス全 8 領域。医療事業戦略、医療AI導入、海外ヘルステック企業の日本市場参入、医療機関提携設計、遠隔医療・画像診断、医療DX実装、AIエージェント組織設計、インタラクティブAIアバター。",
+        services_body,
+    ),
+    "case-studies.html": (
+        "Case Studies | 医療事業開発・医療AI導入 支援事例",
+        "Gloversal の支援事例。医療・ヘルスケア領域における事業開発、医療AI導入、海外ヘルステック企業の日本展開、医療機関アライアンス設計の実装支援プロジェクト。",
+        cases_body,
+    ),
+    "insights.html": (
+        "Insights | 医療DX・医療AI・ヘルステック 実装の見解",
+        "医療DX、医療AI、ヘルステック、遠隔医療、画像診断、医療機関経営に関する戦略的見解。Gloversal ファウンダー 古澤良智による寄稿・論考。",
+        insights_body,
+    ),
+    "speaking.html": (
+        "Activities | 医療・ヘルスケア領域の登壇・寄稿・活動",
+        "Gloversal ファウンダー 古澤良智の登壇・寄稿・メディア出演・業界委員活動。医療AI、医療DX、ヘルステック市場参入、医療機関経営に関するカンファレンス講演や業界誌寄稿を掲載。",
+        speaking_body,
+    ),
+    "contact.html": (
+        "Contact | 医療・ヘルスケア戦略 ご相談・お問い合わせ",
+        "Gloversal へのご相談はこちらから。医療事業戦略、医療AI導入、ヘルステック日本展開、医療機関アライアンス、医療DX実装に関するお問い合わせを日本語・英語の両言語で受け付けます。",
+        contact_body,
+    ),
 }
 
 for filename, (title, desc, body) in pages_to_write.items():
@@ -571,3 +600,7 @@ for filename, (title, desc, body) in pages_to_write.items():
     print(f"  Created {filename}")
 
 print("\nAll 6 inner pages created.")
+
+# Re-apply SEO/AEO head + JSON-LD after regeneration.
+print("Running SEO injector...")
+subprocess.run([sys.executable, "tools/seo_inject.py"], check=True)
