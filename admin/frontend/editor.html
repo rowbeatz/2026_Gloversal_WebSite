@@ -92,7 +92,77 @@
             </div>
           </div>
 
+          <!-- ═══ Media Section ═══ -->
+          <div class="section-header" style="margin-top:24px"><h3>Media</h3></div>
+
+          <div class="form-group">
+            <label>Thumbnail / Hero Image</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="url" id="thumbnail" placeholder="https://... or /assets/images/uploads/..." style="flex:1">
+              <button type="button" class="btn btn-sm" onclick="openMediaPicker('thumbnail')">Library</button>
+              <button type="button" class="btn btn-sm" onclick="uploadMedia('thumbnail')">Upload</button>
+            </div>
+            <div id="thumbnail-preview" class="img-preview hidden" style="margin-top:8px"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Image Gallery (multiple)</label>
+            <div id="gallery-list"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="url" id="gallery-url-input" placeholder="Add image URL" style="flex:1">
+              <button type="button" class="btn btn-sm" onclick="addGalleryImage()">+ Add</button>
+              <button type="button" class="btn btn-sm" onclick="uploadMedia('gallery')">Upload</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="video">Video (URL or YouTube/Vimeo embed URL)</label>
+            <input type="url" id="video" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+
+          <!-- ═══ SEO / AEO Section ═══ -->
+          <div class="section-header" style="margin-top:24px"><h3>SEO / AEO Settings</h3></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="seo-title">SEO Title (overrides display title)</label>
+              <input type="text" id="seo-title" placeholder="Leave blank to use article title" maxlength="60">
+              <span class="text-muted text-sm" id="seo-title-count">0/60</span>
+            </div>
+            <div class="form-group">
+              <label for="seo-keywords">SEO Keywords</label>
+              <input type="text" id="seo-keywords" placeholder="keyword1, keyword2, keyword3">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="seo-description">Meta Description (SEO/AEO)</label>
+            <textarea id="seo-description" rows="2" placeholder="155 chars max — used for search snippets and AI citations" maxlength="155" style="min-height:60px"></textarea>
+            <span class="text-muted text-sm" id="seo-desc-count">0/155</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="og-image">OG Image URL (social preview)</label>
+              <input type="url" id="og-image" placeholder="/assets/images/gloversal-og.png">
+            </div>
+            <div class="form-group">
+              <label for="share-text">SNS Share Text</label>
+              <input type="text" id="share-text" placeholder="Custom share copy (under 280 chars)" maxlength="280">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Citation Sources (for AEO credibility)</label>
+            <div id="sources-list"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="url" id="source-url-input" placeholder="https://...">
+              <button type="button" class="btn btn-sm" onclick="addSource()">+ Add Source</button>
+            </div>
+          </div>
+
           <!-- Embed -->
+          <div class="section-header" style="margin-top:24px"><h3>Embed</h3></div>
           <div class="form-group">
             <label for="embed">Embed Code (optional: YouTube, LinkedIn, Instagram, X, Notion, note, Substack, Bluesky, Threads, etc.)</label>
             <textarea id="embed" placeholder='<iframe src="..." ...></iframe>&#10;&#10;<!-- Substack: <iframe src="https://yourname.substack.com/embed" ...> -->&#10;<!-- Bluesky: <blockquote class="bluesky-embed" data-bluesky-uri="at://..."> -->&#10;<!-- Threads: <blockquote class="text-post-media" ...> -->'></textarea>
@@ -122,6 +192,22 @@
     </div>
   </div>
 
+  <!-- Hidden file upload input -->
+  <input type="file" id="file-upload-input" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.mp4,.webm,.mov" style="display:none">
+
+  <!-- Media Picker Modal -->
+  <div id="media-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center">
+    <div style="background:var(--surface,#161b22);border:1px solid var(--border,#30363d);border-radius:8px;width:90%;max-width:700px;max-height:80vh;overflow-y:auto;padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--accent,#4F8EF7)">Media Library</h3>
+        <button class="btn btn-sm" onclick="closeMediaPicker()">Close</button>
+      </div>
+      <div id="media-modal-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+        <span class="text-muted text-sm">Loading...</span>
+      </div>
+    </div>
+  </div>
+
   <script src="/admin/assets/admin.js"></script>
   <script>
     requireAuth();
@@ -133,11 +219,16 @@
     const params = getParams();
     const section = params.get('section') || 'insights';
     const slug = params.get('slug') || '';
+    const fromPlayground = params.get('from');
     const isEditing = !!slug;
 
     const sectionEl = document.getElementById('section');
     const slugEl = document.getElementById('slug');
     const pageTitle = document.getElementById('page-title');
+
+    // ─── Gallery and sources state ───
+    let galleryImages = [];
+    let sourcesList = [];
 
     // Lock section and slug if editing
     if (isEditing) {
@@ -195,6 +286,248 @@
       }
     });
 
+    // ─── SEO character counters ───
+    const seoTitleEl = document.getElementById('seo-title');
+    const seoDescEl = document.getElementById('seo-description');
+
+    seoTitleEl.addEventListener('input', () => {
+      document.getElementById('seo-title-count').textContent = `${seoTitleEl.value.length}/60`;
+    });
+    seoDescEl.addEventListener('input', () => {
+      document.getElementById('seo-desc-count').textContent = `${seoDescEl.value.length}/155`;
+    });
+
+    // ─── Thumbnail preview ───
+    const thumbnailEl = document.getElementById('thumbnail');
+    thumbnailEl.addEventListener('input', () => {
+      const url = thumbnailEl.value.trim();
+      const prev = document.getElementById('thumbnail-preview');
+      if (url) {
+        prev.innerHTML = `<img src="${url}" style="max-width:200px;max-height:120px;border-radius:4px" onerror="this.style.display='none'">`;
+        prev.classList.remove('hidden');
+      } else {
+        prev.innerHTML = '';
+        prev.classList.add('hidden');
+      }
+    });
+
+    // ─── Gallery management ───
+    function renderGallery() {
+      const list = document.getElementById('gallery-list');
+      list.innerHTML = galleryImages.map((url, i) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;background:var(--bg);padding:6px 10px;border-radius:4px;border:1px solid var(--border)">
+          <img src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:3px" onerror="this.style.display='none'">
+          <span style="flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${url}</span>
+          <button type="button" class="btn btn-sm btn-danger" onclick="removeGalleryImage(${i})" style="padding:2px 6px;font-size:11px">X</button>
+        </div>
+      `).join('');
+    }
+
+    function addGalleryImage() {
+      const input = document.getElementById('gallery-url-input');
+      const url = input.value.trim();
+      if (url) {
+        galleryImages.push(url);
+        input.value = '';
+        renderGallery();
+      }
+    }
+
+    function removeGalleryImage(index) {
+      galleryImages.splice(index, 1);
+      renderGallery();
+    }
+
+    // ─── Sources management ───
+    function renderSources() {
+      const list = document.getElementById('sources-list');
+      list.innerHTML = sourcesList.map((url, i) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;background:var(--bg);padding:6px 10px;border-radius:4px;border:1px solid var(--border)">
+          <span style="flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${url}</span>
+          <button type="button" class="btn btn-sm btn-danger" onclick="removeSource(${i})" style="padding:2px 6px;font-size:11px">X</button>
+        </div>
+      `).join('');
+    }
+
+    function addSource() {
+      const input = document.getElementById('source-url-input');
+      const url = input.value.trim();
+      if (url) {
+        sourcesList.push(url);
+        input.value = '';
+        renderSources();
+      }
+    }
+
+    function removeSource(index) {
+      sourcesList.splice(index, 1);
+      renderSources();
+    }
+
+    // ─── Media picker (modal) ───
+    let mediaPickerTarget = null;
+
+    async function openMediaPicker(target) {
+      mediaPickerTarget = target;
+      const modal = document.getElementById('media-modal');
+      modal.style.display = 'flex';
+
+      const list = document.getElementById('media-modal-list');
+      list.innerHTML = '<span class="text-muted text-sm">Loading...</span>';
+
+      const res = await apiFetch('/api/media/list');
+      if (!res) { closeMediaPicker(); return; }
+      const data = await res.json();
+      const files = data.files || [];
+
+      if (files.length === 0) {
+        list.innerHTML = '<span class="text-muted text-sm">No uploaded files yet. Use the Upload button to add media.</span>';
+        return;
+      }
+
+      list.innerHTML = files.map(f => {
+        if (f.type === 'video') {
+          return `<div onclick="selectMedia('${f.url}')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center;transition:border-color .15s">
+            <div style="font-size:32px;margin-bottom:4px">&#9654;</div>
+            <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.filename}</div>
+            <div style="font-size:10px;color:var(--muted)">${f.size_mb}MB</div>
+          </div>`;
+        }
+        return `<div onclick="selectMedia('${f.url}')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center;transition:border-color .15s">
+          <img src="${f.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px" onerror="this.outerHTML='<div style=\\'font-size:32px\\'>&#128444;</div>'">
+          <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px">${f.filename}</div>
+          <div style="font-size:10px;color:var(--muted)">${f.size_mb}MB</div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectMedia(url) {
+      if (mediaPickerTarget === 'thumbnail') {
+        document.getElementById('thumbnail').value = url;
+        thumbnailEl.dispatchEvent(new Event('input'));
+      } else if (mediaPickerTarget === 'gallery') {
+        galleryImages.push(url);
+        renderGallery();
+      }
+      closeMediaPicker();
+    }
+
+    function closeMediaPicker() {
+      document.getElementById('media-modal').style.display = 'none';
+      mediaPickerTarget = null;
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('media-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('media-modal')) closeMediaPicker();
+    });
+
+    // ─── File upload ───
+    let uploadTarget = null;
+    const fileInput = document.getElementById('file-upload-input');
+
+    function uploadMedia(target) {
+      uploadTarget = target;
+      fileInput.click();
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const token = localStorage.getItem('glv_admin_token');
+        const res = await fetch('/api/media/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        if (res.status === 401) { logout(); return; }
+
+        if (res.ok) {
+          const data = await res.json();
+          showToast(`Uploaded: ${data.original}`);
+
+          if (uploadTarget === 'thumbnail') {
+            document.getElementById('thumbnail').value = data.url;
+            thumbnailEl.dispatchEvent(new Event('input'));
+          } else if (uploadTarget === 'gallery') {
+            galleryImages.push(data.url);
+            renderGallery();
+          }
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Upload failed', 'error');
+        }
+      } catch (e) {
+        showToast('Upload failed: ' + e.message, 'error');
+      }
+
+      fileInput.value = '';
+    });
+
+    // ─── Import from Playground ───
+    if (fromPlayground === 'playground') {
+      try {
+        const pgData = JSON.parse(sessionStorage.getItem('pg_import') || 'null');
+        if (pgData) {
+          sessionStorage.removeItem('pg_import');
+          if (pgData.slug) slugEl.value = pgData.slug;
+          if (pgData.tag) document.getElementById('tag').value = pgData.tag;
+          if (pgData.date) dateEl.value = pgData.date;
+          if (pgData.dateLabel) {
+            document.getElementById('dateLabel-ja').value = pgData.dateLabel.ja || '';
+            document.getElementById('dateLabel-en').value = pgData.dateLabel.en || '';
+          }
+          if (pgData.title) {
+            document.getElementById('title-ja').value = pgData.title.ja || '';
+            document.getElementById('title-en').value = pgData.title.en || '';
+          }
+          if (pgData.excerpt) {
+            document.getElementById('excerpt-ja').value = pgData.excerpt.ja || '';
+            document.getElementById('excerpt-en').value = pgData.excerpt.en || '';
+          }
+          if (pgData.body) {
+            document.getElementById('body-ja').value = pgData.body.ja || '';
+            document.getElementById('body-en').value = pgData.body.en || '';
+          }
+          if (pgData.seo_keywords && pgData.seo_keywords.length) {
+            document.getElementById('seo-keywords').value = pgData.seo_keywords.join(', ');
+          }
+          if (pgData.seo_description) {
+            seoDescEl.value = pgData.seo_description;
+            seoDescEl.dispatchEvent(new Event('input'));
+          }
+          if (pgData.share_text) document.getElementById('share-text').value = pgData.share_text;
+          if (pgData.sources && pgData.sources.length) {
+            sourcesList = pgData.sources;
+            renderSources();
+          }
+          showToast('Content imported from AI Playground');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    if (fromPlayground === 'embed') {
+      try {
+        const embedImport = JSON.parse(sessionStorage.getItem('pg_embed') || 'null');
+        if (embedImport && embedImport.embed) {
+          sessionStorage.removeItem('pg_embed');
+          embedEl.value = embedImport.embed;
+          embedPreview.innerHTML = embedImport.embed;
+          if (embedImport.thumbnail) {
+            document.getElementById('thumbnail').value = embedImport.thumbnail;
+            thumbnailEl.dispatchEvent(new Event('input'));
+          }
+          showToast('Embed imported from Playground');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
     // Load existing content if editing
     if (isEditing) {
       loadItem();
@@ -210,15 +543,14 @@
         return;
       }
 
-      // Populate form
+      // Populate form — original fields
       document.getElementById('tag').value = item.tag || '';
 
-      // Handle date — could be YYYY-MM or YYYY-MM-DD
       const dateRaw = item.date || '';
       if (dateRaw.length === 7) {
-        dateEl.value = dateRaw; // YYYY-MM
+        dateEl.value = dateRaw;
       } else if (dateRaw.length >= 10) {
-        dateEl.value = dateRaw.substring(0, 7); // YYYY-MM from YYYY-MM-DD
+        dateEl.value = dateRaw.substring(0, 7);
       }
 
       if (item.dateLabel) {
@@ -241,6 +573,42 @@
       if (item.embed) {
         embedPreview.innerHTML = item.embed;
       }
+
+      // New fields — Media
+      if (item.thumbnail) {
+        document.getElementById('thumbnail').value = item.thumbnail;
+        thumbnailEl.dispatchEvent(new Event('input'));
+      }
+      if (item.images && item.images.length) {
+        galleryImages = [...item.images];
+        renderGallery();
+      }
+      if (item.video) {
+        document.getElementById('video').value = item.video;
+      }
+
+      // New fields — SEO/AEO
+      if (item.seo_title) {
+        seoTitleEl.value = item.seo_title;
+        seoTitleEl.dispatchEvent(new Event('input'));
+      }
+      if (item.seo_keywords && item.seo_keywords.length) {
+        document.getElementById('seo-keywords').value = item.seo_keywords.join(', ');
+      }
+      if (item.seo_description) {
+        seoDescEl.value = item.seo_description;
+        seoDescEl.dispatchEvent(new Event('input'));
+      }
+      if (item.og_image) {
+        document.getElementById('og-image').value = item.og_image;
+      }
+      if (item.share_text) {
+        document.getElementById('share-text').value = item.share_text;
+      }
+      if (item.sources && item.sources.length) {
+        sourcesList = [...item.sources];
+        renderSources();
+      }
     }
 
     // Save handler
@@ -258,7 +626,11 @@
       saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
 
       const currentSection = isEditing ? section : sectionEl.value;
-      const dateVal = dateEl.value; // YYYY-MM
+      const dateVal = dateEl.value;
+
+      // Parse SEO keywords from comma-separated string
+      const kwRaw = document.getElementById('seo-keywords').value.trim();
+      const keywords = kwRaw ? kwRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
       const payload = {
         slug: slugEl.value,
@@ -280,7 +652,18 @@
           ja: document.getElementById('body-ja').value,
           en: document.getElementById('body-en').value
         },
-        embed: embedEl.value
+        embed: embedEl.value,
+        // New fields
+        thumbnail: document.getElementById('thumbnail').value.trim(),
+        images: galleryImages,
+        video: document.getElementById('video').value.trim(),
+        seo_keywords: keywords,
+        seo_title: seoTitleEl.value.trim(),
+        seo_description: seoDescEl.value.trim(),
+        og_image: document.getElementById('og-image').value.trim(),
+        reading_time: 0,
+        sources: sourcesList,
+        share_text: document.getElementById('share-text').value.trim()
       };
 
       let res;

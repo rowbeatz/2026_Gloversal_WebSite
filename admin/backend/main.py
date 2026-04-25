@@ -4,8 +4,9 @@ Serves the API and static frontend at /admin.
 """
 
 import re
+from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile as FastAPIUpload, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -14,6 +15,8 @@ from pydantic import BaseModel
 from auth import authenticate_user, create_token, get_current_user
 from content import read_content, write_content
 from build_runner import run_build, git_push
+from playground import generate_content, import_url
+from media import save_upload, list_uploads
 
 app = FastAPI(title="Gloversal Admin", version="1.0.0")
 
@@ -55,10 +58,29 @@ class ContentItem(BaseModel):
     excerpt: BilingualText = BilingualText()
     body: BilingualText = BilingualText()
     embed: str = ""
+    thumbnail: str = ""
+    images: List[str] = []
+    video: str = ""
+    seo_keywords: List[str] = []
+    seo_title: str = ""
+    seo_description: str = ""
+    og_image: str = ""
+    reading_time: int = 0
+    sources: List[str] = []
+    share_text: str = ""
 
 
 class BuildRequest(BaseModel):
     commit_msg: str = "chore(admin): content update"
+
+
+class PlaygroundRequest(BaseModel):
+    input: str
+    section_hint: str = ""
+
+
+class ImportURLRequest(BaseModel):
+    url: str
 
 
 # ───────────────────────── Auth ─────────────────────────
@@ -174,6 +196,41 @@ async def deploy_site(req: BuildRequest = BuildRequest(), _user: str = Depends(g
         return {"build": build_result, "deploy": None, "error": "Build failed"}
     deploy_result = git_push(req.commit_msg)
     return {"build": build_result, "deploy": deploy_result}
+
+
+# ───────────────────────── AI Playground ─────────────────────────
+
+@app.post("/api/playground/generate")
+async def playground_generate(req: PlaygroundRequest, _user: str = Depends(get_current_user)):
+    try:
+        result = await generate_content(req.input, req.section_hint)
+        return {"status": "ok", "content": result}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"AI API error: {str(e)}")
+
+
+@app.post("/api/playground/import-url")
+async def playground_import(req: ImportURLRequest, _user: str = Depends(get_current_user)):
+    result = await import_url(req.url)
+    return result
+
+
+# ───────────────────────── Media Upload ─────────────────────────
+
+@app.post("/api/media/upload")
+async def media_upload(file: FastAPIUpload = File(...), _user: str = Depends(get_current_user)):
+    try:
+        result = await save_upload(file)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/media/list")
+async def media_list(_user: str = Depends(get_current_user)):
+    return {"files": list_uploads()}
 
 
 # ───────────────────────── Static + Root redirect ─────────────────────────

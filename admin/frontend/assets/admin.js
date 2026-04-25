@@ -84,6 +84,10 @@ function renderSidebar() {
     <div class="sidebar">
       <div class="sidebar-brand">Gloversal Admin</div>
       <nav class="sidebar-nav">
+        <a href="/admin/playground.html">
+          <span class="icon">&#9889;</span>
+          <span>AI Playground</span>
+        </a>
         <a href="/admin/dashboard.html">
           <span class="icon">&#9632;</span>
           <span>Dashboard</span>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — AI Playground</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <style>
+    /* ─── Playground-specific styles ─── */
+    .pg-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .pg-layout { grid-template-columns: 1fr; }
+    }
+
+    .pg-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .pg-panel h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .pg-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .pg-textarea:focus { outline: none; border-color: var(--accent); }
+
+    .pg-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .pg-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    /* Result cards with animation */
+    .pg-result { display: none; }
+    .pg-result.is-visible { display: block; }
+
+    .pg-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 12px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: pgSlideIn 0.3s var(--ease, ease-out) forwards;
+    }
+    .pg-card:nth-child(1) { animation-delay: 0s; }
+    .pg-card:nth-child(2) { animation-delay: 0.05s; }
+    .pg-card:nth-child(3) { animation-delay: 0.1s; }
+    .pg-card:nth-child(4) { animation-delay: 0.15s; }
+    .pg-card:nth-child(5) { animation-delay: 0.2s; }
+    .pg-card:nth-child(6) { animation-delay: 0.25s; }
+    .pg-card:nth-child(7) { animation-delay: 0.3s; }
+    .pg-card:nth-child(8) { animation-delay: 0.35s; }
+    .pg-card:nth-child(9) { animation-delay: 0.4s; }
+    .pg-card:nth-child(10) { animation-delay: 0.45s; }
+
+    @keyframes pgSlideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pg-card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .pg-card-value {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .pg-card-value.html-preview {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: var(--mono);
+      white-space: pre-wrap;
+    }
+
+    .pg-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .pg-copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    .pg-suggestion-box {
+      background: rgba(79, 142, 247, 0.08);
+      border: 1px solid rgba(79, 142, 247, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .pg-suggestion-box.is-visible { display: block; }
+
+    .pg-suggestion-box .suggestion-section {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .pg-suggestion-box .suggestion-reason {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .pg-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Loading overlay */
+    .pg-loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .pg-loading.is-visible { display: block; }
+
+    .pg-loading-spinner {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .pg-loading-text {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SNS Import section */
+    .pg-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    .pg-sns-row {
+      display: flex;
+      gap: 8px;
+    }
+    .pg-sns-row input {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+    }
+    .pg-sns-row input:focus { outline: none; border-color: var(--accent); }
+
+    .pg-embed-preview {
+      margin-top: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      min-height: 50px;
+      display: none;
+    }
+    .pg-embed-preview.is-visible { display: block; }
+    .pg-embed-preview iframe { max-width: 100%; }
+
+    .pg-error {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+    .pg-error.is-visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">AI Playground</h1>
+        <button class="btn btn-sm" onclick="logout()">Logout</button>
+      </div>
+      <div class="content-area" id="content-area">
+
+        <div class="pg-layout">
+          <!-- ─── Left: Input Panel ─── -->
+          <div>
+            <div class="pg-panel">
+              <h3>Content Input</h3>
+
+              <div class="pg-row">
+                <div class="form-group" style="margin-bottom:0">
+                  <label for="pg-model">AI Model</label>
+                  <select id="pg-model">
+                    <option value="claude" selected>Claude (Haiku)</option>
+                    <option value="openai">GPT-4o-mini</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label for="pg-section-hint">Section Hint</label>
+                  <select id="pg-section-hint">
+                    <option value="" selected>Auto (AI decides)</option>
+                    <option value="insights">Insights</option>
+                    <option value="speaking">Activities</option>
+                    <option value="cases">Case Studies</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top:12px">
+                <label for="pg-input">Paste rough notes, ideas, or transcripts (any language)</label>
+                <textarea id="pg-input" class="pg-textarea" placeholder="Paste your rough notes, meeting transcripts, article ideas, or any text in any language. The AI will transform it into structured, publication-ready bilingual content for Gloversal's site."></textarea>
+                <div class="pg-meta">
+                  <span id="pg-char-count">0 characters</span>
+                  <span id="pg-word-count">0 words</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="pg-generate-btn" onclick="generateContent()">
+                Generate Content
+              </button>
+
+              <div class="pg-error" id="pg-error"></div>
+            </div>
+
+            <!-- SNS Import -->
+            <div class="pg-panel" style="margin-top:16px">
+              <h3>SNS / URL Import</h3>
+              <div class="pg-sns-row">
+                <input type="url" id="pg-sns-url" placeholder="Paste YouTube, X, LinkedIn, Instagram, Bluesky, note.com URL...">
+                <button class="btn btn-primary" onclick="importSNS()">Import</button>
+              </div>
+              <div class="pg-embed-preview" id="pg-embed-preview"></div>
+              <div class="pg-actions" id="pg-embed-actions" style="display:none">
+                <button class="btn btn-sm" onclick="copyEmbedToClipboard()">Copy Embed Code</button>
+                <button class="btn btn-sm btn-primary" onclick="useEmbedInEditor()">Use in Editor</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── Right: Generated Preview ─── -->
+          <div>
+            <div class="pg-loading" id="pg-loading">
+              <div class="pg-loading-spinner"></div>
+              <div class="pg-loading-text">Generating content with AI...</div>
+            </div>
+
+            <div class="pg-result" id="pg-result">
+              <div class="pg-panel">
+                <h3>Generated Content</h3>
+
+                <div class="pg-suggestion-box" id="pg-suggestion">
+                  <span class="suggestion-section" id="pg-suggested-section"></span>
+                  <div class="suggestion-reason" id="pg-suggested-reason"></div>
+                </div>
+
+                <div id="pg-cards"></div>
+
+                <div class="pg-actions">
+                  <button class="btn btn-primary" onclick="editInEditor()">Edit in Editor</button>
+                  <button class="btn btn-success" onclick="saveToSite()">Save to Site</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar
+    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
+    highlightNav();
+
+    // ─── State ───
+    let generatedData = null;
+    let embedData = null;
+
+    // ─── Character / word counter ───
+    const pgInput = document.getElementById('pg-input');
+    const charCount = document.getElementById('pg-char-count');
+    const wordCount = document.getElementById('pg-word-count');
+
+    pgInput.addEventListener('input', () => {
+      const val = pgInput.value;
+      charCount.textContent = `${val.length} characters`;
+      const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words} words`;
+    });
+
+    // ─── Generate Content ───
+    async function generateContent() {
+      const input = pgInput.value.trim();
+      if (!input) {
+        showError('Please enter some content to transform.');
+        return;
+      }
+
+      const model = document.getElementById('pg-model').value;
+      const sectionHint = document.getElementById('pg-section-hint').value;
+
+      // Show loading
+      hideError();
+      document.getElementById('pg-result').classList.remove('is-visible');
+      document.getElementById('pg-loading').classList.add('is-visible');
+      document.getElementById('pg-generate-btn').disabled = true;
+      document.getElementById('pg-generate-btn').innerHTML = '<span class="spinner"></span> Generating...';
+
+      try {
+        const res = await apiFetch('/api/playground/generate', {
+          method: 'POST',
+          body: JSON.stringify({ input, section_hint: sectionHint })
+        });
+
+        if (!res) return;
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Generation failed');
+        }
+
+        const data = await res.json();
+        generatedData = data.content;
+        renderResult(generatedData);
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        document.getElementById('pg-loading').classList.remove('is-visible');
+        document.getElementById('pg-generate-btn').disabled = false;
+        document.getElementById('pg-generate-btn').textContent = 'Generate Content';
+      }
+    }
+
+    // ─── Render Result ───
+    function renderResult(data) {
+      // Suggestion box
+      const suggBox = document.getElementById('pg-suggestion');
+      if (data.suggested_section) {
+        const sectionLabels = { insights: 'Insights', speaking: 'Activities', cases: 'Case Studies' };
+        document.getElementById('pg-suggested-section').textContent =
+          'Suggested: ' + (sectionLabels[data.suggested_section] || data.suggested_section);
+        document.getElementById('pg-suggested-reason').textContent = data.reasoning || '';
+        suggBox.classList.add('is-visible');
+      } else {
+        suggBox.classList.remove('is-visible');
+      }
+
+      // Build cards
+      const cards = document.getElementById('pg-cards');
+      cards.innerHTML = '';
+
+      const fields = [
+        { key: 'slug', label: 'Slug' },
+        { key: 'tag', label: 'Tag' },
+        { key: 'date', label: 'Date' },
+        { key: 'title', label: 'Title', bilingual: true },
+        { key: 'excerpt', label: 'Excerpt', bilingual: true },
+        { key: 'body', label: 'Body', bilingual: true, html: true },
+        { key: 'seo_keywords', label: 'SEO Keywords', array: true },
+        { key: 'seo_description', label: 'Meta Description' },
+        { key: 'share_text', label: 'Share Text' },
+        { key: 'sources', label: 'Sources', array: true },
+      ];
+
+      for (const field of fields) {
+        const val = data[field.key];
+        if (!val || (Array.isArray(val) && val.length === 0)) continue;
+
+        let displayVal = '';
+        if (field.bilingual && typeof val === 'object') {
+          if (field.html) {
+            displayVal =
+              '<strong style="color:var(--accent)">JA:</strong>\n' +
+              (val.ja || '(empty)') +
+              '\n\n<strong style="color:var(--accent)">EN:</strong>\n' +
+              (val.en || '(empty)');
+          } else {
+            displayVal =
+              'JA: ' + (val.ja || '(empty)') +
+              '\nEN: ' + (val.en || '(empty)');
+          }
+        } else if (field.array && Array.isArray(val)) {
+          displayVal = val.join(', ');
+        } else if (typeof val === 'object') {
+          displayVal = JSON.stringify(val, null, 2);
+        } else {
+          displayVal = String(val);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'pg-card';
+        card.innerHTML = `
+          <button class="pg-copy-btn" onclick="copyCardValue(this)" title="Copy">Copy</button>
+          <div class="pg-card-label">${field.label}</div>
+          <div class="pg-card-value${field.html ? ' html-preview' : ''}">${escapeForDisplay(displayVal, field.html)}</div>
+        `;
+        cards.appendChild(card);
+      }
+
+      document.getElementById('pg-result').classList.add('is-visible');
+    }
+
+    function escapeForDisplay(text, allowHtmlTags) {
+      if (allowHtmlTags) return text; // body preview keeps HTML tags visible
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    // ─── Copy card value ───
+    function copyCardValue(btn) {
+      const card = btn.closest('.pg-card');
+      const value = card.querySelector('.pg-card-value').textContent;
+      navigator.clipboard.writeText(value).then(() => {
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    // ─── Edit in Editor ───
+    function editInEditor() {
+      if (!generatedData) return;
+      const section = generatedData.suggested_section || 'insights';
+
+      // Store generated data in sessionStorage so editor.html can pick it up
+      sessionStorage.setItem('pg_import', JSON.stringify(generatedData));
+      window.location.href = `/admin/editor.html?section=${section}&from=playground`;
+    }
+
+    // ─── Save to Site ───
+    async function saveToSite() {
+      if (!generatedData) return;
+      const section = generatedData.suggested_section || 'insights';
+
+      // Build the payload matching ContentItem schema
+      const payload = {
+        slug: generatedData.slug || '',
+        date: generatedData.date || '',
+        dateLabel: generatedData.dateLabel || { ja: '', en: '' },
+        tag: generatedData.tag || '',
+        title: generatedData.title || { ja: '', en: '' },
+        excerpt: generatedData.excerpt || { ja: '', en: '' },
+        body: generatedData.body || { ja: '', en: '' },
+        embed: '',
+        seo_keywords: generatedData.seo_keywords || [],
+        seo_description: generatedData.seo_description || '',
+        share_text: generatedData.share_text || '',
+        sources: generatedData.sources || [],
+      };
+
+      try {
+        const res = await apiFetch(`/api/content/${section}`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (!res) return;
+
+        if (res.ok) {
+          showToast(`Saved to ${sectionLabel(section)}!`);
+          if (confirm('Content saved. Would you like to build the site now?')) {
+            const buildRes = await apiFetch('/api/build', { method: 'POST' });
+            if (buildRes && (await buildRes.json()).returncode === 0) {
+              showToast('Site built successfully');
+            } else {
+              showToast('Build failed', 'error');
+            }
+          }
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Save failed', 'error');
+        }
+      } catch (e) {
+        showToast('Save failed: ' + e.message, 'error');
+      }
+    }
+
+    // ─── SNS Import ───
+    async function importSNS() {
+      const url = document.getElementById('pg-sns-url').value.trim();
+      if (!url) return;
+
+      try {
+        const res = await apiFetch('/api/playground/import-url', {
+          method: 'POST',
+          body: JSON.stringify({ url })
+        });
+
+        if (!res) return;
+        const data = await res.json();
+        embedData = data;
+
+        const preview = document.getElementById('pg-embed-preview');
+        if (data.embed) {
+          preview.innerHTML = data.embed;
+          preview.classList.add('is-visible');
+          document.getElementById('pg-embed-actions').style.display = 'flex';
+        } else {
+          preview.innerHTML = '<span class="text-muted text-sm">No embed preview available</span>';
+          preview.classList.add('is-visible');
+        }
+
+        if (data.title) {
+          showToast(`Imported: ${data.title} (${data.platform})`);
+        }
+      } catch (e) {
+        showToast('Import failed: ' + e.message, 'error');
+      }
+    }
+
+    function copyEmbedToClipboard() {
+      if (!embedData || !embedData.embed) return;
+      navigator.clipboard.writeText(embedData.embed).then(() => {
+        showToast('Embed code copied');
+      });
+    }
+
+    function useEmbedInEditor() {
+      if (!embedData) return;
+      // Store embed data for editor to pick up
+      sessionStorage.setItem('pg_embed', JSON.stringify(embedData));
+      window.location.href = `/admin/editor.html?section=insights&from=embed`;
+    }
+
+    // ─── Helpers ───
+    function showError(msg) {
+      const el = document.getElementById('pg-error');
+      el.textContent = msg;
+      el.classList.add('is-visible');
+    }
+
+    function hideError() {
+      document.getElementById('pg-error').classList.remove('is-visible');
+    }
+  </script>
+</body>
+</html>
