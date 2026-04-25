@@ -108,6 +108,10 @@ function renderSidebar() {
           <span class="icon">&#9655;</span>
           <span>Embeds</span>
         </a>
+        <a href="/admin/settings.html">
+          <span class="icon">&#9881;</span>
+          <span>Settings</span>
+        </a>
         <a href="/admin/dashboard.html?view=deploy">
           <span class="icon">&#9650;</span>
           <span>Deploy</span>

@@ -5,6 +5,7 @@ Thumbs.db
 node_modules/
 .env
 used_keys.txt
+admin/settings.json
 
 # Source/workspace docs (not for deployment)
 *.zip

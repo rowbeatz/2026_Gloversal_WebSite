@@ -3,8 +3,9 @@
 Serves the API and static frontend at /admin.
 """
 
+import json
 import re
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile as FastAPIUpload, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,11 +13,13 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from ai_providers import PROVIDER_MODELS, get_provider, known_providers
 from auth import authenticate_user, create_token, get_current_user
 from content import read_content, write_content
 from build_runner import run_build, git_push
-from playground import generate_content, import_url
+from playground import generate_content, get_available_models, import_url
 from media import save_upload, list_uploads
+from settings import DEFAULT_SETTINGS, load_settings, save_settings
 
 app = FastAPI(title="Gloversal Admin", version="1.0.0")
 
@@ -77,6 +80,13 @@ class BuildRequest(BaseModel):
 class PlaygroundRequest(BaseModel):
     input: str
     section_hint: str = ""
+    provider: str = ""
+    model: str = ""
+
+
+class TestProviderRequest(BaseModel):
+    provider: str
+    model: str = ""
 
 
 class ImportURLRequest(BaseModel):
@@ -203,8 +213,17 @@ async def deploy_site(req: BuildRequest = BuildRequest(), _user: str = Depends(g
 @app.post("/api/playground/generate")
 async def playground_generate(req: PlaygroundRequest, _user: str = Depends(get_current_user)):
     try:
-        result = await generate_content(req.input, req.section_hint)
-        return {"status": "ok", "content": result}
+        result = await generate_content(
+            req.input, req.section_hint, req.provider, req.model
+        )
+        provider_used = req.provider or load_settings().get("default_provider", "")
+        model_used = req.model or load_settings().get("default_model", "")
+        return {
+            "status": "ok",
+            "content": result,
+            "provider": provider_used,
+            "model": model_used,
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -231,6 +250,120 @@ async def media_upload(file: FastAPIUpload = File(...), _user: str = Depends(get
 @app.get("/api/media/list")
 async def media_list(_user: str = Depends(get_current_user)):
     return {"files": list_uploads()}
+
+
+# ───────────────────────── Settings ─────────────────────────
+
+_KEY_FIELDS = {"api_key"}  # fields that should be masked when read by the UI
+
+
+def _mask_secret(value: str) -> str:
+    if not isinstance(value, str) or not value:
+        return ""
+    return "••••" + value[-4:] if len(value) > 4 else "••••"
+
+
+@app.get("/api/settings")
+async def get_settings(_user: str = Depends(get_current_user)):
+    s = load_settings()
+    masked = json.loads(json.dumps(s))  # deep copy via JSON roundtrip
+    for prov, cfg in masked.get("providers", {}).items():
+        for field in _KEY_FIELDS:
+            if field in cfg and cfg[field]:
+                cfg[field] = _mask_secret(cfg[field])
+    return masked
+
+
+@app.post("/api/settings")
+async def update_settings(data: dict, _user: str = Depends(get_current_user)):
+    current = load_settings()
+    incoming_providers = (data or {}).get("providers", {}) or {}
+
+    for prov, cfg in incoming_providers.items():
+        if not isinstance(cfg, dict):
+            continue
+        bucket = current["providers"].setdefault(prov, {})
+        for k, v in cfg.items():
+            # Preserve the existing key if the UI sent back the masked placeholder.
+            if k in _KEY_FIELDS and isinstance(v, str) and v.startswith("••••"):
+                continue
+            bucket[k] = v
+
+    if "default_provider" in (data or {}):
+        current["default_provider"] = data["default_provider"]
+    if "default_model" in (data or {}):
+        current["default_model"] = data["default_model"]
+
+    try:
+        save_settings(current)
+    except OSError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to persist settings: {e}")
+    return {"status": "saved"}
+
+
+# ───────────────────────── AI provider / model discovery ─────────────────────────
+
+@app.get("/api/ai/providers")
+async def list_providers(_user: str = Depends(get_current_user)):
+    s = load_settings()
+    result = []
+    for pid in known_providers():
+        cfg = s.get("providers", {}).get(pid, {})
+        models = PROVIDER_MODELS.get(pid, [])
+        # "configured" means: has either an api_key or a base_url set.
+        has_key = bool((cfg.get("api_key") or "").strip())
+        has_url = bool((cfg.get("base_url") or "").strip())
+        result.append({
+            "id": pid,
+            "enabled": bool(cfg.get("enabled", False)),
+            "configured": has_key or has_url,
+            "has_key": has_key,
+            "has_base_url": has_url,
+            "models": models,
+            "dynamic_models": pid in {"ollama", "lmstudio", "custom"},
+        })
+    return {
+        "providers": result,
+        "default_provider": s.get("default_provider", ""),
+        "default_model": s.get("default_model", ""),
+    }
+
+
+@app.get("/api/ai/models/{provider_id}")
+async def list_models(provider_id: str, _user: str = Depends(get_current_user)):
+    if provider_id not in PROVIDER_MODELS:
+        raise HTTPException(status_code=404, detail=f"Unknown provider: {provider_id}")
+    models = await get_available_models(provider_id)
+    return {"provider": provider_id, "models": models}
+
+
+@app.post("/api/ai/test")
+async def test_provider(req: TestProviderRequest, _user: str = Depends(get_current_user)):
+    try:
+        provider = get_provider(req.provider)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # Pick a sensible default model if the caller didn't specify one.
+    model = req.model.strip()
+    if not model:
+        models = await get_available_models(req.provider)
+        if not models:
+            return {
+                "status": "error",
+                "error": f"No model available for {req.provider}. Configure model_ids or pull/download one.",
+            }
+        model = models[0]
+
+    try:
+        text = await provider.generate(
+            "You are a test assistant. Reply with valid JSON only.",
+            'Say hello in JSON: {"message": "..."}',
+            model,
+        )
+        return {"status": "ok", "model": model, "response": (text or "")[:300]}
+    except Exception as e:
+        return {"status": "error", "model": model, "error": str(e)}
 
 
 # ───────────────────────── Static + Root redirect ─────────────────────────

@@ -229,6 +229,38 @@
       display: none;
     }
     .pg-error.is-visible { display: block; }
+
+    .pg-model-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 720px) {
+      .pg-model-row { grid-template-columns: 1fr; }
+    }
+    .pg-no-providers {
+      background: rgba(210, 153, 34, 0.08);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .pg-no-providers.is-visible { display: block; }
+    .pg-provider-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+      letter-spacing: 0.4px;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -246,23 +278,37 @@
             <div class="pg-panel">
               <h3>Content Input</h3>
 
-              <div class="pg-row">
+              <div class="pg-no-providers" id="pg-no-providers">
+                No AI providers are enabled. <a href="/admin/settings.html" style="color:inherit;text-decoration:underline">Configure providers in Settings →</a>
+              </div>
+
+              <div class="pg-model-row">
                 <div class="form-group" style="margin-bottom:0">
-                  <label for="pg-model">AI Model</label>
+                  <label for="pg-provider">AI Provider</label>
+                  <select id="pg-provider" onchange="onProviderChange()">
+                    <option value="">-- Loading… --</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label for="pg-model">Model</label>
                   <select id="pg-model">
-                    <option value="claude" selected>Claude (Haiku)</option>
-                    <option value="openai">GPT-4o-mini</option>
+                    <option value="">-- Select provider first --</option>
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0">
-                  <label for="pg-section-hint">Section Hint</label>
-                  <select id="pg-section-hint">
-                    <option value="" selected>Auto (AI decides)</option>
-                    <option value="insights">Insights</option>
-                    <option value="speaking">Activities</option>
-                    <option value="cases">Case Studies</option>
-                  </select>
+                  <label>&nbsp;</label>
+                  <a href="/admin/settings.html" class="btn btn-sm" style="display:block;text-align:center">⚙ Settings</a>
                 </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0">
+                <label for="pg-section-hint">Section Hint</label>
+                <select id="pg-section-hint">
+                  <option value="" selected>Auto (AI decides)</option>
+                  <option value="insights">Insights</option>
+                  <option value="speaking">Activities</option>
+                  <option value="cases">Case Studies</option>
+                </select>
               </div>
 
               <div class="form-group" style="margin-top:12px">
@@ -338,6 +384,102 @@
     // ─── State ───
     let generatedData = null;
     let embedData = null;
+    let providersCatalog = [];      // [{id, enabled, models, dynamic_models, ...}]
+    let dynamicModelsCache = {};    // { ollama: [...], lmstudio: [...] }
+
+    const PROVIDER_LABEL = {
+      anthropic: 'Anthropic Claude',
+      openai: 'OpenAI GPT',
+      google: 'Google Gemini',
+      mistral: 'Mistral AI',
+      groq: 'Groq',
+      together: 'Together AI',
+      perplexity: 'Perplexity',
+      cohere: 'Cohere',
+      deepseek: 'DeepSeek',
+      ollama: 'Ollama',
+      lmstudio: 'LM Studio',
+      custom: 'Custom',
+    };
+
+    // ─── Provider / Model bootstrap ───
+    async function loadProviders() {
+      const res = await apiFetch('/api/ai/providers');
+      if (!res || !res.ok) {
+        document.getElementById('pg-no-providers').classList.add('is-visible');
+        return;
+      }
+      const data = await res.json();
+      providersCatalog = data.providers || [];
+      const enabled = providersCatalog.filter(p => p.enabled);
+
+      const provSel = document.getElementById('pg-provider');
+      provSel.innerHTML = '';
+
+      if (!enabled.length) {
+        document.getElementById('pg-no-providers').classList.add('is-visible');
+        provSel.innerHTML = '<option value="">-- No providers enabled --</option>';
+        document.getElementById('pg-model').innerHTML = '<option value="">--</option>';
+        document.getElementById('pg-generate-btn').disabled = true;
+        return;
+      }
+
+      for (const p of enabled) {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = PROVIDER_LABEL[p.id] || p.id;
+        provSel.appendChild(opt);
+      }
+      // Pre-select the configured default if it's enabled.
+      if (data.default_provider && enabled.some(p => p.id === data.default_provider)) {
+        provSel.value = data.default_provider;
+      }
+      await onProviderChange();
+      // Pre-select default model after the dropdown is populated.
+      if (data.default_model) {
+        const modelSel = document.getElementById('pg-model');
+        if ([...modelSel.options].some(o => o.value === data.default_model)) {
+          modelSel.value = data.default_model;
+        }
+      }
+    }
+
+    async function onProviderChange() {
+      const pid = document.getElementById('pg-provider').value;
+      const modelSel = document.getElementById('pg-model');
+      modelSel.innerHTML = '<option value="">Loading…</option>';
+      if (!pid) {
+        modelSel.innerHTML = '<option value="">--</option>';
+        return;
+      }
+      const cat = providersCatalog.find(p => p.id === pid);
+      let models = [];
+      if (cat && cat.models && cat.models.length && !cat.dynamic_models) {
+        models = cat.models;
+      } else if (dynamicModelsCache[pid]) {
+        models = dynamicModelsCache[pid];
+      } else {
+        const res = await apiFetch(`/api/ai/models/${pid}`);
+        if (res && res.ok) {
+          const data = await res.json();
+          models = data.models || [];
+          dynamicModelsCache[pid] = models;
+        }
+      }
+      modelSel.innerHTML = '';
+      if (!models.length) {
+        modelSel.innerHTML = '<option value="">(no models — check Settings)</option>';
+        return;
+      }
+      for (const m of models) {
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = label;
+        modelSel.appendChild(opt);
+      }
+    }
 
     // ─── Character / word counter ───
     const pgInput = document.getElementById('pg-input');
@@ -359,8 +501,18 @@
         return;
       }
 
+      const provider = document.getElementById('pg-provider').value;
       const model = document.getElementById('pg-model').value;
       const sectionHint = document.getElementById('pg-section-hint').value;
+
+      if (!provider) {
+        showError('Please select an AI provider (configure one in Settings).');
+        return;
+      }
+      if (!model) {
+        showError('Please select a model.');
+        return;
+      }
 
       // Show loading
       hideError();
@@ -372,7 +524,7 @@
       try {
         const res = await apiFetch('/api/playground/generate', {
           method: 'POST',
-          body: JSON.stringify({ input, section_hint: sectionHint })
+          body: JSON.stringify({ input, section_hint: sectionHint, provider, model })
         });
 
         if (!res) return;
@@ -384,7 +536,7 @@
 
         const data = await res.json();
         generatedData = data.content;
-        renderResult(generatedData);
+        renderResult(generatedData, data.provider || provider, data.model || model);
       } catch (e) {
         showError(e.message);
       } finally {
@@ -395,13 +547,17 @@
     }
 
     // ─── Render Result ───
-    function renderResult(data) {
+    function renderResult(data, providerId, modelId) {
       // Suggestion box
       const suggBox = document.getElementById('pg-suggestion');
       if (data.suggested_section) {
         const sectionLabels = { insights: 'Insights', speaking: 'Activities', cases: 'Case Studies' };
-        document.getElementById('pg-suggested-section').textContent =
-          'Suggested: ' + (sectionLabels[data.suggested_section] || data.suggested_section);
+        const provLabel = providerId ? (PROVIDER_LABEL[providerId] || providerId) : '';
+        const badge = providerId
+          ? `<span class="pg-provider-badge">Generated by ${provLabel}${modelId ? ' · ' + modelId : ''}</span>`
+          : '';
+        document.getElementById('pg-suggested-section').innerHTML =
+          'Suggested: ' + (sectionLabels[data.suggested_section] || data.suggested_section) + badge;
         document.getElementById('pg-suggested-reason').textContent = data.reasoning || '';
         suggBox.classList.add('is-visible');
       } else {
@@ -601,6 +757,9 @@
     function hideError() {
       document.getElementById('pg-error').classList.remove('is-visible');
     }
+
+    // ─── Boot ───
+    loadProviders();
   </script>
 </body>
 </html>
