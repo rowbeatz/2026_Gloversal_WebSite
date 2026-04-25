@@ -73,9 +73,14 @@
       const body = document.querySelector('.detail-body');
       if (!body) return;
       const params = new URLSearchParams(location.search);
-      const slug = params.get('slug');
+      // Static pre-rendered pages use a clean URL (no ?slug=); fall back to data-slug attr.
+      const slug = params.get('slug') || document.body.dataset.slug || null;
       const type = document.body.dataset.contentType;
-      if (!slug || !type || !data[type]) return this.notFound(body);
+      if (!slug || !type || !data[type]) {
+        // If body already has pre-rendered content (static page), don't clobber it.
+        if (body.children.length > 0) return;
+        return this.notFound(body);
+      }
 
       const items = data[type];
       const item = items.find(i => i.slug === slug);
