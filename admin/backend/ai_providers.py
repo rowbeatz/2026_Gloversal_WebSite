@@ -94,13 +94,16 @@ def score_model(provider_id: str, model_id: str) -> int:
     ]):
         score -= 30
 
-    # Exclude embedding / audio / image / safety models — we want chat completions only.
+    # Exclude embedding / audio / image-gen / safety models — we want chat completions only.
     if any(x in m for x in [
         "embed", "embedding",
-        "tts", "whisper", "audio",
-        "dall-e", "stable-diffusion", "imagen",
-        "guard", "moderation",
+        "tts", "whisper", "audio", "voice", "speech",
+        "dall-e", "stable-diffusion", "imagen", "image-generation",
+        "flash-image", "flash-image-preview",  # Gemini image-gen variants
+        "veo", "lyria",                          # Google video/music models
+        "guard", "moderation", "safety",
         "rerank",
+        "live-",                                 # streaming/realtime variants
     ]):
         return 0
 
@@ -131,13 +134,18 @@ def score_model(provider_id: str, model_id: str) -> int:
         elif "gpt-3.5" in m: score = 30
 
     # ── Google Gemini ────────────────────────────────────────────────────────
+    # Flash models are ranked above Pro because Pro requires paid plan
+    # (free tier quota = 0 for Pro). Flash models work on free tier and
+    # are still highly capable. Users with paid plans can manually pick Pro.
     elif provider_id == "google":
-        if "2.5" in m and "pro" in m: score = 100
-        elif "2.5" in m and "flash" in m: score = 92
-        elif "2.0" in m and "pro" in m: score = 88
-        elif "2.0" in m and "flash" in m: score = 85
-        elif "1.5" in m and "pro" in m: score = 75
-        elif "1.5" in m and "flash" in m: score = 65
+        # Penalize "lite" / "flash-8b" tiny variants
+        if "flash-lite" in m or "flash-8b" in m: score = 50
+        elif "2.5" in m and "flash" in m: score = 100
+        elif "2.0" in m and "flash" in m: score = 92
+        elif "1.5" in m and "flash" in m: score = 80
+        elif "2.5" in m and "pro" in m: score = 75   # paid only — don't auto-pick
+        elif "2.0" in m and "pro" in m: score = 70
+        elif "1.5" in m and "pro" in m: score = 65
 
     # ── Mistral ──────────────────────────────────────────────────────────────
     elif provider_id == "mistral":
