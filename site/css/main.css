@@ -1137,23 +1137,6 @@
 .share-btn.is-copied{background:#10A37F;color:#fff}
 .share-btn.is-copied::after{content:"\2713";font-size:.65rem;margin-left:.25rem;font-weight:700}
 
-/* WeChat QR modal */
-.wechat-qr-modal{
-  display:none;position:fixed;inset:0;z-index:9999;
-  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;
-}
-.wechat-qr-modal.is-open{display:flex}
-.wechat-qr-modal__inner{
-  background:var(--bg-surface, #1c1c1e);color:var(--text-primary,#fff);
-  padding:1.75rem 2rem;border-radius:.75rem;text-align:center;
-  border:1px solid var(--border-default, rgba(255,255,255,.1));
-  max-width:280px;
-}
-.wechat-qr-modal__inner h4{margin:0 0 1rem;font-size:1rem;font-weight:600}
-.wechat-qr-modal__inner img{display:block;margin:0 auto;background:#fff;padding:.5rem;border-radius:.5rem}
-.wechat-qr-modal__hint{font-size:.75rem;opacity:.7;margin:.75rem 0 1rem}
-
 /* Detail prev/next navigation */
 .detail-nav{
   border-top:1px solid var(--border-default);
