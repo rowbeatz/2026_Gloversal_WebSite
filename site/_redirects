@@ -1,0 +1,6 @@
+# Cloudflare Pages routing rules
+# Defense-in-depth: block any /admin/* path from being served, even if
+# admin files were ever accidentally copied into site/. The admin panel
+# is local-Docker only and must NEVER be exposed via the public origin.
+/admin/*   /404.html  404
+/api/*     /404.html  404
