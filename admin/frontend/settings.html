@@ -59,10 +59,20 @@
       gap: 12px;
     }
     .provider-icon {
-      font-size: 22px;
-      line-height: 1;
-      width: 32px;
-      text-align: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
     .provider-name {
       font-size: 14px;
@@ -172,7 +182,7 @@
     .model-list {
       font-size: 11px;
       color: var(--muted);
-      max-height: 90px;
+      max-height: 180px;
       overflow-y: auto;
       padding: 6px 8px;
       border: 1px dashed var(--border);
@@ -185,6 +195,34 @@
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text);
+    }
+    .model-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 2px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .model-row:last-child { border-bottom: none; }
+    .model-row .score {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .recommended-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--success);
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
     }
 
     .provider-actions {
@@ -295,19 +333,20 @@
     highlightNav();
 
     // ─── Static metadata about each provider ───
+    // icon = inline SVG markup (from PROVIDER_ICONS in admin.js)
     const PROVIDER_META = {
-      anthropic:  { name: "Anthropic Claude",      icon: "🧠", desc: "Claude Opus/Sonnet/Haiku — 高品質・日本語強い", type: "key" },
-      openai:     { name: "OpenAI GPT",            icon: "⚡",       desc: "GPT-4o/o1 — 汎用性最高",                   type: "key" },
-      google:     { name: "Google Gemini",         icon: "✨",       desc: "Gemini 2.0 Flash — 高速・長文対応",         type: "key" },
-      mistral:    { name: "Mistral AI",            icon: "🌀", desc: "Mistral Large — 欧州製・プライバシー重視",     type: "key" },
-      groq:       { name: "Groq",                  icon: "🚀", desc: "Llama/Mixtral — 世界最速推論",              type: "key" },
-      together:   { name: "Together AI",           icon: "🤝", desc: "Llama/DeepSeek — オープンモデル",            type: "key" },
-      perplexity: { name: "Perplexity",            icon: "🔍", desc: "Web検索付き生成 — 最新情報対応",             type: "key" },
-      cohere:     { name: "Cohere",                icon: "🔗", desc: "Command R+ — RAG特化",                  type: "key" },
-      deepseek:   { name: "DeepSeek",              icon: "🔬", desc: "DeepSeek V3/R1 — 中国発・高精度",          type: "key" },
-      ollama:     { name: "Ollama (ローカル)",       icon: "🖥️", desc: "ローカルLLM — プライベート・無料",   type: "url" },
-      lmstudio:   { name: "LM Studio (ローカル)",    icon: "💻", desc: "ローカルLLM — GUI付き",                  type: "url" },
-      custom:     { name: "カスタム API",            icon: "⚙️", desc: "OpenAI互換エンドポイント",                type: "custom" },
+      anthropic:  { name: "Anthropic Claude",   icon: PROVIDER_ICONS.anthropic,  desc: "Claude Opus/Sonnet/Haiku — 高品質・日本語強い", type: "key" },
+      openai:     { name: "OpenAI GPT",         icon: PROVIDER_ICONS.openai,     desc: "GPT-4o / o1 / o3 — 汎用性最高",            type: "key" },
+      google:     { name: "Google Gemini",      icon: PROVIDER_ICONS.google,     desc: "Gemini 2.5 Pro / Flash — 高速・長文対応",   type: "key" },
+      mistral:    { name: "Mistral AI",         icon: PROVIDER_ICONS.mistral,    desc: "Mistral Large — 欧州製・プライバシー重視", type: "key" },
+      groq:       { name: "Groq",               icon: PROVIDER_ICONS.groq,       desc: "Llama / Mixtral — 世界最速推論",            type: "key" },
+      together:   { name: "Together AI",        icon: PROVIDER_ICONS.together,   desc: "Llama / DeepSeek — オープンモデル",         type: "key" },
+      perplexity: { name: "Perplexity",         icon: PROVIDER_ICONS.perplexity, desc: "Web検索付き生成 — 最新情報対応",            type: "key" },
+      cohere:     { name: "Cohere",             icon: PROVIDER_ICONS.cohere,     desc: "Command R+ — RAG特化",                     type: "key" },
+      deepseek:   { name: "DeepSeek",           icon: PROVIDER_ICONS.deepseek,   desc: "DeepSeek V3 / R1 — 中国発・高精度",         type: "key" },
+      ollama:     { name: "Ollama (ローカル)",    icon: PROVIDER_ICONS.ollama,     desc: "ローカルLLM — プライベート・無料",          type: "url" },
+      lmstudio:   { name: "LM Studio (ローカル)", icon: PROVIDER_ICONS.lmstudio,   desc: "ローカルLLM — GUI付き",                     type: "url" },
+      custom:     { name: "カスタム API",         icon: PROVIDER_ICONS.custom,     desc: "OpenAI互換エンドポイント",                 type: "custom" },
     };
 
     // ─── Local state — mirrors what's on the server with masked keys ───
@@ -398,7 +437,7 @@
           ${fields}
           <div class="provider-actions">
             <button type="button" class="btn" onclick="testConnection('${pid}')">Test Connection</button>
-            <button type="button" class="btn" onclick="loadModels('${pid}')">Show Models</button>
+            <button type="button" class="btn" onclick="refreshModels('${pid}')">Refresh Models</button>
           </div>
           <div class="test-result" data-role="test-result"></div>
           <div class="model-list" data-role="model-list"></div>
@@ -415,10 +454,11 @@
         .filter(p => (settingsCache.providers[p.id] || {}).enabled);
       const candidates = enabled.length ? enabled : providerCatalog;
       for (const p of candidates) {
-        const meta = PROVIDER_META[p.id] || { name: p.id, icon: '' };
+        const meta = PROVIDER_META[p.id] || { name: p.id };
         const opt = document.createElement('option');
         opt.value = p.id;
-        opt.textContent = `${meta.icon} ${meta.name}`;
+        // Native <option> can't render SVG; show plain name.
+        opt.textContent = meta.name;
         provSel.appendChild(opt);
       }
       const currentDefault = settingsCache.default_provider || (candidates[0] && candidates[0].id) || '';
@@ -436,31 +476,34 @@
         modelSel.innerHTML = '<option value="">(no models)</option>';
         return;
       }
-      for (const m of models) {
+      // Sort by score desc so the recommended one is first.
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      sorted.forEach((m, idx) => {
         const opt = document.createElement('option');
-        if (typeof m === 'string') {
-          opt.value = m; opt.textContent = m;
-        } else {
-          opt.value = m.id; opt.textContent = m.label || m.id;
-        }
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        opt.value = id;
+        opt.textContent = idx === 0 ? `★ ${label} (recommended)` : label;
         modelSel.appendChild(opt);
-      }
+      });
       const desired = settingsCache.default_model || '';
       if (desired && [...modelSel.options].some(o => o.value === desired)) {
         modelSel.value = desired;
+      } else if (sorted[0]) {
+        // Auto-select the recommended one when no saved default matches.
+        modelSel.value = typeof sorted[0] === 'string' ? sorted[0] : sorted[0].id;
       }
     }
 
-    async function fetchModelsFor(pid) {
+    async function fetchModelsFor(pid, { force } = {}) {
       if (!pid) return [];
-      // Cloud providers come from the catalog response; local ones we fetch.
-      const cat = providerCatalog.find(p => p.id === pid);
-      if (cat && cat.models && cat.models.length && !cat.dynamic_models) {
-        return cat.models;
-      }
-      if (dynamicModelsCache[pid]) return dynamicModelsCache[pid];
+      if (!force && dynamicModelsCache[pid]) return dynamicModelsCache[pid];
       const res = await apiFetch(`/api/ai/models/${pid}`);
-      if (!res || !res.ok) return cat ? cat.models : [];
+      if (!res || !res.ok) {
+        // Fall back to whatever the catalog had.
+        const cat = providerCatalog.find(p => p.id === pid);
+        return cat ? (cat.models || []) : [];
+      }
       const data = await res.json();
       const models = data.models || [];
       dynamicModelsCache[pid] = models;
@@ -468,7 +511,7 @@
     }
 
     // ───────────── Events ─────────────
-    function onEnabledToggle(input) {
+    async function onEnabledToggle(input) {
       const card = input.closest('.provider-card');
       card.classList.toggle('is-enabled', input.checked);
       // Mirror back into local cache so the defaults dropdown updates.
@@ -476,6 +519,19 @@
       settingsCache.providers[pid] = settingsCache.providers[pid] || {};
       settingsCache.providers[pid].enabled = input.checked;
       renderDefaults();
+      // When enabling a provider that already has a key/url, auto-fetch live models.
+      if (input.checked) {
+        const cfg = settingsCache.providers[pid] || {};
+        const hasCreds =
+          (cfg.api_key && !String(cfg.api_key).startsWith('••••') ? true : false) ||
+          !!cfg.base_url ||
+          // Already-saved (masked) keys still count.
+          (typeof cfg.api_key === 'string' && cfg.api_key.startsWith('••••'));
+        if (hasCreds) {
+          // Fire-and-forget; don't block the UI.
+          refreshModels(pid).catch(() => {});
+        }
+      }
     }
 
     function toggleKeyVisibility(btn) {
@@ -494,20 +550,18 @@
       const result = card.querySelector('[data-role="test-result"]');
       result.className = 'test-result is-visible';
       result.textContent = 'Testing…';
-      // Pick a default model to test with: first available.
-      const models = await fetchModelsFor(pid);
-      const model = models.length
-        ? (typeof models[0] === 'string' ? models[0] : models[0].id)
-        : '';
+      // Force a live refresh so we don't try to use a stale model id.
+      delete dynamicModelsCache[pid];
+      // Send NO model — let the backend auto-pick the best from the live list.
       const res = await apiFetch('/api/ai/test', {
         method: 'POST',
-        body: JSON.stringify({ provider: pid, model }),
+        body: JSON.stringify({ provider: pid, model: '' }),
       });
       if (!res) return;
       const data = await res.json();
       if (data.status === 'ok') {
         result.className = 'test-result ok is-visible';
-        result.innerHTML = `OK · ${escapeHtml(data.model || model)} · ${escapeHtml(data.response || '')}`;
+        result.innerHTML = `OK · <code>${escapeHtml(data.model || '')}</code> · ${escapeHtml(data.response || '')}`;
         card.classList.remove('is-error');
       } else {
         result.className = 'test-result err is-visible';
@@ -516,25 +570,36 @@
       }
     }
 
-    async function loadModels(pid) {
+    async function refreshModels(pid) {
       const card = document.querySelector(`.provider-card[data-provider="${pid}"]`);
       const list = card.querySelector('[data-role="model-list"]');
       list.className = 'model-list is-visible';
-      list.textContent = 'Loading…';
-      // Save first so dynamic providers see the latest base_url/model_ids.
+      list.textContent = 'Fetching live model list…';
+      // Save first so the backend sees the latest API key / base URL / model IDs.
       await saveSettings({ silent: true });
-      // Bypass cache when refreshing.
+      // Bypass cache.
       delete dynamicModelsCache[pid];
-      const models = await fetchModelsFor(pid);
+      const models = await fetchModelsFor(pid, { force: true });
       if (!models.length) {
-        list.textContent = '(no models found — check endpoint, API key, or pull a model)';
+        list.textContent = '(no models found — check API key, endpoint, or pull a model locally)';
         return;
       }
-      list.innerHTML = models.map(m => {
+      // Sort by score desc; top 3 get a "★ Recommended" badge.
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      list.innerHTML = sorted.map((m, idx) => {
         const id = typeof m === 'string' ? m : m.id;
         const label = typeof m === 'string' ? m : (m.label || m.id);
-        return `<div><code>${escapeHtml(id)}</code> — ${escapeHtml(label)}</div>`;
+        const score = (typeof m === 'object' && m.score != null) ? m.score : '';
+        const badge = idx < 3 ? `<span class="recommended-badge">★ Recommended</span>` : '';
+        return `
+          <div class="model-row">
+            <div><code>${escapeHtml(id)}</code> ${escapeHtml(label !== id ? '— ' + label : '')}${badge}</div>
+            <span class="score">${score !== '' ? 'score ' + score : ''}</span>
+          </div>
+        `;
       }).join('');
+      // Refresh the defaults dropdown so the new top-scoring model is offered.
+      onDefaultProviderChange();
     }
 
     // ───────────── Save ─────────────

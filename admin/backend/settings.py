@@ -45,7 +45,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "custom":     {"api_key": "", "base_url": "", "model_ids": "", "enabled": False},
     },
     "default_provider": "anthropic",
-    "default_model": "claude-haiku-4-5-20251001",
+    "default_model": "claude-sonnet-4-6",
 }
 
 

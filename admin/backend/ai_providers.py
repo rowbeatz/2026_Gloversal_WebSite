@@ -17,12 +17,13 @@ import httpx
 from settings import get_provider_config
 
 
-# ── Hardcoded model catalog (overridable per-provider via Custom + dynamic for local) ──
+# ── Fallback model catalog (used when the live /v1/models endpoint is unreachable) ──
+# When the user has a working API key, we ALWAYS prefer the live list over this.
 PROVIDER_MODELS: dict[str, list[dict[str, str]]] = {
     "anthropic": [
-        {"id": "claude-opus-4-7",            "label": "Claude Opus 4.7 (最高精度)"},
-        {"id": "claude-sonnet-4-6",          "label": "Claude Sonnet 4.6 (バランス)"},
-        {"id": "claude-haiku-4-5-20251001",  "label": "Claude Haiku 4.5 (高速・低コスト)"},
+        {"id": "claude-opus-4-7",   "label": "Claude Opus 4.7"},
+        {"id": "claude-sonnet-4-6", "label": "Claude Sonnet 4.6"},
+        {"id": "claude-haiku-4-5",  "label": "Claude Haiku 4.5"},
     ],
     "openai": [
         {"id": "gpt-4o",        "label": "GPT-4o"},
@@ -53,8 +54,10 @@ PROVIDER_MODELS: dict[str, list[dict[str, str]]] = {
         {"id": "Qwen/QwQ-32B-Preview",                    "label": "QwQ 32B"},
     ],
     "perplexity": [
-        {"id": "llama-3.1-sonar-large-128k-online", "label": "Sonar Large (Web検索付き)"},
-        {"id": "llama-3.1-sonar-small-128k-online", "label": "Sonar Small (Web検索付き)"},
+        {"id": "sonar-reasoning-pro", "label": "Sonar Reasoning Pro"},
+        {"id": "sonar-reasoning",     "label": "Sonar Reasoning"},
+        {"id": "sonar-pro",           "label": "Sonar Pro"},
+        {"id": "sonar",               "label": "Sonar"},
     ],
     "cohere": [
         {"id": "command-r-plus", "label": "Command R+"},
@@ -68,6 +71,136 @@ PROVIDER_MODELS: dict[str, list[dict[str, str]]] = {
     "lmstudio": [],  # populated dynamically from /v1/models
     "custom":   [],  # user defines model IDs as comma-separated list
 }
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Model scoring — used to rank "best" model per provider so the UI can
+# auto-select a strong default once we have the live model list from the API.
+# Higher score = more capable. 0 = not a chat model (filter out).
+# ──────────────────────────────────────────────────────────────────────────────
+
+def score_model(provider_id: str, model_id: str) -> int:
+    """Return a 0-100 capability score for ranking. 0 means filter out."""
+    if not model_id:
+        return 0
+    m = model_id.lower()
+    score = 50  # baseline
+
+    # Penalize deprecated / legacy date-stamped builds where a better alias exists.
+    if any(x in m for x in [
+        "deprecated", "legacy",
+        "0301", "0613", "0314", "1106",
+        "vision-preview", "instruct-0914",
+    ]):
+        score -= 30
+
+    # Exclude embedding / audio / image / safety models — we want chat completions only.
+    if any(x in m for x in [
+        "embed", "embedding",
+        "tts", "whisper", "audio",
+        "dall-e", "stable-diffusion", "imagen",
+        "guard", "moderation",
+        "rerank",
+    ]):
+        return 0
+
+    # ── Anthropic ────────────────────────────────────────────────────────────
+    if provider_id == "anthropic":
+        if "opus-4" in m: score = 100
+        elif "sonnet-4" in m: score = 90
+        elif "haiku-4" in m: score = 80
+        elif "opus-3" in m: score = 70
+        elif "sonnet-3.5" in m or "sonnet-3-5" in m: score = 65
+        elif "haiku-3.5" in m or "haiku-3-5" in m: score = 60
+        elif "opus" in m: score = 55
+        elif "sonnet" in m: score = 50
+        elif "haiku" in m: score = 45
+
+    # ── OpenAI ───────────────────────────────────────────────────────────────
+    elif provider_id == "openai":
+        if m.startswith("gpt-5"): score = 100
+        elif m.startswith("o3") or m.startswith("o4"): score = 95
+        elif "gpt-4.5" in m or "gpt-4-5" in m: score = 92
+        elif m.startswith("o1") and "mini" not in m: score = 88
+        elif "gpt-4o" in m and "mini" not in m: score = 85
+        elif "o3-mini" in m or "o4-mini" in m: score = 80
+        elif "o1-mini" in m: score = 75
+        elif "gpt-4o-mini" in m: score = 70
+        elif "gpt-4-turbo" in m: score = 65
+        elif "gpt-4" in m: score = 55
+        elif "gpt-3.5" in m: score = 30
+
+    # ── Google Gemini ────────────────────────────────────────────────────────
+    elif provider_id == "google":
+        if "2.5" in m and "pro" in m: score = 100
+        elif "2.5" in m and "flash" in m: score = 92
+        elif "2.0" in m and "pro" in m: score = 88
+        elif "2.0" in m and "flash" in m: score = 85
+        elif "1.5" in m and "pro" in m: score = 75
+        elif "1.5" in m and "flash" in m: score = 65
+
+    # ── Mistral ──────────────────────────────────────────────────────────────
+    elif provider_id == "mistral":
+        if "large" in m: score = 90
+        elif "medium" in m: score = 75
+        elif "small" in m: score = 60
+        elif "nemo" in m: score = 55
+        elif "ministral" in m: score = 50
+
+    # ── Groq (model availability changes; rank by base model) ────────────────
+    elif provider_id == "groq":
+        if "llama-3.3-70b" in m or "llama-3.1-70b" in m or "llama-4" in m: score = 90
+        elif "llama-3.3" in m or "llama-3.1" in m: score = 80
+        elif "deepseek" in m: score = 85
+        elif "qwen" in m: score = 78
+        elif "mixtral" in m: score = 75
+        elif "8b" in m or "7b" in m: score = 50
+
+    # ── DeepSeek ─────────────────────────────────────────────────────────────
+    elif provider_id == "deepseek":
+        if "reasoner" in m or "r1" in m: score = 95
+        elif "chat" in m or "v3" in m: score = 85
+
+    # ── Cohere ───────────────────────────────────────────────────────────────
+    elif provider_id == "cohere":
+        if "command-r-plus" in m: score = 90
+        elif "command-r" in m: score = 75
+        elif "command-light" in m: score = 50
+
+    # ── Perplexity (Sonar) ───────────────────────────────────────────────────
+    elif provider_id == "perplexity":
+        if "reasoning-pro" in m: score = 95
+        elif "reasoning" in m: score = 88
+        elif "sonar-pro" in m: score = 85
+        elif "sonar" in m: score = 75
+
+    # ── Together (OSS routed) ────────────────────────────────────────────────
+    elif provider_id == "together":
+        if "405b" in m or "405" in m: score = 95
+        elif "llama-3.3-70b" in m or "llama-4" in m: score = 90
+        elif "deepseek-v3" in m or "deepseek-r1" in m: score = 88
+        elif "qwen" in m and "72b" in m: score = 85
+        elif "70b" in m: score = 80
+
+    # ── Ollama / LM Studio: prefer larger params ─────────────────────────────
+    elif provider_id in ("ollama", "lmstudio"):
+        if "70b" in m or "72b" in m: score = 85
+        elif "32b" in m or "34b" in m: score = 75
+        elif "13b" in m or "14b" in m: score = 65
+        elif "7b" in m or "8b" in m: score = 55
+        elif "3b" in m or "1b" in m: score = 35
+
+    return max(0, min(100, score))
+
+
+def best_model(provider_id: str, models: list) -> str:
+    """Return the highest-scoring model id from a list of dicts or strings."""
+    if not models:
+        return ""
+    def _id(m):
+        return m["id"] if isinstance(m, dict) else m
+    scored = sorted(models, key=lambda m: score_model(provider_id, _id(m)), reverse=True)
+    return _id(scored[0])
 
 # Providers whose OpenAI-compatible endpoint accepts the JSON-mode response_format.
 # OpenAI itself supports it; some compat providers reject it with 400.
@@ -91,6 +224,15 @@ class BaseProvider(ABC):
 
     @abstractmethod
     async def generate(self, system: str, user: str, model: str) -> str: ...
+
+    async def list_models_live(self) -> list[dict]:
+        """Fetch the live model list from the provider's /models endpoint.
+
+        Returns [{"id": str, "label": str, "score": int}, ...] or [] on
+        failure. Subclasses override this; the default returns [] so the
+        caller falls back to PROVIDER_MODELS.
+        """
+        return []
 
     async def _post_json(
         self,
@@ -135,6 +277,38 @@ class AnthropicProvider(BaseProvider):
             return data["content"][0]["text"]
         except (KeyError, IndexError, TypeError) as e:
             raise RuntimeError(f"anthropic: unexpected response shape: {e}") from e
+
+    async def list_models_live(self) -> list[dict]:
+        cfg = get_provider_config("anthropic")
+        key = (cfg.get("api_key") or os.getenv("ANTHROPIC_API_KEY", "")).strip()
+        if not key:
+            return []
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get(
+                    "https://api.anthropic.com/v1/models",
+                    headers={
+                        "x-api-key": key,
+                        "anthropic-version": "2023-06-01",
+                    },
+                )
+                if r.status_code != 200:
+                    return []
+                items = r.json().get("data", [])
+                out: list[dict] = []
+                for m in items:
+                    mid = m.get("id", "")
+                    s = score_model("anthropic", mid)
+                    if s <= 0:
+                        continue
+                    out.append({
+                        "id": mid,
+                        "label": m.get("display_name", mid),
+                        "score": s,
+                    })
+                return out
+        except Exception:
+            return []
 
 
 # ── OpenAI-compatible (OpenAI / Mistral / Groq / Together / Perplexity / DeepSeek / LM Studio / Custom) ──
@@ -187,6 +361,57 @@ class OpenAICompatProvider(BaseProvider):
         except (KeyError, IndexError, TypeError) as e:
             raise RuntimeError(f"{self.provider_id}: unexpected response shape: {e}") from e
 
+    async def list_models_live(self) -> list[dict]:
+        # Perplexity does not expose a /models endpoint — return [] so the
+        # caller falls back to the static catalog.
+        if self.provider_id == "perplexity":
+            return []
+        # Custom provider with comma-separated user IDs is not a /models call.
+        if self.provider_id == "custom":
+            cfg = get_provider_config("custom")
+            ids = (cfg.get("model_ids") or "").strip()
+            if not ids:
+                return []
+            return [
+                {"id": mid.strip(), "label": mid.strip(), "score": 50}
+                for mid in ids.split(",") if mid.strip()
+            ]
+
+        key, base = self._resolve()
+        if not base:
+            return []
+        # LM Studio / local / custom servers don't require auth — only require
+        # a key for true cloud providers.
+        if self.provider_id not in ("lmstudio",) and not key:
+            return []
+
+        headers: dict[str, str] = {}
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
+
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get(f"{base}/models", headers=headers)
+                if r.status_code != 200:
+                    return []
+                payload = r.json()
+                items = payload.get("data") or payload.get("models") or []
+                out: list[dict] = []
+                for m in items:
+                    mid = m.get("id") if isinstance(m, dict) else str(m)
+                    if not mid:
+                        continue
+                    s = score_model(self.provider_id, mid)
+                    if s <= 0:
+                        continue
+                    label = mid
+                    if isinstance(m, dict):
+                        label = m.get("display_name") or m.get("name") or mid
+                    out.append({"id": mid, "label": label, "score": s})
+                return out
+        except Exception:
+            return []
+
 
 # ── Google Gemini ─────────────────────────────────────────────────────────────
 class GoogleProvider(BaseProvider):
@@ -221,6 +446,40 @@ class GoogleProvider(BaseProvider):
         except (KeyError, IndexError, TypeError) as e:
             raise RuntimeError(f"google: unexpected response shape: {e}") from e
 
+    async def list_models_live(self) -> list[dict]:
+        cfg = get_provider_config("google")
+        key = (cfg.get("api_key") or os.getenv("GOOGLE_API_KEY", "")).strip()
+        if not key:
+            return []
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get(
+                    f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+                )
+                if r.status_code != 200:
+                    return []
+                items = r.json().get("models", [])
+                out: list[dict] = []
+                for m in items:
+                    name = (m.get("name") or "").replace("models/", "")
+                    if not name:
+                        continue
+                    if "generateContent" not in m.get("supportedGenerationMethods", []):
+                        continue
+                    if any(x in name for x in ["embed", "aqa", "vision-latest"]):
+                        continue
+                    s = score_model("google", name)
+                    if s <= 0:
+                        continue
+                    out.append({
+                        "id": name,
+                        "label": m.get("displayName", name),
+                        "score": s,
+                    })
+                return out
+        except Exception:
+            return []
+
 
 # ── Cohere v2 ─────────────────────────────────────────────────────────────────
 class CohereProvider(BaseProvider):
@@ -250,6 +509,37 @@ class CohereProvider(BaseProvider):
             return data["message"]["content"][0]["text"]
         except (KeyError, IndexError, TypeError) as e:
             raise RuntimeError(f"cohere: unexpected response shape: {e}") from e
+
+    async def list_models_live(self) -> list[dict]:
+        cfg = get_provider_config("cohere")
+        key = (cfg.get("api_key") or os.getenv("COHERE_API_KEY", "")).strip()
+        if not key:
+            return []
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get(
+                    "https://api.cohere.com/v1/models",
+                    headers={"Authorization": f"Bearer {key}"},
+                    params={"endpoint": "chat", "page_size": 100},
+                )
+                if r.status_code != 200:
+                    return []
+                items = r.json().get("models", [])
+                out: list[dict] = []
+                for m in items:
+                    name = m.get("name", "")
+                    if not name:
+                        continue
+                    endpoints = m.get("endpoints", []) or []
+                    if endpoints and "chat" not in endpoints:
+                        continue
+                    s = score_model("cohere", name)
+                    if s <= 0:
+                        continue
+                    out.append({"id": name, "label": name, "score": s})
+                return out
+        except Exception:
+            return []
 
 
 # ── Ollama (local) ────────────────────────────────────────────────────────────
@@ -282,12 +572,32 @@ class OllamaProvider(BaseProvider):
             raise RuntimeError(f"ollama: unexpected response shape: {e}") from e
 
     async def list_models(self) -> list[str]:
+        """Legacy plain-string listing kept for backward compatibility."""
         base = self._base()
         try:
             async with httpx.AsyncClient(timeout=5) as c:
                 r = await c.get(f"{base}/api/tags")
                 r.raise_for_status()
                 return [m["name"] for m in r.json().get("models", [])]
+        except Exception:
+            return []
+
+    async def list_models_live(self) -> list[dict]:
+        base = self._base()
+        try:
+            async with httpx.AsyncClient(timeout=5) as c:
+                r = await c.get(f"{base}/api/tags")
+                if r.status_code != 200:
+                    return []
+                return [
+                    {
+                        "id": m["name"],
+                        "label": m["name"],
+                        "score": score_model("ollama", m["name"]),
+                    }
+                    for m in r.json().get("models", [])
+                    if m.get("name")
+                ]
         except Exception:
             return []
 

@@ -13,7 +13,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from ai_providers import PROVIDER_MODELS, get_provider, known_providers
+from ai_providers import PROVIDER_MODELS, best_model, get_provider, known_providers
 from auth import authenticate_user, create_token, get_current_user
 from content import read_content, write_content
 from build_runner import run_build, git_push
@@ -334,7 +334,23 @@ async def list_models(provider_id: str, _user: str = Depends(get_current_user)):
     if provider_id not in PROVIDER_MODELS:
         raise HTTPException(status_code=404, detail=f"Unknown provider: {provider_id}")
     models = await get_available_models(provider_id)
-    return {"provider": provider_id, "models": models}
+    return {
+        "provider": provider_id,
+        "models": models,
+        "best": best_model(provider_id, models),
+    }
+
+
+@app.get("/api/ai/best_model/{provider_id}")
+async def get_best_model(provider_id: str, _user: str = Depends(get_current_user)):
+    if provider_id not in PROVIDER_MODELS:
+        raise HTTPException(status_code=404, detail=f"Unknown provider: {provider_id}")
+    models = await get_available_models(provider_id)
+    return {
+        "provider": provider_id,
+        "best": best_model(provider_id, models),
+        "all": models,
+    }
 
 
 @app.post("/api/ai/test")
@@ -344,16 +360,19 @@ async def test_provider(req: TestProviderRequest, _user: str = Depends(get_curre
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Pick a sensible default model if the caller didn't specify one.
+    # Pick the best available model if the caller didn't specify one.
     model = req.model.strip()
     if not model:
         models = await get_available_models(req.provider)
-        if not models:
-            return {
-                "status": "error",
-                "error": f"No model available for {req.provider}. Configure model_ids or pull/download one.",
-            }
-        model = models[0]
+        model = best_model(req.provider, models)
+    if not model:
+        return {
+            "status": "error",
+            "error": (
+                f"No model available for {req.provider}. "
+                "Check the API key, base URL, or pull a model locally."
+            ),
+        }
 
     try:
         text = await provider.generate(

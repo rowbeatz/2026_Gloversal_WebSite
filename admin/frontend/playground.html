@@ -261,6 +261,102 @@
       letter-spacing: 0.4px;
       margin-left: 8px;
     }
+
+    /* ─── Custom provider picker (SVG-friendly replacement for native select) ─── */
+    .provider-picker {
+      position: relative;
+      width: 100%;
+    }
+    .provider-picker-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .provider-picker-btn:hover { border-color: var(--accent); }
+    .provider-picker-btn .caret { margin-left: auto; opacity: 0.6; }
+    .provider-picker-btn .pp-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-picker-btn .pp-icon svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .provider-picker-list {
+      position: absolute;
+      z-index: 50;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+      max-height: 280px;
+      overflow-y: auto;
+      display: none;
+    }
+    .provider-picker-list.is-open { display: block; }
+    .provider-picker-list .pp-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .provider-picker-list .pp-item:hover { background: var(--surface-alt); }
+    .provider-picker-list .pp-item.active {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
+    .provider-picker-list .pp-item .pp-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-picker-list .pp-item .pp-icon svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+    .pg-best-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--success);
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
@@ -284,10 +380,17 @@
 
               <div class="pg-model-row">
                 <div class="form-group" style="margin-bottom:0">
-                  <label for="pg-provider">AI Provider</label>
-                  <select id="pg-provider" onchange="onProviderChange()">
-                    <option value="">-- Loading… --</option>
-                  </select>
+                  <label>AI Provider</label>
+                  <div class="provider-picker" id="pg-provider-picker">
+                    <button type="button" class="provider-picker-btn" id="pg-provider-btn" onclick="toggleProviderPicker()">
+                      <span class="pp-icon" id="pg-provider-btn-icon"></span>
+                      <span id="pg-provider-btn-label">Loading…</span>
+                      <span class="caret">▾</span>
+                    </button>
+                    <div class="provider-picker-list" id="pg-provider-list"></div>
+                  </div>
+                  <!-- Hidden field to keep an authoritative value for callers. -->
+                  <input type="hidden" id="pg-provider" value="">
                 </div>
                 <div class="form-group" style="margin-bottom:0">
                   <label for="pg-model">Model</label>
@@ -297,7 +400,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom:0">
                   <label>&nbsp;</label>
-                  <a href="/admin/settings.html" class="btn btn-sm" style="display:block;text-align:center">⚙ Settings</a>
+                  <a href="/admin/settings.html" class="btn btn-sm" style="display:block;text-align:center">Settings</a>
                 </div>
               </div>
 
@@ -402,7 +505,53 @@
       custom: 'Custom',
     };
 
-    // ─── Provider / Model bootstrap ───
+    // ─── Provider picker (custom, SVG-friendly) ───
+    function toggleProviderPicker(forceState) {
+      const list = document.getElementById('pg-provider-list');
+      const open = forceState != null ? forceState : !list.classList.contains('is-open');
+      list.classList.toggle('is-open', open);
+    }
+    // Close picker when clicking outside.
+    document.addEventListener('click', (e) => {
+      const picker = document.getElementById('pg-provider-picker');
+      if (picker && !picker.contains(e.target)) toggleProviderPicker(false);
+    });
+
+    function renderProviderPicker(enabledProviders, selectedId) {
+      const list = document.getElementById('pg-provider-list');
+      const btnIcon = document.getElementById('pg-provider-btn-icon');
+      const btnLabel = document.getElementById('pg-provider-btn-label');
+      list.innerHTML = '';
+      enabledProviders.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'pp-item' + (p.id === selectedId ? ' active' : '');
+        item.innerHTML = `
+          <span class="pp-icon">${PROVIDER_ICONS[p.id] || ''}</span>
+          <span>${escapeHtml(PROVIDER_LABEL[p.id] || p.id)}</span>
+        `;
+        item.onclick = () => {
+          setProvider(p.id);
+          toggleProviderPicker(false);
+        };
+        list.appendChild(item);
+      });
+      // Update the trigger button.
+      if (selectedId) {
+        btnIcon.innerHTML = PROVIDER_ICONS[selectedId] || '';
+        btnLabel.textContent = PROVIDER_LABEL[selectedId] || selectedId;
+      } else {
+        btnIcon.innerHTML = '';
+        btnLabel.textContent = '-- Select provider --';
+      }
+    }
+
+    async function setProvider(pid) {
+      document.getElementById('pg-provider').value = pid || '';
+      const enabled = providersCatalog.filter(p => p.enabled);
+      renderProviderPicker(enabled, pid);
+      await onProviderChange();
+    }
+
     async function loadProviders() {
       const res = await apiFetch('/api/ai/providers');
       if (!res || !res.ok) {
@@ -413,29 +562,25 @@
       providersCatalog = data.providers || [];
       const enabled = providersCatalog.filter(p => p.enabled);
 
-      const provSel = document.getElementById('pg-provider');
-      provSel.innerHTML = '';
-
       if (!enabled.length) {
         document.getElementById('pg-no-providers').classList.add('is-visible');
-        provSel.innerHTML = '<option value="">-- No providers enabled --</option>';
+        renderProviderPicker([], null);
+        document.getElementById('pg-provider-btn-label').textContent = '-- No providers enabled --';
         document.getElementById('pg-model').innerHTML = '<option value="">--</option>';
         document.getElementById('pg-generate-btn').disabled = true;
         return;
       }
 
-      for (const p of enabled) {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = PROVIDER_LABEL[p.id] || p.id;
-        provSel.appendChild(opt);
-      }
-      // Pre-select the configured default if it's enabled.
+      // Pre-select the configured default if it's enabled, else the first.
+      let selected = enabled[0].id;
       if (data.default_provider && enabled.some(p => p.id === data.default_provider)) {
-        provSel.value = data.default_provider;
+        selected = data.default_provider;
       }
+      document.getElementById('pg-provider').value = selected;
+      renderProviderPicker(enabled, selected);
       await onProviderChange();
-      // Pre-select default model after the dropdown is populated.
+
+      // Honor the saved default model if present in the freshly-loaded list.
       if (data.default_model) {
         const modelSel = document.getElementById('pg-model');
         if ([...modelSel.options].some(o => o.value === data.default_model)) {
@@ -447,23 +592,23 @@
     async function onProviderChange() {
       const pid = document.getElementById('pg-provider').value;
       const modelSel = document.getElementById('pg-model');
-      modelSel.innerHTML = '<option value="">Loading…</option>';
+      modelSel.innerHTML = '<option value="">Loading live models…</option>';
       if (!pid) {
         modelSel.innerHTML = '<option value="">--</option>';
         return;
       }
-      const cat = providersCatalog.find(p => p.id === pid);
-      let models = [];
-      if (cat && cat.models && cat.models.length && !cat.dynamic_models) {
-        models = cat.models;
-      } else if (dynamicModelsCache[pid]) {
-        models = dynamicModelsCache[pid];
-      } else {
+      // Always fetch live; fall back is handled server-side.
+      let models = dynamicModelsCache[pid];
+      let bestId = '';
+      if (!models) {
         const res = await apiFetch(`/api/ai/models/${pid}`);
         if (res && res.ok) {
           const data = await res.json();
           models = data.models || [];
+          bestId = data.best || '';
           dynamicModelsCache[pid] = models;
+        } else {
+          models = [];
         }
       }
       modelSel.innerHTML = '';
@@ -471,14 +616,19 @@
         modelSel.innerHTML = '<option value="">(no models — check Settings)</option>';
         return;
       }
-      for (const m of models) {
+      // Sort by score desc; mark the top one as "Best available".
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      sorted.forEach((m, idx) => {
         const id = typeof m === 'string' ? m : m.id;
         const label = typeof m === 'string' ? m : (m.label || m.id);
         const opt = document.createElement('option');
         opt.value = id;
-        opt.textContent = label;
+        opt.textContent = idx === 0 ? `★ Best available — ${label}` : label;
         modelSel.appendChild(opt);
-      }
+      });
+      // Auto-select the best.
+      const top = bestId || (typeof sorted[0] === 'string' ? sorted[0] : sorted[0].id);
+      if (top) modelSel.value = top;
     }
 
     // ─── Character / word counter ───

@@ -18,6 +18,7 @@ from ai_providers import (
     PROVIDER_MODELS,
     OllamaProvider,
     get_provider,
+    score_model,
 )
 from settings import get_provider_config, load_settings
 
@@ -87,7 +88,14 @@ async def generate_content(
     """Generate structured content using the configured AI provider."""
     s = load_settings()
     pid = (provider_id or s.get("default_provider") or "anthropic").strip()
-    mid = (model_id or s.get("default_model") or "claude-haiku-4-5-20251001").strip()
+    mid = (model_id or s.get("default_model") or "claude-sonnet-4-6").strip()
+
+    # If no explicit model and no default, auto-pick best from live list.
+    if not mid:
+        models = await get_available_models(pid)
+        if models:
+            from ai_providers import best_model
+            mid = best_model(pid, models)
 
     if not mid:
         raise ValueError(f"No model selected for provider '{pid}'")
@@ -114,34 +122,39 @@ async def generate_content(
             ) from e
 
 
-async def get_available_models(provider_id: str) -> list[str]:
-    """Return a list of model ids for a provider.
+async def get_available_models(provider_id: str) -> list[dict]:
+    """Return ranked model dicts for a provider.
 
-    Local providers (Ollama, LM Studio) are queried at runtime; the Custom
-    provider returns the user's manually-entered comma-separated list; all
-    cloud providers return the curated catalog.
+    Strategy:
+      1. Try the provider's *live* `/v1/models` endpoint (uses the saved API key).
+      2. Fall back to the static PROVIDER_MODELS catalog.
+
+    Always returns a list of {"id", "label", "score"} dicts, sorted by score
+    descending so the caller can simply take the first entry as "best".
     """
     pid = provider_id.strip()
-    if pid == "ollama":
-        return await OllamaProvider().list_models()
 
-    if pid == "lmstudio":
-        cfg = get_provider_config("lmstudio")
-        base = (cfg.get("base_url") or "http://host.docker.internal:1234/v1").rstrip("/")
-        try:
-            async with httpx.AsyncClient(timeout=5) as c:
-                r = await c.get(f"{base}/models")
-                r.raise_for_status()
-                return [m["id"] for m in r.json().get("data", [])]
-        except Exception:
-            return []
+    # 1. Try live first.
+    try:
+        provider = get_provider(pid)
+        live = await provider.list_models_live()
+        if live:
+            return sorted(live, key=lambda m: m.get("score", 0), reverse=True)
+    except Exception:
+        # Don't crash — degrade to catalog.
+        pass
 
-    if pid == "custom":
-        cfg = get_provider_config("custom")
-        ids = cfg.get("model_ids", "") or ""
-        return [m.strip() for m in ids.split(",") if m.strip()]
-
-    return [m["id"] for m in PROVIDER_MODELS.get(pid, [])]
+    # 2. Fall back to static catalog.
+    catalog = PROVIDER_MODELS.get(pid, [])
+    out = [
+        {
+            "id": m["id"],
+            "label": m.get("label", m["id"]),
+            "score": score_model(pid, m["id"]),
+        }
+        for m in catalog
+    ]
+    return sorted(out, key=lambda m: m.get("score", 0), reverse=True)
 
 
 # ── oEmbed SNS import (unchanged from original) ──────────────────────────────
