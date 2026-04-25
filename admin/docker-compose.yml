@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  admin:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ..:/project
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — Editor</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">Editor</h1>
+        <button class="btn btn-sm" onclick="logout()">Logout</button>
+      </div>
+      <div class="content-area" id="content-area">
+
+        <form id="editor-form">
+          <!-- Section + Slug -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="section">Section</label>
+              <select id="section">
+                <option value="insights">Insights</option>
+                <option value="speaking">Activities</option>
+                <option value="cases">Case Studies</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="slug">Slug</label>
+              <input type="text" id="slug" placeholder="auto-generated-from-title">
+            </div>
+          </div>
+
+          <!-- Tag + Date -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tag">Tag</label>
+              <input type="text" id="tag" placeholder="Medical AI, Market Entry, etc.">
+            </div>
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="month" id="date">
+            </div>
+          </div>
+
+          <!-- Date labels -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dateLabel-ja">Date Label JA</label>
+              <input type="text" id="dateLabel-ja" placeholder="2026 . 04">
+            </div>
+            <div class="form-group">
+              <label for="dateLabel-en">Date Label EN</label>
+              <input type="text" id="dateLabel-en" placeholder="2026 . 04">
+            </div>
+          </div>
+
+          <!-- Titles -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title-ja">Title JA</label>
+              <input type="text" id="title-ja" placeholder="Japanese title">
+            </div>
+            <div class="form-group">
+              <label for="title-en">Title EN</label>
+              <input type="text" id="title-en" placeholder="English title">
+            </div>
+          </div>
+
+          <!-- Excerpts -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="excerpt-ja">Excerpt JA</label>
+              <textarea id="excerpt-ja" placeholder="Short Japanese summary..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="excerpt-en">Excerpt EN</label>
+              <textarea id="excerpt-en" placeholder="Short English summary..."></textarea>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="body-ja">Body JA (HTML)</label>
+              <textarea id="body-ja" class="large" placeholder="<h2>...</h2><p>...</p>"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="body-en">Body EN (HTML)</label>
+              <textarea id="body-en" class="large" placeholder="<h2>...</h2><p>...</p>"></textarea>
+            </div>
+          </div>
+
+          <!-- Embed -->
+          <div class="form-group">
+            <label for="embed">Embed Code (optional: YouTube, LinkedIn, Instagram, X, Notion, etc.)</label>
+            <textarea id="embed" placeholder='<iframe src="..." ...></iframe>'></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Embed Preview</label>
+            <div class="embed-preview" id="embed-preview">
+              <span class="text-muted text-sm">Paste embed code above to preview</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="deploy-actions mt-24">
+            <button type="submit" class="btn btn-primary" id="save-btn">Save</button>
+            <button type="button" class="btn" id="save-build-btn" style="display:none">Save &amp; Build</button>
+            <a href="/admin/dashboard.html" class="btn">Cancel</a>
+          </div>
+        </form>
+
+        <div id="build-log" class="hidden mt-24">
+          <div class="section-header"><h2>Build Output</h2></div>
+          <div class="terminal" id="log-output"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar
+    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
+    highlightNav();
+
+    const params = getParams();
+    const section = params.get('section') || 'insights';
+    const slug = params.get('slug') || '';
+    const isEditing = !!slug;
+
+    const sectionEl = document.getElementById('section');
+    const slugEl = document.getElementById('slug');
+    const pageTitle = document.getElementById('page-title');
+
+    // Lock section and slug if editing
+    if (isEditing) {
+      pageTitle.textContent = `Edit: ${slug}`;
+      sectionEl.value = section;
+      sectionEl.disabled = true;
+      slugEl.value = slug;
+      slugEl.readOnly = true;
+    } else {
+      pageTitle.textContent = `New ${sectionLabel(section)} Article`;
+      sectionEl.value = section;
+    }
+
+    // Auto-generate slug from English title
+    const titleEnEl = document.getElementById('title-en');
+    titleEnEl.addEventListener('input', () => {
+      if (!isEditing && !slugEl.dataset.manual) {
+        const val = titleEnEl.value
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/[\s_]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+        slugEl.value = val;
+      }
+    });
+
+    // Mark slug as manually edited
+    slugEl.addEventListener('input', () => {
+      slugEl.dataset.manual = 'true';
+    });
+
+    // Auto-generate date labels from date
+    const dateEl = document.getElementById('date');
+    dateEl.addEventListener('change', () => {
+      const val = dateEl.value; // YYYY-MM
+      if (val) {
+        const [y, m] = val.split('-');
+        const monthInt = parseInt(m, 10);
+        const label = `${y} · ${m}`;
+        document.getElementById('dateLabel-ja').value = label;
+        document.getElementById('dateLabel-en').value = label;
+      }
+    });
+
+    // Embed preview
+    const embedEl = document.getElementById('embed');
+    const embedPreview = document.getElementById('embed-preview');
+    embedEl.addEventListener('input', () => {
+      const code = embedEl.value.trim();
+      if (code) {
+        embedPreview.innerHTML = code;
+      } else {
+        embedPreview.innerHTML = '<span class="text-muted text-sm">Paste embed code above to preview</span>';
+      }
+    });
+
+    // Load existing content if editing
+    if (isEditing) {
+      loadItem();
+    }
+
+    async function loadItem() {
+      const res = await apiFetch(`/api/content/${section}`);
+      if (!res) return;
+      const data = await res.json();
+      const item = (data.items || []).find(i => i.slug === slug);
+      if (!item) {
+        showToast('Item not found', 'error');
+        return;
+      }
+
+      // Populate form
+      document.getElementById('tag').value = item.tag || '';
+
+      // Handle date — could be YYYY-MM or YYYY-MM-DD
+      const dateRaw = item.date || '';
+      if (dateRaw.length === 7) {
+        dateEl.value = dateRaw; // YYYY-MM
+      } else if (dateRaw.length >= 10) {
+        dateEl.value = dateRaw.substring(0, 7); // YYYY-MM from YYYY-MM-DD
+      }
+
+      if (item.dateLabel) {
+        document.getElementById('dateLabel-ja').value = item.dateLabel.ja || '';
+        document.getElementById('dateLabel-en').value = item.dateLabel.en || '';
+      }
+      if (item.title) {
+        document.getElementById('title-ja').value = item.title.ja || '';
+        document.getElementById('title-en').value = item.title.en || '';
+      }
+      if (item.excerpt) {
+        document.getElementById('excerpt-ja').value = item.excerpt.ja || '';
+        document.getElementById('excerpt-en').value = item.excerpt.en || '';
+      }
+      if (item.body) {
+        document.getElementById('body-ja').value = item.body.ja || '';
+        document.getElementById('body-en').value = item.body.en || '';
+      }
+      embedEl.value = item.embed || '';
+      if (item.embed) {
+        embedPreview.innerHTML = item.embed;
+      }
+    }
+
+    // Save handler
+    const form = document.getElementById('editor-form');
+    const saveBtn = document.getElementById('save-btn');
+    const saveBuildBtn = document.getElementById('save-build-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await saveItem();
+    });
+
+    async function saveItem() {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+      const currentSection = isEditing ? section : sectionEl.value;
+      const dateVal = dateEl.value; // YYYY-MM
+
+      const payload = {
+        slug: slugEl.value,
+        date: dateVal,
+        dateLabel: {
+          ja: document.getElementById('dateLabel-ja').value,
+          en: document.getElementById('dateLabel-en').value
+        },
+        tag: document.getElementById('tag').value,
+        title: {
+          ja: document.getElementById('title-ja').value,
+          en: document.getElementById('title-en').value
+        },
+        excerpt: {
+          ja: document.getElementById('excerpt-ja').value,
+          en: document.getElementById('excerpt-en').value
+        },
+        body: {
+          ja: document.getElementById('body-ja').value,
+          en: document.getElementById('body-en').value
+        },
+        embed: embedEl.value
+      };
+
+      let res;
+      if (isEditing) {
+        res = await apiFetch(`/api/content/${currentSection}/${slug}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await apiFetch(`/api/content/${currentSection}`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+
+      if (res && res.ok) {
+        showToast(isEditing ? 'Updated successfully' : 'Created successfully');
+        saveBuildBtn.style.display = 'inline-flex';
+      } else if (res) {
+        const err = await res.json();
+        showToast(err.detail || 'Save failed', 'error');
+      }
+    }
+
+    // Save & Build
+    saveBuildBtn.addEventListener('click', async () => {
+      await saveItem();
+      saveBuildBtn.disabled = true;
+      saveBuildBtn.innerHTML = '<span class="spinner"></span> Building...';
+
+      const logWrap = document.getElementById('build-log');
+      const logEl = document.getElementById('log-output');
+      logWrap.classList.remove('hidden');
+      logEl.textContent = 'Building...\n';
+
+      const res = await apiFetch('/api/build', { method: 'POST' });
+      if (res) {
+        const data = await res.json();
+        logEl.textContent = '';
+        if (data.stdout) logEl.textContent += data.stdout;
+        if (data.stderr) logEl.textContent += data.stderr;
+        if (data.returncode === 0) {
+          showToast('Build completed');
+        } else {
+          showToast('Build failed', 'error');
+        }
+      }
+
+      saveBuildBtn.disabled = false;
+      saveBuildBtn.textContent = 'Save & Build';
+    });
+  </script>
+</body>
+</html>

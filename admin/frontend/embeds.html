@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — Embeds</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1>Embed Manager</h1>
+        <button class="btn btn-sm" onclick="logout()">Logout</button>
+      </div>
+      <div class="content-area" id="content-area">
+        <div class="section-header">
+          <h2>Articles with Embed Codes</h2>
+        </div>
+        <p class="text-muted mb-16">All articles across sections that have embed codes (YouTube, LinkedIn, Instagram, X, Notion, etc.).</p>
+
+        <div id="embeds-list">
+          <p class="text-muted">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar
+    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
+    highlightNav();
+
+    const listEl = document.getElementById('embeds-list');
+
+    async function loadEmbeds() {
+      const sections = ['insights', 'speaking', 'cases'];
+      let allEmbeds = [];
+
+      for (const s of sections) {
+        const res = await apiFetch(`/api/content/${s}`);
+        if (!res) continue;
+        const data = await res.json();
+        const items = (data.items || []).filter(item => item.embed && item.embed.trim());
+        for (const item of items) {
+          allEmbeds.push({ ...item, _section: s });
+        }
+      }
+
+      if (allEmbeds.length === 0) {
+        listEl.innerHTML = `
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Section</th>
+                  <th>Embed Type</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="4" class="text-muted" style="text-align:center;padding:24px">
+                    No articles with embed codes yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        return;
+      }
+
+      let rows = '';
+      for (const item of allEmbeds) {
+        const titleEn = item.title ? (item.title.en || item.title.ja || item.slug) : item.slug;
+        const embedType = detectEmbedType(item.embed);
+        rows += `
+          <tr>
+            <td><strong>${escapeHtml(titleEn)}</strong></td>
+            <td><span class="tag">${sectionLabel(item._section)}</span></td>
+            <td class="text-muted">${embedType}</td>
+            <td>
+              <a href="/admin/editor.html?section=${item._section}&slug=${item.slug}" class="btn btn-sm">Edit</a>
+              <button class="btn btn-sm" onclick="previewEmbed(this)">Preview</button>
+            </td>
+          </tr>
+          <tr class="embed-row hidden" id="embed-${item.slug}">
+            <td colspan="4">
+              <div class="embed-preview">${item.embed}</div>
+            </td>
+          </tr>
+        `;
+      }
+
+      listEl.innerHTML = `
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Section</th>
+                <th>Embed Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function detectEmbedType(code) {
+      if (!code) return 'Unknown';
+      const lower = code.toLowerCase();
+      if (lower.includes('youtube.com') || lower.includes('youtu.be')) return 'YouTube';
+      if (lower.includes('linkedin.com')) return 'LinkedIn';
+      if (lower.includes('instagram.com')) return 'Instagram';
+      if (lower.includes('twitter.com') || lower.includes('x.com')) return 'X (Twitter)';
+      if (lower.includes('notion.so') || lower.includes('notion.site')) return 'Notion';
+      if (lower.includes('<iframe')) return 'iframe';
+      if (lower.includes('<blockquote')) return 'Blockquote';
+      return 'Custom';
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text || '';
+      return d.innerHTML;
+    }
+
+    function previewEmbed(btn) {
+      // Find the next row and toggle it
+      const tr = btn.closest('tr');
+      const nextRow = tr.nextElementSibling;
+      if (nextRow && nextRow.classList.contains('embed-row')) {
+        nextRow.classList.toggle('hidden');
+        btn.textContent = nextRow.classList.contains('hidden') ? 'Preview' : 'Hide';
+      }
+    }
+
+    loadEmbeds();
+  </script>
+</body>
+</html>

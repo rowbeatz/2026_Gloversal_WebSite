@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — Dashboard</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <!-- Sidebar injected by JS -->
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">Dashboard</h1>
+        <button class="btn btn-sm" onclick="logout()">Logout</button>
+      </div>
+      <div class="content-area" id="content-area">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar
+    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
+    highlightNav();
+
+    const contentArea = document.getElementById('content-area');
+    const pageTitle = document.getElementById('page-title');
+    const params = getParams();
+    const view = params.get('view');
+
+    // Content cache
+    let allContent = null;
+
+    async function loadContent() {
+      if (allContent) return allContent;
+      const sections = ['insights', 'speaking', 'cases'];
+      const result = {};
+      for (const s of sections) {
+        const res = await apiFetch(`/api/content/${s}`);
+        if (res) {
+          const data = await res.json();
+          result[s] = data.items || [];
+        } else {
+          result[s] = [];
+        }
+      }
+      allContent = result;
+      return result;
+    }
+
+    async function renderDashboard() {
+      pageTitle.textContent = 'Dashboard';
+      const data = await loadContent();
+      const insightsCount = data.insights.length;
+      const speakingCount = data.speaking.length;
+      const casesCount = data.cases.length;
+
+      contentArea.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Insights</div>
+            <div class="stat-value">${insightsCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Activities</div>
+            <div class="stat-value">${speakingCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Case Studies</div>
+            <div class="stat-value">${casesCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Articles</div>
+            <div class="stat-value">${insightsCount + speakingCount + casesCount}</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="deploy-actions">
+          <a href="/admin/editor.html?section=insights" class="btn btn-primary">New Insight</a>
+          <a href="/admin/editor.html?section=speaking" class="btn btn-primary">New Activity</a>
+          <a href="/admin/editor.html?section=cases" class="btn btn-primary">New Case Study</a>
+          <button class="btn btn-success" onclick="doBuild()">Build Site</button>
+          <button class="btn" onclick="doDeploy()">Build &amp; Deploy</button>
+        </div>
+
+        <div id="build-log" class="hidden mt-16">
+          <div class="section-header"><h2>Build Output</h2></div>
+          <div class="terminal" id="log-output"></div>
+        </div>
+      `;
+    }
+
+    async function renderSection(section) {
+      const label = sectionLabel(section);
+      pageTitle.textContent = label;
+      const data = await loadContent();
+      const items = data[section] || [];
+
+      let rows = '';
+      for (const item of items) {
+        const titleEn = item.title ? (item.title.en || item.title.ja || '') : '';
+        const hasEmbed = item.embed ? '<span class="tag">embed</span>' : '';
+        rows += `
+          <tr>
+            <td><strong>${titleEn}</strong></td>
+            <td><span class="tag">${item.tag || ''}</span></td>
+            <td class="text-muted">${item.date || ''}</td>
+            <td>${hasEmbed}</td>
+            <td>
+              <a href="/admin/editor.html?section=${section}&slug=${item.slug}" class="btn btn-sm">Edit</a>
+              <button class="btn btn-sm btn-danger" onclick="deleteItem('${section}', '${item.slug}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      }
+
+      contentArea.innerHTML = `
+        <div class="section-header">
+          <h2>${label} (${items.length})</h2>
+          <a href="/admin/editor.html?section=${section}" class="btn btn-primary">New ${label.replace(/s$/, '')}</a>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Tag</th>
+                <th>Date</th>
+                <th>Embed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="5" class="text-muted" style="text-align:center;padding:24px">No items yet</td></tr>'}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    async function renderDeploy() {
+      pageTitle.textContent = 'Deploy';
+      contentArea.innerHTML = `
+        <div class="section-header">
+          <h2>Build &amp; Deploy</h2>
+        </div>
+        <p class="text-muted mb-16">Build the site from content-data.js, then optionally push to GitHub for Cloudflare Pages deployment.</p>
+
+        <div class="deploy-actions">
+          <button class="btn btn-success" onclick="doBuild()" id="build-btn">Build Site</button>
+          <button class="btn btn-primary" onclick="doDeploy()" id="deploy-btn">Build &amp; Deploy</button>
+        </div>
+
+        <div class="form-group mt-16" style="max-width:500px">
+          <label for="commit-msg">Commit Message</label>
+          <input type="text" id="commit-msg" value="chore(admin): content update" placeholder="Commit message for deploy">
+        </div>
+
+        <div id="build-log" class="mt-16">
+          <div class="section-header"><h2>Output</h2></div>
+          <div class="terminal" id="log-output">Ready.</div>
+        </div>
+      `;
+    }
+
+    // ─────────── Actions ───────────
+
+    async function doBuild() {
+      const logEl = document.getElementById('log-output');
+      const logWrap = document.getElementById('build-log');
+      if (logWrap) logWrap.classList.remove('hidden');
+      if (logEl) logEl.textContent = 'Building...\n';
+
+      const res = await apiFetch('/api/build', { method: 'POST' });
+      if (!res) return;
+      const data = await res.json();
+
+      if (logEl) {
+        logEl.textContent = '';
+        if (data.stdout) logEl.textContent += data.stdout;
+        if (data.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.stderr)}</span>`;
+        if (data.returncode === 0) {
+          logEl.innerHTML += '\n<span class="info">Build completed successfully.</span>';
+          showToast('Build completed successfully');
+        } else {
+          logEl.innerHTML += `\n<span class="error">Build failed (exit code ${data.returncode}).</span>`;
+          showToast('Build failed', 'error');
+        }
+      }
+    }
+
+    async function doDeploy() {
+      const logEl = document.getElementById('log-output');
+      const logWrap = document.getElementById('build-log');
+      if (logWrap) logWrap.classList.remove('hidden');
+      if (logEl) logEl.textContent = 'Building and deploying...\n';
+
+      const commitMsg = document.getElementById('commit-msg');
+      const body = commitMsg ? { commit_msg: commitMsg.value } : {};
+
+      const res = await apiFetch('/api/deploy', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+      if (!res) return;
+      const data = await res.json();
+
+      if (logEl) {
+        logEl.textContent = '';
+        // Build output
+        if (data.build) {
+          logEl.textContent += '=== BUILD ===\n';
+          if (data.build.stdout) logEl.textContent += data.build.stdout;
+          if (data.build.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.build.stderr)}</span>`;
+        }
+        // Deploy output
+        if (data.deploy && data.deploy.steps) {
+          logEl.innerHTML += '\n=== DEPLOY ===\n';
+          for (const step of data.deploy.steps) {
+            logEl.innerHTML += `<span class="info">$ ${escapeHtml(step.cmd)}</span>\n`;
+            logEl.innerHTML += escapeHtml(step.out) + '\n';
+          }
+        }
+        if (data.error) {
+          logEl.innerHTML += `<span class="error">${escapeHtml(data.error)}</span>`;
+          showToast('Deploy failed', 'error');
+        } else {
+          logEl.innerHTML += '\n<span class="info">Deploy completed.</span>';
+          showToast('Deploy completed');
+        }
+      }
+    }
+
+    async function deleteItem(section, slug) {
+      if (!confirm(`Delete "${slug}" from ${sectionLabel(section)}?`)) return;
+      const res = await apiFetch(`/api/content/${section}/${slug}`, { method: 'DELETE' });
+      if (res && res.ok) {
+        showToast('Item deleted');
+        allContent = null;  // clear cache
+        renderSection(section);
+      } else {
+        showToast('Delete failed', 'error');
+      }
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    // ─────────── Router ───────────
+
+    if (view === 'insights' || view === 'speaking' || view === 'cases') {
+      renderSection(view);
+    } else if (view === 'deploy') {
+      renderDeploy();
+    } else {
+      renderDashboard();
+    }
+  </script>
+</body>
+</html>

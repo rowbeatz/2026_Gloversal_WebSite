@@ -51,11 +51,11 @@ def verify_slugs_against_data():
     text = data_path.read_text(encoding="utf-8")
     available = {}
     for section in ("insights", "speaking", "cases"):
-        m = re.search(rf"{section}:\s*\[(.*?)\n  \]", text, flags=re.DOTALL)
+        m = re.search(rf'"?{section}"?\s*:\s*\[(.*?)\n\s*\]', text, flags=re.DOTALL)
         if not m:
             available[section] = set()
             continue
-        available[section] = set(re.findall(r'slug:\s*"([^"]+)"', m.group(1)))
+        available[section] = set(re.findall(r'"?slug"?\s*:\s*"([^"]+)"', m.group(1)))
     missing = []
     for ctype, slugs in _REGISTERED_SLUGS.items():
         for s in slugs:

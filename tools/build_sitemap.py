@@ -46,8 +46,8 @@ def harvest_slugs():
     text = DATA.read_text(encoding="utf-8")
     out = {}
     for section in DETAIL_DIRS:
-        m = re.search(rf"{section}:\s*\[(.*?)\n  \]", text, flags=re.DOTALL)
-        out[section] = re.findall(r'slug:\s*"([^"]+)"', m.group(1)) if m else []
+        m = re.search(rf'"?{section}"?\s*:\s*\[(.*?)\n\s*\]', text, flags=re.DOTALL)
+        out[section] = re.findall(r'"?slug"?\s*:\s*"([^"]+)"', m.group(1)) if m else []
     return out
 
 
