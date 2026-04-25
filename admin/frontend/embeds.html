@@ -17,7 +17,7 @@
         <div class="section-header">
           <h2>Articles with Embed Codes</h2>
         </div>
-        <p class="text-muted mb-16">All articles across sections that have embed codes (YouTube, LinkedIn, Instagram, X, Notion, etc.).</p>
+        <p class="text-muted mb-16">All articles across sections that have embed codes (YouTube, LinkedIn, Instagram, X, Notion, note, Substack, Bluesky, Threads, etc.).</p>
 
         <div id="embeds-list">
           <p class="text-muted">Loading...</p>
@@ -122,6 +122,10 @@
       if (lower.includes('instagram.com')) return 'Instagram';
       if (lower.includes('twitter.com') || lower.includes('x.com')) return 'X (Twitter)';
       if (lower.includes('notion.so') || lower.includes('notion.site')) return 'Notion';
+      if (lower.includes('note.com')) return 'note';
+      if (lower.includes('substack.com')) return 'Substack';
+      if (lower.includes('bsky.app') || lower.includes('bsky.social') || lower.includes('bluesky-embed')) return 'Bluesky';
+      if (lower.includes('threads.net') || lower.includes('text-post-media')) return 'Threads';
       if (lower.includes('<iframe')) return 'iframe';
       if (lower.includes('<blockquote')) return 'Blockquote';
       return 'Custom';
