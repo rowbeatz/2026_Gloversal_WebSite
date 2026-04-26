@@ -19,6 +19,7 @@ from content import read_content, write_content
 from build_runner import run_build, git_push
 from playground import generate_content, get_available_models, import_url
 from media import save_upload, list_uploads
+from media_helpers import detect_media_type
 from settings import DEFAULT_SETTINGS, load_settings, save_settings
 
 app = FastAPI(title="Gloversal Admin", version="1.0.0")
@@ -52,6 +53,15 @@ class BilingualText(BaseModel):
     en: str = ""
 
 
+class MediaItem(BaseModel):
+    type: str = "image"   # "image" | "video" | "youtube" | "vimeo"
+    src: str = ""         # for image/video: full URL or /assets/... path
+    id: str = ""          # for youtube/vimeo: just the video ID
+    poster: str = ""      # optional poster image (auto-derived for youtube)
+    alt: str = ""         # alt text or caption
+    title: str = ""       # display title
+
+
 class ContentItem(BaseModel):
     slug: str = ""
     date: str = ""
@@ -64,6 +74,7 @@ class ContentItem(BaseModel):
     thumbnail: str = ""
     images: List[str] = []
     video: str = ""
+    media: List[MediaItem] = []   # NEW — unified ordered media (Sprint 3)
     seo_keywords: List[str] = []
     seo_title: str = ""
     seo_description: str = ""
@@ -250,6 +261,17 @@ async def media_upload(file: FastAPIUpload = File(...), _user: str = Depends(get
 @app.get("/api/media/list")
 async def media_list(_user: str = Depends(get_current_user)):
     return {"files": list_uploads()}
+
+
+@app.post("/api/media/extract")
+async def media_extract(data: dict, _user: str = Depends(get_current_user)):
+    """Given a URL, return {type, id, src, poster, alt, title} for unified media[]."""
+    url = (data or {}).get("url", "")
+    if isinstance(url, str):
+        url = url.strip()
+    if not url:
+        raise HTTPException(status_code=400, detail="URL required")
+    return detect_media_type(url)
 
 
 # ───────────────────────── Settings ─────────────────────────

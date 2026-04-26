@@ -92,33 +92,27 @@
             </div>
           </div>
 
-          <!-- ═══ Media Section ═══ -->
+          <!-- ═══ Media Section (unified ordered list) ═══ -->
           <div class="section-header" style="margin-top:24px"><h3>Media</h3></div>
+          <p class="text-muted text-sm" style="margin-top:-4px;margin-bottom:12px">
+            Add images, videos, or paste YouTube/Vimeo URLs. Drag to reorder. The first item appears as the hero.
+          </p>
 
-          <div class="form-group">
-            <label>Thumbnail / Hero Image</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="url" id="thumbnail" placeholder="https://... or /assets/images/uploads/..." style="flex:1">
-              <button type="button" class="btn btn-sm" onclick="openMediaPicker('thumbnail')">Library</button>
-              <button type="button" class="btn btn-sm" onclick="uploadMedia('thumbnail')">Upload</button>
-            </div>
-            <div id="thumbnail-preview" class="img-preview hidden" style="margin-top:8px"></div>
+          <div id="media-list" class="media-editor-list"></div>
+
+          <div class="media-editor-actions" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-sm" onclick="addMediaImage()">+ Image URL</button>
+            <button type="button" class="btn btn-sm" onclick="addMediaVideo()">+ Video URL</button>
+            <button type="button" class="btn btn-sm" onclick="addMediaExternal()">+ YouTube / Vimeo</button>
+            <button type="button" class="btn btn-sm" onclick="openMediaPicker('media')">Library</button>
+            <button type="button" class="btn btn-sm" onclick="uploadMedia('media')">Upload File</button>
           </div>
 
-          <div class="form-group">
-            <label>Image Gallery (multiple)</label>
-            <div id="gallery-list"></div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="url" id="gallery-url-input" placeholder="Add image URL" style="flex:1">
-              <button type="button" class="btn btn-sm" onclick="addGalleryImage()">+ Add</button>
-              <button type="button" class="btn btn-sm" onclick="uploadMedia('gallery')">Upload</button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="video">Video (URL or YouTube/Vimeo embed URL)</label>
-            <input type="url" id="video" placeholder="https://www.youtube.com/watch?v=...">
-          </div>
+          <!-- Hidden legacy fields, kept in sync for backward compatibility -->
+          <input type="hidden" id="thumbnail">
+          <input type="hidden" id="video">
+          <div id="gallery-list" style="display:none"></div>
+          <input type="hidden" id="gallery-url-input">
 
           <!-- ═══ SEO / AEO Section ═══ -->
           <div class="section-header" style="margin-top:24px"><h3>SEO / AEO Settings</h3></div>
@@ -230,6 +224,11 @@
     let galleryImages = [];
     let sourcesList = [];
 
+    // ─── Unified media state (Sprint 3) ───
+    // Each entry: {type, src, id, poster, alt, title}
+    // type ∈ "image" | "video" | "youtube" | "vimeo"
+    let mediaItems = [];
+
     // Lock section and slug if editing
     if (isEditing) {
       pageTitle.textContent = `Edit: ${slug}`;
@@ -297,19 +296,14 @@
       document.getElementById('seo-desc-count').textContent = `${seoDescEl.value.length}/155`;
     });
 
-    // ─── Thumbnail preview ───
+    // ─── Thumbnail (now a hidden field, kept for backward compat) ───
+    // The visible "thumbnail preview" was removed in favor of the unified
+    // media editor. The hidden #thumbnail field is still synced from the
+    // first media item so legacy code paths (renderer fallback, og:image)
+    // keep working. We expose `thumbnailEl` and a no-op input handler so
+    // the existing import flows (Playground / file upload) don't break.
     const thumbnailEl = document.getElementById('thumbnail');
-    thumbnailEl.addEventListener('input', () => {
-      const url = thumbnailEl.value.trim();
-      const prev = document.getElementById('thumbnail-preview');
-      if (url) {
-        prev.innerHTML = `<img src="${url}" style="max-width:200px;max-height:120px;border-radius:4px" onerror="this.style.display='none'">`;
-        prev.classList.remove('hidden');
-      } else {
-        prev.innerHTML = '';
-        prev.classList.add('hidden');
-      }
-    });
+    thumbnailEl.addEventListener('input', () => { /* no-op: handled by syncLegacyFields() */ });
 
     // ─── Gallery management ───
     function renderGallery() {
@@ -336,6 +330,202 @@
     function removeGalleryImage(index) {
       galleryImages.splice(index, 1);
       renderGallery();
+    }
+
+    // ─── Unified media editor (Sprint 3) ───
+    // Mirror of admin/backend/media_helpers.py: build a media[] from legacy
+    // thumbnail/video/images fields when the saved item has no media[].
+    const YT_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/;
+    const VIMEO_RES = [
+      /vimeo\.com\/(?:video\/|channels\/[^/]+\/)?(\d+)/,
+      /player\.vimeo\.com\/video\/(\d+)/,
+    ];
+    function detectMediaTypeClient(url) {
+      if (!url) return {type: 'image', id: '', src: '', poster: '', alt: '', title: ''};
+      const yt = url.match(YT_RE);
+      if (yt) {
+        return {type: 'youtube', id: yt[1], src: '', poster: `https://i.ytimg.com/vi/${yt[1]}/maxresdefault.jpg`, alt: '', title: ''};
+      }
+      for (const re of VIMEO_RES) {
+        const m = url.match(re);
+        if (m) return {type: 'vimeo', id: m[1], src: '', poster: '', alt: '', title: ''};
+      }
+      const lower = url.toLowerCase();
+      if (['.mp4', '.webm', '.mov'].some(ext => lower.endsWith(ext))) {
+        return {type: 'video', id: '', src: url, poster: '', alt: '', title: ''};
+      }
+      return {type: 'image', id: '', src: url, poster: '', alt: '', title: ''};
+    }
+    function buildMediaFromLegacy(item) {
+      const out = [];
+      const titleAlt = (item.title && (item.title.ja || item.title.en)) || '';
+      if (item.thumbnail) {
+        out.push({type: 'image', src: item.thumbnail, id: '', poster: '', alt: titleAlt, title: ''});
+      }
+      if (item.video) {
+        out.push(detectMediaTypeClient(item.video));
+      }
+      if (Array.isArray(item.images)) {
+        item.images.forEach(img => {
+          if (img) out.push({type: 'image', src: img, id: '', poster: '', alt: '', title: ''});
+        });
+      }
+      return out;
+    }
+
+    function escapeAttr(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;');
+    }
+
+    function mediaPreviewHTML(m) {
+      if (m.type === 'image' && m.src) {
+        return `<img class="media-thumb" src="${escapeAttr(m.src)}" alt="" onerror="this.outerHTML='<div class=&quot;media-thumb media-thumb--placeholder&quot;>IMG</div>'">`;
+      }
+      if (m.type === 'youtube' && m.id) {
+        return `<img class="media-thumb" src="https://i.ytimg.com/vi/${escapeAttr(m.id)}/mqdefault.jpg" alt="" onerror="this.outerHTML='<div class=&quot;media-thumb media-thumb--placeholder&quot;>YT</div>'">`;
+      }
+      if (m.type === 'vimeo' && m.id) {
+        return `<div class="media-thumb media-thumb--placeholder">VIMEO</div>`;
+      }
+      if (m.type === 'video' && m.src) {
+        return `<div class="media-thumb media-thumb--placeholder">VIDEO</div>`;
+      }
+      return `<div class="media-thumb media-thumb--placeholder">…</div>`;
+    }
+
+    function renderMediaList() {
+      const list = document.getElementById('media-list');
+      if (!list) return;
+      if (!mediaItems.length) {
+        list.innerHTML = '<div class="media-empty">No media yet. Add an image or video above.</div>';
+        syncLegacyFields();
+        return;
+      }
+      list.innerHTML = mediaItems.map((m, i) => {
+        const preview = mediaPreviewHTML(m);
+        const typeBadge = `<span class="media-type-badge">${escapeAttr(m.type)}</span>`;
+        const valueField = (m.type === 'youtube' || m.type === 'vimeo')
+          ? `<input type="text" value="${escapeAttr(m.id || '')}" oninput="updateMedia(${i},'id',this.value)" placeholder="${escapeAttr(m.type)} ID">`
+          : `<input type="text" value="${escapeAttr(m.src || '')}" oninput="updateMedia(${i},'src',this.value)" placeholder="URL or path">`;
+        const altField = `<input type="text" value="${escapeAttr(m.alt || '')}" oninput="updateMedia(${i},'alt',this.value)" placeholder="Alt text / caption">`;
+        return `
+          <div class="media-row" draggable="true" data-idx="${i}">
+            <span class="media-handle" title="Drag to reorder">&#x22EE;&#x22EE;</span>
+            ${preview}
+            <div class="media-fields">
+              ${typeBadge}
+              ${valueField}
+              ${altField}
+            </div>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeMedia(${i})" title="Remove" style="padding:2px 8px">×</button>
+          </div>`;
+      }).join('');
+      attachDragHandlers();
+      syncLegacyFields();
+    }
+
+    function updateMedia(i, key, value) {
+      if (mediaItems[i]) {
+        mediaItems[i][key] = value;
+        syncLegacyFields();
+      }
+    }
+
+    function removeMedia(i) {
+      mediaItems.splice(i, 1);
+      renderMediaList();
+    }
+
+    function addMediaImage() {
+      const url = prompt('Image URL or path (e.g., /assets/images/uploads/foo.jpg):', '');
+      if (!url) return;
+      mediaItems.push({type: 'image', src: url.trim(), id: '', poster: '', alt: '', title: ''});
+      renderMediaList();
+    }
+
+    function addMediaVideo() {
+      const url = prompt('Video file URL (mp4, webm, mov):', '');
+      if (!url) return;
+      mediaItems.push({type: 'video', src: url.trim(), id: '', poster: '', alt: '', title: ''});
+      renderMediaList();
+    }
+
+    async function addMediaExternal() {
+      const url = prompt('YouTube or Vimeo URL:', '');
+      if (!url) return;
+      try {
+        const res = await apiFetch('/api/media/extract', {
+          method: 'POST',
+          body: JSON.stringify({url: url.trim()})
+        });
+        if (res && res.ok) {
+          const m = await res.json();
+          mediaItems.push(m);
+          renderMediaList();
+        } else if (res) {
+          let detail = 'Could not detect media type for that URL.';
+          try { const err = await res.json(); detail = err.detail || detail; } catch (_) {}
+          showToast(detail, 'error');
+        }
+      } catch (e) {
+        showToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    let dragIdx = null;
+    function attachDragHandlers() {
+      document.querySelectorAll('.media-row').forEach(row => {
+        row.addEventListener('dragstart', () => { dragIdx = +row.dataset.idx; row.classList.add('dragging'); });
+        row.addEventListener('dragend', () => { row.classList.remove('dragging'); dragIdx = null; });
+        row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+        row.addEventListener('drop', e => {
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          const targetIdx = +row.dataset.idx;
+          if (dragIdx === null || dragIdx === targetIdx) return;
+          const [moved] = mediaItems.splice(dragIdx, 1);
+          mediaItems.splice(targetIdx, 0, moved);
+          renderMediaList();
+        });
+      });
+    }
+
+    // Keep hidden legacy fields (thumbnail / video / images) in sync with
+    // mediaItems so the static page renderer's legacy fallback still works
+    // and any code that reads those fields (search, sitemap, og:image) is happy.
+    function syncLegacyFields() {
+      const firstImage = mediaItems.find(m => m.type === 'image' && m.src);
+      const thumb = document.getElementById('thumbnail');
+      if (thumb) thumb.value = firstImage ? firstImage.src : '';
+
+      const firstVideo = mediaItems.find(m => m.type === 'youtube' || m.type === 'vimeo' || m.type === 'video');
+      const vid = document.getElementById('video');
+      if (vid) {
+        if (firstVideo) {
+          if (firstVideo.type === 'youtube') vid.value = `https://www.youtube.com/watch?v=${firstVideo.id}`;
+          else if (firstVideo.type === 'vimeo') vid.value = `https://vimeo.com/${firstVideo.id}`;
+          else vid.value = firstVideo.src || '';
+        } else {
+          vid.value = '';
+        }
+      }
+
+      // Mirror image entries (after the first) into the legacy gallery state.
+      // The first image already plays the role of "thumbnail/hero".
+      const galleryFromMedia = mediaItems
+        .filter(m => m.type === 'image' && m.src)
+        .slice(1)
+        .map(m => m.src);
+      if (galleryFromMedia.length || (firstImage && mediaItems.filter(m => m.type === 'image').length === 1)) {
+        // Replace galleryImages whenever the user is actively driving things
+        // through the media editor. The save handler still serializes both
+        // the legacy `images` array and the unified `media` array.
+        galleryImages = galleryFromMedia;
+      }
     }
 
     // ─── Sources management ───
@@ -402,13 +592,19 @@
     }
 
     function selectMedia(url) {
-      if (mediaPickerTarget === 'thumbnail') {
-        document.getElementById('thumbnail').value = url;
-        thumbnailEl.dispatchEvent(new Event('input'));
-      } else if (mediaPickerTarget === 'gallery') {
-        galleryImages.push(url);
-        renderGallery();
-      }
+      // All picker selections now feed the unified media editor.
+      // Detect type from extension so videos still register as video.
+      const lower = (url || '').toLowerCase();
+      const isVideo = ['.mp4', '.webm', '.mov'].some(ext => lower.endsWith(ext));
+      mediaItems.push({
+        type: isVideo ? 'video' : 'image',
+        src: url,
+        id: '',
+        poster: '',
+        alt: '',
+        title: ''
+      });
+      renderMediaList();
       closeMediaPicker();
     }
 
@@ -452,13 +648,18 @@
           const data = await res.json();
           showToast(`Uploaded: ${data.original}`);
 
-          if (uploadTarget === 'thumbnail') {
-            document.getElementById('thumbnail').value = data.url;
-            thumbnailEl.dispatchEvent(new Event('input'));
-          } else if (uploadTarget === 'gallery') {
-            galleryImages.push(data.url);
-            renderGallery();
-          }
+          // All upload targets feed the unified media editor. The server's
+          // detected type (image/video) drives which media-row gets added.
+          const t = data.type === 'video' ? 'video' : 'image';
+          mediaItems.push({
+            type: t,
+            src: data.url,
+            id: '',
+            poster: '',
+            alt: data.original || '',
+            title: ''
+          });
+          renderMediaList();
         } else {
           const err = await res.json();
           showToast(err.detail || 'Upload failed', 'error');
@@ -520,13 +721,17 @@
           embedEl.value = embedImport.embed;
           embedPreview.innerHTML = embedImport.embed;
           if (embedImport.thumbnail) {
-            document.getElementById('thumbnail').value = embedImport.thumbnail;
-            thumbnailEl.dispatchEvent(new Event('input'));
+            mediaItems.push({type: 'image', src: embedImport.thumbnail, id: '', poster: '', alt: '', title: ''});
+            renderMediaList();
           }
           showToast('Embed imported from Playground');
         }
       } catch (e) { /* ignore */ }
     }
+
+    // Render the empty-state media list so the editor surface is visible
+    // even when creating a brand-new item (no item.media[] to load yet).
+    renderMediaList();
 
     // Load existing content if editing
     if (isEditing) {
@@ -574,18 +779,30 @@
         embedPreview.innerHTML = item.embed;
       }
 
-      // New fields — Media
-      if (item.thumbnail) {
-        document.getElementById('thumbnail').value = item.thumbnail;
-        thumbnailEl.dispatchEvent(new Event('input'));
+      // ─── Unified media (Sprint 3) ───
+      // Source of truth: item.media[]. If empty, fall back to building it
+      // from the legacy thumbnail/video/images fields so any saved-before-
+      // Sprint-3 article still loads with editable media rows.
+      if (item.media && item.media.length) {
+        mediaItems = item.media.map(m => ({
+          type: m.type || 'image',
+          src: m.src || '',
+          id: m.id || '',
+          poster: m.poster || '',
+          alt: m.alt || '',
+          title: m.title || ''
+        }));
+      } else {
+        mediaItems = buildMediaFromLegacy(item);
       }
+      // Keep the legacy fields populated (defense-in-depth).
+      if (item.thumbnail) document.getElementById('thumbnail').value = item.thumbnail;
+      if (item.video) document.getElementById('video').value = item.video;
       if (item.images && item.images.length) {
         galleryImages = [...item.images];
         renderGallery();
       }
-      if (item.video) {
-        document.getElementById('video').value = item.video;
-      }
+      renderMediaList();
 
       // New fields — SEO/AEO
       if (item.seo_title) {
@@ -653,7 +870,18 @@
           en: document.getElementById('body-en').value
         },
         embed: embedEl.value,
-        // New fields
+        // Sprint 3 — unified media[]. Source of truth.
+        media: mediaItems.map(m => ({
+          type: m.type || 'image',
+          src: m.src || '',
+          id: m.id || '',
+          poster: m.poster || '',
+          alt: m.alt || '',
+          title: m.title || ''
+        })),
+        // Legacy fields kept in sync for backward compat (renderer fallback,
+        // og:image priority, search index). syncLegacyFields() updates the
+        // hidden inputs and galleryImages whenever mediaItems changes.
         thumbnail: document.getElementById('thumbnail').value.trim(),
         images: galleryImages,
         video: document.getElementById('video').value.trim(),

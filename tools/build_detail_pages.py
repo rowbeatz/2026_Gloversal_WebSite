@@ -26,6 +26,11 @@ import subprocess
 import sys
 import urllib.parse
 
+# Reuse the admin backend's media helpers so detail pages and the editor
+# share one source of truth for media handling.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "admin" / "backend"))
+from media_helpers import normalize_legacy, youtube_thumb  # noqa: E402
+
 ORIGIN = "https://gloversal.com"
 SITE_NAME = "Gloversal, Inc."
 DEFAULT_OG = f"{ORIGIN}/assets/images/gloversal-og.png"
@@ -98,7 +103,10 @@ process.stdout.write(JSON.stringify(ctx.window.__GLV_CONTENT__));
 def slug_image(section, slug, item=None):
     """Determine OG image for a content item.
 
-    Priority: item.og_image > item.thumbnail > per-slug override > default.
+    Priority: item.og_image > item.thumbnail > first image in media[] >
+    per-slug override > default. The new media[] check is added last so
+    legacy behavior is preserved exactly for content that already had a
+    thumbnail or og_image set.
     """
     if item:
         og = item.get("og_image", "")
@@ -109,6 +117,12 @@ def slug_image(section, slug, item=None):
         if thumb:
             url = thumb if thumb.startswith("http") else f"{ORIGIN}/{thumb.lstrip('/')}"
             return (url, 1200, 630)
+        # Fall back to the first image in media[] (new schema).
+        for m in (item.get("media") or []):
+            if isinstance(m, dict) and m.get("type") == "image" and m.get("src"):
+                src = m["src"]
+                url = src if src.startswith("http") else f"{ORIGIN}/{src.lstrip('/')}"
+                return (url, 1200, 630)
     if section == "insights" and slug in INSIGHT_IMAGES:
         rel = f"assets/images/insights/{INSIGHT_IMAGES[slug]}"
         return (f"{ORIGIN}/{rel}", 1200, 900)
@@ -158,6 +172,116 @@ def build_jsonld(section, slug, item, canonical, og_image_url):
         ],
     }
     return {"@context": "https://schema.org", "@graph": [article_node, breadcrumb]}
+
+
+def _resolve_asset(src: str, asset_prefix: str) -> str:
+    """Turn a /assets/... or absolute URL into something the detail page can load."""
+    if not src:
+        return src
+    if src.startswith(("http://", "https://", "data:")):
+        return src
+    return f"{asset_prefix}{src.lstrip('/')}"
+
+
+def _esc_attr(s: str) -> str:
+    return (s or "").replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
+
+
+def _esc_text(s: str) -> str:
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def render_media_block(item: dict, asset_prefix: str = "../") -> tuple:
+    """Render the unified media block.
+
+    Returns (html, has_youtube). When the first media item is the same
+    image as the legacy thumbnail (already rendered as the hero), it's
+    skipped to avoid duplication.
+    """
+    media = normalize_legacy(item)
+    if not media:
+        return ("", False)
+
+    legacy_thumb = item.get("thumbnail", "") or ""
+    if (
+        legacy_thumb
+        and media
+        and media[0].get("type") == "image"
+        and (media[0].get("src") or "") == legacy_thumb
+    ):
+        media = media[1:]
+    if not media:
+        return ("", False)
+
+    has_youtube = False
+    parts = ['<section class="media-block">', '  <div class="container">']
+    for m in media:
+        t = (m.get("type") or "image").lower()
+        if t == "image":
+            src = _resolve_asset(m.get("src", ""), asset_prefix)
+            if not src:
+                continue
+            alt_raw = m.get("alt") or ""
+            alt = _esc_attr(alt_raw)
+            parts.append('    <figure class="media-item media-item--image">')
+            parts.append(f'      <img src="{src}" alt="{alt}" loading="lazy">')
+            if alt_raw:
+                parts.append(f'      <figcaption>{_esc_text(alt_raw)}</figcaption>')
+            parts.append('    </figure>')
+        elif t == "video":
+            src = _resolve_asset(m.get("src", ""), asset_prefix)
+            if not src:
+                continue
+            poster = _resolve_asset(m.get("poster", ""), asset_prefix)
+            poster_attr = f' poster="{_esc_attr(poster)}"' if poster else ""
+            parts.append('    <figure class="media-item media-item--video">')
+            parts.append(f'      <video controls preload="metadata"{poster_attr}>')
+            parts.append(f'        <source src="{src}">')
+            parts.append('      </video>')
+            cap = m.get("title") or m.get("alt") or ""
+            if cap:
+                parts.append(f'      <figcaption>{_esc_text(cap)}</figcaption>')
+            parts.append('    </figure>')
+        elif t == "youtube":
+            yid = (m.get("id") or "").strip()
+            if not yid:
+                continue
+            has_youtube = True
+            thumb = m.get("poster") or youtube_thumb(yid)
+            label = m.get("title") or m.get("alt") or "Video"
+            parts.append('    <figure class="media-item media-item--youtube">')
+            parts.append(
+                f'      <button type="button" class="lite-youtube" data-id="{_esc_attr(yid)}" '
+                f'aria-label="Play: {_esc_attr(label)}" '
+                f'style="background-image:url({_esc_attr(thumb)})">'
+            )
+            parts.append('        <span class="lite-youtube__play" aria-hidden="true">')
+            parts.append(
+                '          <svg viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#f00"/><path d="M45 24L27 14v20" fill="#fff"/></svg>'
+            )
+            parts.append('        </span>')
+            parts.append('      </button>')
+            cap = m.get("title") or m.get("alt") or ""
+            if cap:
+                parts.append(f'      <figcaption>{_esc_text(cap)}</figcaption>')
+            parts.append('    </figure>')
+        elif t == "vimeo":
+            vid = (m.get("id") or "").strip()
+            if not vid:
+                continue
+            parts.append('    <figure class="media-item media-item--vimeo">')
+            parts.append(
+                f'      <iframe src="https://player.vimeo.com/video/{_esc_attr(vid)}" '
+                f'loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
+            )
+            cap = m.get("title") or m.get("alt") or ""
+            if cap:
+                parts.append(f'      <figcaption>{_esc_text(cap)}</figcaption>')
+            parts.append('    </figure>')
+
+    parts.append('  </div>')
+    parts.append('</section>')
+    return ("\n".join(parts), has_youtube)
 
 
 def render_page(section, slug, item, prev_item, next_item):
@@ -219,17 +343,28 @@ def render_page(section, slug, item, prev_item, next_item):
         else '<span class="detail-nav__next" aria-hidden="true" style="visibility:hidden"></span>'
     )
 
-    # ── Thumbnail hero image ──
+    # ── Thumbnail hero image (legacy) ──
+    # Always render the hero image when a legacy thumbnail is set so that
+    # existing 15 detail pages look exactly the same as before this sprint.
     thumbnail_html = ""
     if thumbnail:
         thumb_src = thumbnail if thumbnail.startswith("http") else f"{asset_prefix}{thumbnail.lstrip('/')}"
         thumbnail_html = f'<img class="detail-hero__thumb" src="{thumb_src}" alt="{title_attr}" loading="eager">'
 
-    # ── Video embed ──
+    # ── Unified media block ──
+    # If the item has a media[] (or legacy thumbnail/video/images that
+    # normalize_legacy() turns into one), render below the hero. The
+    # block already strips the first image when it matches the legacy
+    # thumbnail, so the hero never duplicates.
+    media_block_html, has_youtube_media = render_media_block(item, asset_prefix=asset_prefix)
+
+    # ── Legacy inline hero video — only used when the new media block is
+    # not rendering anything for this item. The fallback inside
+    # normalize_legacy() turns `video` into a media entry, so the typical
+    # path is: media block renders the video, legacy block stays empty.
     video_html = ""
-    if video:
+    if video and not media_block_html:
         if "youtube.com" in video or "youtu.be" in video:
-            # Convert watch URL to embed URL
             vid_id = ""
             if "v=" in video:
                 vid_id = video.split("v=")[1].split("&")[0]
@@ -241,8 +376,30 @@ def render_page(section, slug, item, prev_item, next_item):
             vid_src = video if video.startswith("http") else f"{asset_prefix}{video.lstrip('/')}"
             video_html = f'<div class="detail-video"><video controls preload="metadata" style="width:100%;border-radius:8px"><source src="{vid_src}"></video></div>'
         else:
-            # Generic embed URL
             video_html = f'<div class="detail-video"><iframe src="{video}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>'
+
+    # Tiny inline activator for the lite-youtube facade — only added when needed.
+    lite_youtube_script = (
+        """
+<script>
+document.querySelectorAll('.lite-youtube').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var id = btn.dataset.id;
+    if (!id) return;
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    iframe.setAttribute('allowfullscreen', 'true');
+    iframe.setAttribute('frameborder', '0');
+    iframe.style.cssText = 'width:100%;height:100%;border:0;display:block;border-radius:.5rem;';
+    btn.parentNode.replaceChild(iframe, btn);
+  });
+});
+</script>
+"""
+        if has_youtube_media
+        else ""
+    )
 
     # ── Share bar URLs ──
     share_title_enc = urllib.parse.quote(title_ja, safe="")
@@ -353,6 +510,8 @@ def render_page(section, slug, item, prev_item, next_item):
     {video_html}
   </div>
 </section>
+
+{media_block_html}
 
 <article class="section">
   <div class="container detail-body">
@@ -491,6 +650,7 @@ def render_page(section, slug, item, prev_item, next_item):
 <script src="{asset_prefix}js/i18n.js"></script>
 <script src="{asset_prefix}js/main.js"></script>
 <script src="{asset_prefix}js/content.js"></script>
+{lite_youtube_script}
 </body>
 </html>
 """
