@@ -401,6 +401,89 @@ document.querySelectorAll('.lite-youtube').forEach(function(btn){
         else ""
     )
 
+    # Lightbox: clickable image enlargement with prev/next nav.
+    # Activated only if the page has 1+ images in the media block.
+    has_images = '<figure class="media-item media-item--image">' in media_block_html
+    lightbox_html = (
+        """
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+  <button class="lightbox__close" type="button" aria-label="Close">&times;</button>
+  <button class="lightbox__nav lightbox__nav--prev" type="button" aria-label="Previous image">&lsaquo;</button>
+  <button class="lightbox__nav lightbox__nav--next" type="button" aria-label="Next image">&rsaquo;</button>
+  <figure class="lightbox__stage">
+    <img class="lightbox__img" alt="">
+    <figcaption class="lightbox__caption"></figcaption>
+    <span class="lightbox__counter" aria-live="polite"></span>
+  </figure>
+</div>
+<script>
+(function(){
+  var imgs = Array.prototype.slice.call(document.querySelectorAll('.media-item--image img'));
+  if (!imgs.length) return;
+  var box = document.getElementById('lightbox');
+  var bigImg = box.querySelector('.lightbox__img');
+  var cap = box.querySelector('.lightbox__caption');
+  var counter = box.querySelector('.lightbox__counter');
+  var btnClose = box.querySelector('.lightbox__close');
+  var btnPrev = box.querySelector('.lightbox__nav--prev');
+  var btnNext = box.querySelector('.lightbox__nav--next');
+  var idx = 0;
+
+  function captionFor(i){
+    var fig = imgs[i].closest('figure');
+    var c = fig ? fig.querySelector('figcaption') : null;
+    return c ? c.textContent : (imgs[i].alt || '');
+  }
+  function show(i){
+    idx = (i + imgs.length) % imgs.length;
+    bigImg.src = imgs[idx].currentSrc || imgs[idx].src;
+    bigImg.alt = imgs[idx].alt || '';
+    cap.textContent = captionFor(idx);
+    counter.textContent = (idx + 1) + ' / ' + imgs.length;
+    btnPrev.style.display = imgs.length > 1 ? '' : 'none';
+    btnNext.style.display = imgs.length > 1 ? '' : 'none';
+  }
+  function open(i){
+    show(i);
+    box.hidden = false;
+    document.body.style.overflow = 'hidden';
+    btnClose.focus();
+  }
+  function close(){
+    box.hidden = true;
+    document.body.style.overflow = '';
+    bigImg.src = '';
+  }
+  imgs.forEach(function(img, i){
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', function(){ open(i); });
+  });
+  btnClose.addEventListener('click', close);
+  btnPrev.addEventListener('click', function(){ show(idx - 1); });
+  btnNext.addEventListener('click', function(){ show(idx + 1); });
+  box.addEventListener('click', function(e){ if (e.target === box) close(); });
+  document.addEventListener('keydown', function(e){
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(idx - 1);
+    else if (e.key === 'ArrowRight') show(idx + 1);
+  });
+  // Touch swipe
+  var startX = null;
+  box.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  box.addEventListener('touchend', function(e){
+    if (startX === null) return;
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+    startX = null;
+  });
+})();
+</script>
+"""
+        if has_images
+        else ""
+    )
+
     # ── Share bar URLs ──
     share_title_enc = urllib.parse.quote(title_ja, safe="")
     share_url_enc = urllib.parse.quote(canonical, safe="")
@@ -651,6 +734,7 @@ document.querySelectorAll('.lite-youtube').forEach(function(btn){
 <script src="{asset_prefix}js/main.js"></script>
 <script src="{asset_prefix}js/content.js"></script>
 {lite_youtube_script}
+{lightbox_html}
 </body>
 </html>
 """
