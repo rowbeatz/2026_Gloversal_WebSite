@@ -364,7 +364,9 @@
     <div class="main-content">
       <div class="top-bar">
         <h1 id="page-title">AI Playground</h1>
-        <button class="btn btn-sm" onclick="logout()">Logout</button>
+        <div class="top-bar-actions">
+          <a href="/admin/settings.html" class="btn btn-sm">Provider Settings</a>
+        </div>
       </div>
       <div class="content-area" id="content-area">
 
@@ -480,9 +482,8 @@
   <script>
     requireAuth();
 
-    // Inject sidebar
-    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
-    highlightNav();
+    // Inject sidebar (NHP-inspired: brand mark + SVG icons + user info)
+    initPage('playground');
 
     // ─── State ───
     let generatedData = null;
@@ -833,7 +834,7 @@
 
         if (res.ok) {
           showToast(`Saved to ${sectionLabel(section)}!`);
-          if (confirm('Content saved. Would you like to build the site now?')) {
+          if (await showConfirm('Build site?', 'Content saved. Would you like to build the site now?')) {
             const buildRes = await apiFetch('/api/build', { method: 'POST' });
             if (buildRes && (await buildRes.json()).returncode === 0) {
               showToast('Site built successfully');

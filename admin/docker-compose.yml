@@ -1,7 +1,8 @@
-version: "3.9"
+name: gloversal-admin
 services:
   admin:
     build: .
+    container_name: gloversal-admin
     ports:
       - "8080:8080"
     volumes:

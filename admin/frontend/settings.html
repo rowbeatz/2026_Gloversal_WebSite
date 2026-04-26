@@ -279,7 +279,9 @@
     <div class="main-content">
       <div class="top-bar">
         <h1 id="page-title">Settings</h1>
-        <button class="btn btn-sm" onclick="logout()">Logout</button>
+        <div class="top-bar-actions">
+          <a href="/admin/playground.html" class="btn btn-sm">Open Playground</a>
+        </div>
       </div>
       <div class="content-area">
         <div class="settings-wrap">
@@ -329,8 +331,7 @@
   <script src="/admin/assets/admin.js"></script>
   <script>
     requireAuth();
-    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
-    highlightNav();
+    initPage('settings');
 
     // ─── Static metadata about each provider ───
     // icon = inline SVG markup (from PROVIDER_ICONS in admin.js)

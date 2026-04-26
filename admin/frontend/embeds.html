@@ -11,16 +11,18 @@
     <div class="main-content">
       <div class="top-bar">
         <h1>Embed Manager</h1>
-        <button class="btn btn-sm" onclick="logout()">Logout</button>
+        <div class="top-bar-actions">
+          <span class="text-sm text-muted">All sections · YouTube / LinkedIn / X / Notion / note / Substack / Bluesky / Threads</span>
+        </div>
       </div>
       <div class="content-area" id="content-area">
-        <div class="section-header">
+        <div class="section-header" style="margin-top:0">
           <h2>Articles with Embed Codes</h2>
         </div>
         <p class="text-muted mb-16">All articles across sections that have embed codes (YouTube, LinkedIn, Instagram, X, Notion, note, Substack, Bluesky, Threads, etc.).</p>
 
         <div id="embeds-list">
-          <p class="text-muted">Loading...</p>
+          <div class="loading-center"><div class="spinner spinner-lg"></div><span>Loading…</span></div>
         </div>
       </div>
     </div>
@@ -29,10 +31,7 @@
   <script src="/admin/assets/admin.js"></script>
   <script>
     requireAuth();
-
-    // Inject sidebar
-    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
-    highlightNav();
+    (async () => { await initPage('embeds'); })();
 
     const listEl = document.getElementById('embeds-list');
 
@@ -82,14 +81,14 @@
         rows += `
           <tr>
             <td><strong>${escapeHtml(titleEn)}</strong></td>
-            <td><span class="tag">${sectionLabel(item._section)}</span></td>
-            <td class="text-muted">${embedType}</td>
+            <td>${sectionBadge(item._section)}</td>
+            <td class="text-muted">${escapeHtml(embedType)}</td>
             <td>
-              <a href="/admin/editor.html?section=${item._section}&slug=${item.slug}" class="btn btn-sm">Edit</a>
+              <a href="/admin/editor.html?section=${encodeURIComponent(item._section)}&slug=${encodeURIComponent(item.slug)}" class="btn btn-sm">Edit</a>
               <button class="btn btn-sm" onclick="previewEmbed(this)">Preview</button>
             </td>
           </tr>
-          <tr class="embed-row hidden" id="embed-${item.slug}">
+          <tr class="embed-row hidden" id="embed-${escapeHtml(item.slug)}">
             <td colspan="4">
               <div class="embed-preview">${item.embed}</div>
             </td>

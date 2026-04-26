@@ -9,7 +9,8 @@
 <body>
   <div class="login-page">
     <div class="login-card">
-      <div class="brand">
+      <div class="login-brand">
+        <div class="login-brand-mark">G</div>
         <h1>Gloversal</h1>
         <p>Admin Panel</p>
       </div>
@@ -68,6 +69,7 @@
       } catch (err) {
         errorEl.textContent = err.message;
         errorEl.style.display = 'block';
+        showToast(err.message, 'error');
         loginBtn.disabled = false;
         loginBtn.textContent = 'Sign In';
       }

@@ -8,14 +8,23 @@
 </head>
 <body>
   <div class="app-layout" id="app">
-    <!-- Sidebar injected by JS -->
+    <!-- Sidebar injected by initPage() -->
     <div class="main-content">
       <div class="top-bar">
         <h1 id="page-title">Dashboard</h1>
-        <button class="btn btn-sm" onclick="logout()">Logout</button>
+        <div class="top-bar-actions" id="top-bar-actions">
+          <span class="text-sm text-muted" id="current-date"></span>
+          <button class="btn btn-primary btn-sm" id="publish-btn" onclick="quickDeploy()" title="Build the site and push to GitHub for Cloudflare Pages deploy">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="vertical-align:-3px"><path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z"/></svg>
+            Build &amp; Deploy
+          </button>
+        </div>
       </div>
       <div class="content-area" id="content-area">
-        <!-- Dynamic content -->
+        <div class="loading-center">
+          <div class="spinner spinner-lg"></div>
+          <span>Loading…</span>
+        </div>
       </div>
     </div>
   </div>
@@ -24,246 +33,340 @@
   <script>
     requireAuth();
 
-    // Inject sidebar
-    document.getElementById('app').insertAdjacentHTML('afterbegin', renderSidebar());
-    highlightNav();
+    (async () => {
+      await initPage('dashboard');
 
-    const contentArea = document.getElementById('content-area');
-    const pageTitle = document.getElementById('page-title');
-    const params = getParams();
-    const view = params.get('view');
-
-    // Content cache
-    let allContent = null;
-
-    async function loadContent() {
-      if (allContent) return allContent;
-      const sections = ['insights', 'speaking', 'cases'];
-      const result = {};
-      for (const s of sections) {
-        const res = await apiFetch(`/api/content/${s}`);
-        if (res) {
-          const data = await res.json();
-          result[s] = data.items || [];
-        } else {
-          result[s] = [];
-        }
+      const dateEl = document.getElementById('current-date');
+      if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('ja-JP', {
+          year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+        });
       }
-      allContent = result;
-      return result;
-    }
 
-    async function renderDashboard() {
-      pageTitle.textContent = 'Dashboard';
-      const data = await loadContent();
-      const insightsCount = data.insights.length;
-      const speakingCount = data.speaking.length;
-      const casesCount = data.cases.length;
+      const contentArea = document.getElementById('content-area');
+      const pageTitle = document.getElementById('page-title');
+      const topBarActions = document.getElementById('top-bar-actions');
+      const publishBtn = document.getElementById('publish-btn');
+      const params = getParams();
+      const view = params.get('view');
 
-      contentArea.innerHTML = `
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Insights</div>
-            <div class="stat-value">${insightsCount}</div>
+      // Content cache
+      let allContent = null;
+
+      async function loadContent() {
+        if (allContent) return allContent;
+        const sections = ['insights', 'speaking', 'cases'];
+        const result = {};
+        for (const s of sections) {
+          const res = await apiFetch(`/api/content/${s}`);
+          if (res) {
+            const data = await res.json();
+            result[s] = data.items || [];
+          } else {
+            result[s] = [];
+          }
+        }
+        allContent = result;
+        return result;
+      }
+
+      // Fallback "recent activity" derived from content dates (until a real audit log endpoint exists).
+      function deriveRecentActivity(data) {
+        const items = [];
+        for (const sec of ['insights', 'speaking', 'cases']) {
+          for (const it of (data[sec] || [])) {
+            items.push({
+              section: sec,
+              slug: it.slug || '',
+              title: (it.title && (it.title.en || it.title.ja)) || it.slug || '(untitled)',
+              date: it.date || '',
+            });
+          }
+        }
+        items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        return items.slice(0, 8);
+      }
+
+      async function renderDashboard() {
+        pageTitle.textContent = 'Dashboard';
+        if (publishBtn) publishBtn.style.display = '';
+        const data = await loadContent();
+        const insightsCount = data.insights.length;
+        const speakingCount = data.speaking.length;
+        const casesCount = data.cases.length;
+        const total = insightsCount + speakingCount + casesCount;
+        const recent = deriveRecentActivity(data);
+
+        const recentHtml = recent.length === 0
+          ? '<div class="log-empty">操作ログは Sprint 5 で実装予定です</div>'
+          : recent.map(r => `
+              <div class="log-item">
+                <span class="log-time">${escapeHtml(r.date || '')}</span>
+                <span class="log-action">${escapeHtml(sectionLabel(r.section))}</span>
+                <span class="log-target"><a href="/admin/editor.html?section=${encodeURIComponent(r.section)}&slug=${encodeURIComponent(r.slug)}" style="color:var(--text);text-decoration:none">${escapeHtml(r.title)}</a></span>
+                <span class="log-detail">${escapeHtml(r.slug)}</span>
+              </div>
+            `).join('');
+
+        contentArea.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
+              </div>
+              <div class="stat-label">Insights</div>
+              <div class="stat-value">${insightsCount}</div>
+              <div class="stat-sub"><a href="/admin/dashboard.html?view=insights" style="color:var(--accent);text-decoration:none">View all →</a></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="stat-label">Activities</div>
+              <div class="stat-value">${speakingCount}</div>
+              <div class="stat-sub"><a href="/admin/dashboard.html?view=speaking" style="color:var(--accent);text-decoration:none">View all →</a></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon cyan">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5z"/></svg>
+              </div>
+              <div class="stat-label">Case Studies</div>
+              <div class="stat-value">${casesCount}</div>
+              <div class="stat-sub"><a href="/admin/dashboard.html?view=cases" style="color:var(--accent);text-decoration:none">View all →</a></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon purple">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+              </div>
+              <div class="stat-label">Total Articles</div>
+              <div class="stat-value">${total}</div>
+              <div class="stat-sub">合計 ${total} 件</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Activities</div>
-            <div class="stat-value">${speakingCount}</div>
+
+          <div class="section-header">
+            <h2>Quick Actions</h2>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Case Studies</div>
-            <div class="stat-value">${casesCount}</div>
+          <div class="deploy-actions">
+            <a href="/admin/editor.html?section=insights" class="btn btn-primary">+ New Insight</a>
+            <a href="/admin/editor.html?section=speaking" class="btn btn-primary">+ New Activity</a>
+            <a href="/admin/editor.html?section=cases" class="btn btn-primary">+ New Case Study</a>
+            <a href="/admin/playground.html" class="btn">AI Playground</a>
+            <button class="btn" onclick="doBuild()">Build Site</button>
+            <a href="/admin/dashboard.html?view=deploy" class="btn">Deploy →</a>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Articles</div>
-            <div class="stat-value">${insightsCount + speakingCount + casesCount}</div>
+
+          <div id="build-log" class="hidden mt-16">
+            <div class="section-header"><h3>Build Output</h3></div>
+            <div class="terminal" id="log-output"></div>
           </div>
-        </div>
 
-        <div class="section-header">
-          <h2>Quick Actions</h2>
-        </div>
-        <div class="deploy-actions">
-          <a href="/admin/editor.html?section=insights" class="btn btn-primary">New Insight</a>
-          <a href="/admin/editor.html?section=speaking" class="btn btn-primary">New Activity</a>
-          <a href="/admin/editor.html?section=cases" class="btn btn-primary">New Case Study</a>
-          <button class="btn btn-success" onclick="doBuild()">Build Site</button>
-          <button class="btn" onclick="doDeploy()">Build &amp; Deploy</button>
-        </div>
-
-        <div id="build-log" class="hidden mt-16">
-          <div class="section-header"><h2>Build Output</h2></div>
-          <div class="terminal" id="log-output"></div>
-        </div>
-      `;
-    }
-
-    async function renderSection(section) {
-      const label = sectionLabel(section);
-      pageTitle.textContent = label;
-      const data = await loadContent();
-      const items = data[section] || [];
-
-      let rows = '';
-      for (const item of items) {
-        const titleEn = item.title ? (item.title.en || item.title.ja || '') : '';
-        const hasEmbed = item.embed ? '<span class="tag">embed</span>' : '';
-        rows += `
-          <tr>
-            <td><strong>${titleEn}</strong></td>
-            <td><span class="tag">${item.tag || ''}</span></td>
-            <td class="text-muted">${item.date || ''}</td>
-            <td>${hasEmbed}</td>
-            <td>
-              <a href="/admin/editor.html?section=${section}&slug=${item.slug}" class="btn btn-sm">Edit</a>
-              <button class="btn btn-sm btn-danger" onclick="deleteItem('${section}', '${item.slug}')">Delete</button>
-            </td>
-          </tr>
+          <div class="section-header">
+            <h2>Recent Activity</h2>
+            <span class="text-sm text-muted">Latest content updates across all sections</span>
+          </div>
+          <div class="log-list">
+            ${recentHtml}
+          </div>
         `;
       }
 
-      contentArea.innerHTML = `
-        <div class="section-header">
-          <h2>${label} (${items.length})</h2>
-          <a href="/admin/editor.html?section=${section}" class="btn btn-primary">New ${label.replace(/s$/, '')}</a>
-        </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Tag</th>
-                <th>Date</th>
-                <th>Embed</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>${rows || '<tr><td colspan="5" class="text-muted" style="text-align:center;padding:24px">No items yet</td></tr>'}</tbody>
-          </table>
-        </div>
-      `;
-    }
+      async function renderSection(section) {
+        const label = sectionLabel(section);
+        pageTitle.textContent = label;
+        if (publishBtn) publishBtn.style.display = 'none';
+        const data = await loadContent();
+        const items = data[section] || [];
 
-    async function renderDeploy() {
-      pageTitle.textContent = 'Deploy';
-      contentArea.innerHTML = `
-        <div class="section-header">
-          <h2>Build &amp; Deploy</h2>
-        </div>
-        <p class="text-muted mb-16">Build the site from content-data.js, then optionally push to GitHub for Cloudflare Pages deployment.</p>
-
-        <div class="deploy-actions">
-          <button class="btn btn-success" onclick="doBuild()" id="build-btn">Build Site</button>
-          <button class="btn btn-primary" onclick="doDeploy()" id="deploy-btn">Build &amp; Deploy</button>
-        </div>
-
-        <div class="form-group mt-16" style="max-width:500px">
-          <label for="commit-msg">Commit Message</label>
-          <input type="text" id="commit-msg" value="chore(admin): content update" placeholder="Commit message for deploy">
-        </div>
-
-        <div id="build-log" class="mt-16">
-          <div class="section-header"><h2>Output</h2></div>
-          <div class="terminal" id="log-output">Ready.</div>
-        </div>
-      `;
-    }
-
-    // ─────────── Actions ───────────
-
-    async function doBuild() {
-      const logEl = document.getElementById('log-output');
-      const logWrap = document.getElementById('build-log');
-      if (logWrap) logWrap.classList.remove('hidden');
-      if (logEl) logEl.textContent = 'Building...\n';
-
-      const res = await apiFetch('/api/build', { method: 'POST' });
-      if (!res) return;
-      const data = await res.json();
-
-      if (logEl) {
-        logEl.textContent = '';
-        if (data.stdout) logEl.textContent += data.stdout;
-        if (data.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.stderr)}</span>`;
-        if (data.returncode === 0) {
-          logEl.innerHTML += '\n<span class="info">Build completed successfully.</span>';
-          showToast('Build completed successfully');
-        } else {
-          logEl.innerHTML += `\n<span class="error">Build failed (exit code ${data.returncode}).</span>`;
-          showToast('Build failed', 'error');
+        let rows = '';
+        for (const item of items) {
+          const titleEn = item.title ? (item.title.en || item.title.ja || '') : '';
+          const hasEmbed = item.embed ? '<span class="badge badge-info">embed</span>' : '';
+          const tagBadge = item.tag ? `<span class="badge badge-info">${escapeHtml(item.tag)}</span>` : '';
+          rows += `
+            <tr>
+              <td><strong>${escapeHtml(titleEn)}</strong></td>
+              <td>${tagBadge}</td>
+              <td class="text-muted">${escapeHtml(item.date || '')}</td>
+              <td>${hasEmbed}</td>
+              <td>
+                <a href="/admin/editor.html?section=${encodeURIComponent(section)}&slug=${encodeURIComponent(item.slug)}" class="btn btn-sm">Edit</a>
+                <button class="btn btn-sm btn-danger" data-action="delete" data-section="${escapeHtml(section)}" data-slug="${escapeHtml(item.slug)}" data-title="${escapeHtml(titleEn || item.slug)}">Delete</button>
+              </td>
+            </tr>
+          `;
         }
+
+        contentArea.innerHTML = `
+          <div class="section-header" style="margin-top:0">
+            <h2>${escapeHtml(label)} (${items.length})</h2>
+            <a href="/admin/editor.html?section=${encodeURIComponent(section)}" class="btn btn-primary">+ New ${escapeHtml(label.replace(/s$/, ''))}</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Tag</th>
+                  <th>Date</th>
+                  <th>Embed</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows || '<tr><td colspan="5" class="text-muted" style="text-align:center;padding:24px">No items yet</td></tr>'}</tbody>
+            </table>
+          </div>
+        `;
+
+        // Wire delete buttons (event delegation keeps escaping safe).
+        contentArea.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            deleteItem(btn.dataset.section, btn.dataset.slug, btn.dataset.title);
+          });
+        });
       }
-    }
 
-    async function doDeploy() {
-      const logEl = document.getElementById('log-output');
-      const logWrap = document.getElementById('build-log');
-      if (logWrap) logWrap.classList.remove('hidden');
-      if (logEl) logEl.textContent = 'Building and deploying...\n';
+      async function renderDeploy() {
+        pageTitle.textContent = 'Deploy';
+        if (publishBtn) publishBtn.style.display = 'none';
+        contentArea.innerHTML = `
+          <div class="section-header" style="margin-top:0">
+            <h2>Build &amp; Deploy</h2>
+          </div>
+          <p class="text-muted mb-16">Build the site from content-data.js, then optionally push to GitHub for Cloudflare Pages deployment.</p>
 
-      const commitMsg = document.getElementById('commit-msg');
-      const body = commitMsg ? { commit_msg: commitMsg.value } : {};
+          <div class="deploy-actions">
+            <button class="btn btn-success" onclick="doBuild()" id="build-btn">Build Site</button>
+            <button class="btn btn-primary" onclick="doDeploy()" id="deploy-btn">Build &amp; Deploy</button>
+          </div>
 
-      const res = await apiFetch('/api/deploy', {
-        method: 'POST',
-        body: JSON.stringify(body)
-      });
-      if (!res) return;
-      const data = await res.json();
+          <div class="form-group mt-16" style="max-width:500px">
+            <label for="commit-msg">Commit Message</label>
+            <input type="text" id="commit-msg" value="chore(admin): content update" placeholder="Commit message for deploy">
+          </div>
 
-      if (logEl) {
-        logEl.textContent = '';
-        // Build output
-        if (data.build) {
-          logEl.textContent += '=== BUILD ===\n';
-          if (data.build.stdout) logEl.textContent += data.build.stdout;
-          if (data.build.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.build.stderr)}</span>`;
-        }
-        // Deploy output
-        if (data.deploy && data.deploy.steps) {
-          logEl.innerHTML += '\n=== DEPLOY ===\n';
-          for (const step of data.deploy.steps) {
-            logEl.innerHTML += `<span class="info">$ ${escapeHtml(step.cmd)}</span>\n`;
-            logEl.innerHTML += escapeHtml(step.out) + '\n';
+          <div id="build-log" class="mt-16">
+            <div class="section-header"><h3>Output</h3></div>
+            <div class="terminal" id="log-output">Ready.</div>
+          </div>
+        `;
+      }
+
+      // ─────────── Actions ───────────
+
+      async function doBuild() {
+        const logEl = document.getElementById('log-output');
+        const logWrap = document.getElementById('build-log');
+        if (logWrap) logWrap.classList.remove('hidden');
+        if (logEl) logEl.textContent = 'Building...\n';
+
+        const res = await apiFetch('/api/build', { method: 'POST' });
+        if (!res) return;
+        const data = await res.json();
+
+        if (logEl) {
+          logEl.textContent = '';
+          if (data.stdout) logEl.textContent += data.stdout;
+          if (data.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.stderr)}</span>`;
+          if (data.returncode === 0) {
+            logEl.innerHTML += '\n<span class="info">Build completed successfully.</span>';
+            showToast('Build completed successfully');
+          } else {
+            logEl.innerHTML += `\n<span class="error">Build failed (exit code ${data.returncode}).</span>`;
+            showToast('Build failed', 'error');
           }
         }
-        if (data.error) {
-          logEl.innerHTML += `<span class="error">${escapeHtml(data.error)}</span>`;
-          showToast('Deploy failed', 'error');
-        } else {
-          logEl.innerHTML += '\n<span class="info">Deploy completed.</span>';
-          showToast('Deploy completed');
+      }
+
+      async function doDeploy() {
+        const logEl = document.getElementById('log-output');
+        const logWrap = document.getElementById('build-log');
+        if (logWrap) logWrap.classList.remove('hidden');
+        if (logEl) logEl.textContent = 'Building and deploying...\n';
+
+        const commitMsg = document.getElementById('commit-msg');
+        const body = commitMsg ? { commit_msg: commitMsg.value } : {};
+
+        const res = await apiFetch('/api/deploy', {
+          method: 'POST',
+          body: JSON.stringify(body)
+        });
+        if (!res) return;
+        const data = await res.json();
+
+        if (logEl) {
+          logEl.textContent = '';
+          if (data.build) {
+            logEl.textContent += '=== BUILD ===\n';
+            if (data.build.stdout) logEl.textContent += data.build.stdout;
+            if (data.build.stderr) logEl.innerHTML += `<span class="error">${escapeHtml(data.build.stderr)}</span>`;
+          }
+          if (data.deploy && data.deploy.steps) {
+            logEl.innerHTML += '\n=== DEPLOY ===\n';
+            for (const step of data.deploy.steps) {
+              logEl.innerHTML += `<span class="info">$ ${escapeHtml(step.cmd)}</span>\n`;
+              logEl.innerHTML += escapeHtml(step.out) + '\n';
+            }
+          }
+          if (data.error) {
+            logEl.innerHTML += `<span class="error">${escapeHtml(data.error)}</span>`;
+            showToast('Deploy failed', 'error');
+          } else {
+            logEl.innerHTML += '\n<span class="info">Deploy completed.</span>';
+            showToast('Deploy completed');
+          }
         }
       }
-    }
 
-    async function deleteItem(section, slug) {
-      if (!confirm(`Delete "${slug}" from ${sectionLabel(section)}?`)) return;
-      const res = await apiFetch(`/api/content/${section}/${slug}`, { method: 'DELETE' });
-      if (res && res.ok) {
-        showToast('Item deleted');
-        allContent = null;  // clear cache
-        renderSection(section);
-      } else {
-        showToast('Delete failed', 'error');
+      // Top-bar quick deploy: jump to deploy view + run build immediately.
+      async function quickDeploy() {
+        const ok = await showConfirm(
+          'Build & Deploy',
+          'Build the site from current content and push to GitHub for Cloudflare Pages deploy?'
+        );
+        if (!ok) return;
+        // Hop to deploy view so the log surface is visible, then trigger.
+        window.location.href = '/admin/dashboard.html?view=deploy&autorun=1';
       }
-    }
 
-    function escapeHtml(text) {
-      const d = document.createElement('div');
-      d.textContent = text;
-      return d.innerHTML;
-    }
+      async function deleteItem(section, slug, title) {
+        const ok = await showConfirm(
+          'Delete article',
+          `Delete "${title || slug}" from ${sectionLabel(section)}? This cannot be undone.`,
+          true
+        );
+        if (!ok) return;
+        const res = await apiFetch(`/api/content/${encodeURIComponent(section)}/${encodeURIComponent(slug)}`, { method: 'DELETE' });
+        if (res && res.ok) {
+          showToast('Item deleted');
+          allContent = null;
+          renderSection(section);
+        } else {
+          showToast('Delete failed', 'error');
+        }
+      }
 
-    // ─────────── Router ───────────
+      // Expose for inline onclick handlers.
+      window.doBuild = doBuild;
+      window.doDeploy = doDeploy;
+      window.quickDeploy = quickDeploy;
+      window.deleteItem = deleteItem;
 
-    if (view === 'insights' || view === 'speaking' || view === 'cases') {
-      renderSection(view);
-    } else if (view === 'deploy') {
-      renderDeploy();
-    } else {
-      renderDashboard();
-    }
+      // ─────────── Router ───────────
+
+      if (view === 'insights' || view === 'speaking' || view === 'cases') {
+        await renderSection(view);
+      } else if (view === 'deploy') {
+        await renderDeploy();
+        // Auto-run deploy if quickDeploy() routed us here.
+        if (params.get('autorun') === '1') {
+          // Small delay so the log surface is visible first.
+          setTimeout(() => doDeploy(), 200);
+        }
+      } else {
+        await renderDashboard();
+      }
+    })();
   </script>
 </body>
 </html>
