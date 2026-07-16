@@ -476,6 +476,9 @@ async function postJson(pid, url, payload, headers, timeoutMs = 90000) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       body: JSON.stringify(payload),
+      // Don't follow redirects — an attacker-controlled base_url could 3xx to
+      // another host and Workers would replay the Authorization header there.
+      redirect: 'manual',
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (e) {
@@ -910,6 +913,14 @@ const LOGIN_WINDOW_SECONDS = 900;
 
 app.post('/api/auth/login', async (c) => {
   const env = c.env;
+
+  // Fail closed if the deployment is misconfigured — never let empty/absent
+  // credential bindings authenticate an empty request body.
+  if (!env.ADMIN_USER || !env.ADMIN_PASS || !env.JWT_SECRET) {
+    console.error('login blocked: ADMIN_USER/ADMIN_PASS/JWT_SECRET not fully configured');
+    return jsonError(c, 503, 'Admin is not configured. Set ADMIN_USER, ADMIN_PASS, JWT_SECRET.');
+  }
+
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-real-ip') || 'unknown';
   const rlKey = `rl:login:${ip}`;
 
@@ -944,12 +955,52 @@ app.use('/api/*', async (c, next) => {
   const auth = c.req.header('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const user = await verifyToken(token, c.env.JWT_SECRET);
-  if (!user) return jsonError(c, 401, 'Invalid or expired token');
+  // Bind the token to the current admin username — rotating ADMIN_USER
+  // invalidates every previously issued token.
+  if (!user || user !== c.env.ADMIN_USER) return jsonError(c, 401, 'Invalid or expired token');
   c.set('user', user);
   return next();
 });
 
 /* ─── content CRUD ─── */
+
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Shape-check an item before it enters content-data.js. The static build
+ *  (build_pages.py / build_detail_pages.py) assumes these types, so one
+ *  malformed payload would otherwise break every future deployment. */
+function validateItem(item) {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) {
+    throw new ApiError(400, 'Body must be a JSON object');
+  }
+  const bilingual = (v, name) => {
+    if (v === undefined) return;
+    if (typeof v === 'string') return;
+    if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+      for (const k of Object.keys(v)) {
+        if (typeof v[k] !== 'string') throw new ApiError(400, `${name}.${k} must be a string`);
+      }
+      return;
+    }
+    throw new ApiError(400, `${name} must be a string or {ja,en} object`);
+  };
+  for (const f of ['title', 'excerpt', 'body', 'dateLabel']) bilingual(item[f], f);
+  for (const f of ['tag', 'date', 'slug', 'seo_title', 'seo_description', 'og_image', 'thumbnail', 'embed', 'video', 'share_text']) {
+    if (item[f] !== undefined && typeof item[f] !== 'string') {
+      throw new ApiError(400, `${f} must be a string`);
+    }
+  }
+  for (const f of ['media', 'images', 'seo_keywords', 'sources']) {
+    if (item[f] !== undefined && !Array.isArray(item[f])) {
+      throw new ApiError(400, `${f} must be an array`);
+    }
+  }
+  if (Array.isArray(item.media)) {
+    for (const m of item.media) {
+      if (!m || typeof m !== 'object' || Array.isArray(m)) throw new ApiError(400, 'each media entry must be an object');
+    }
+  }
+}
 
 function validateSection(section) {
   if (!VALID_SECTIONS.has(section)) {
@@ -968,13 +1019,16 @@ app.post('/api/content/:section', async (c) => {
   const section = c.req.param('section');
   validateSection(section);
   const item = await c.req.json();
+  validateItem(item);
 
   // Always normalize the slug — it becomes a static filename in build_pages.py
   // and a URL on the public site, so it must be safe kebab-case regardless of
   // what the client sent.
   const rawSlug = item.slug || item.title?.en || '';
   item.slug = slugify(rawSlug);
-  if (!item.slug) throw new ApiError(400, 'Slug or English title is required');
+  if (!item.slug || !SLUG_RE.test(item.slug)) {
+    throw new ApiError(400, 'A valid kebab-case slug (or English title) is required');
+  }
 
   const slug = item.slug;
   await mutateContent(c.env, (data) => {
@@ -994,6 +1048,7 @@ app.put('/api/content/:section/:slug', async (c) => {
   const slug = c.req.param('slug');
   validateSection(section);
   const incoming = await c.req.json();
+  validateItem(incoming);
 
   await mutateContent(c.env, (data) => {
     const items = data[section] || [];
@@ -1205,12 +1260,20 @@ app.post('/api/settings', async (c) => {
   const current = await loadSettings(c.env);
   const incomingProviders = data?.providers || {};
 
+  // base_url is only writable for providers that legitimately need a custom
+  // endpoint. Freezing it for cloud providers stops a stolen token from
+  // redirecting e.g. OpenAI's key to an attacker host (SSRF / key exfil).
+  const BASE_URL_EDITABLE = new Set(['custom', 'ollama', 'lmstudio']);
+  const ALLOWED_FIELDS = new Set(['api_key', 'base_url', 'model_ids', 'enabled']);
+
   for (const [prov, cfg] of Object.entries(incomingProviders)) {
     if (typeof cfg !== 'object' || cfg === null) continue;
     // Only known provider ids — blocks prototype pollution via crafted keys.
     if (!Object.prototype.hasOwnProperty.call(DEFAULT_SETTINGS.providers, prov)) continue;
     const bucket = current.providers[prov] || (current.providers[prov] = {});
     for (const [k, v] of Object.entries(cfg)) {
+      if (!ALLOWED_FIELDS.has(k)) continue;
+      if (k === 'base_url' && !BASE_URL_EDITABLE.has(prov)) continue;
       // Preserve the existing key if the UI sent back the masked placeholder.
       if (KEY_FIELDS.has(k) && typeof v === 'string' && v.startsWith('••••')) continue;
       bucket[k] = v;

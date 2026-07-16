@@ -20,8 +20,10 @@ so we never reimplement JS object literal parsing.
 
 Run: python tools/build_detail_pages.py
 """
+import html
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import urllib.parse
@@ -30,6 +32,58 @@ import urllib.parse
 # share one source of truth for media handling.
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "admin" / "backend"))
 from media_helpers import normalize_legacy, youtube_thumb  # noqa: E402
+
+# ── Output-escaping helpers ────────────────────────────────────────────────
+# Content now flows in from the web admin (AI-assisted, single trusted editor),
+# so treat every text field as untrusted at render time. Plain fields are
+# HTML-escaped; the intentionally-rich `body` is passed through an allowlist
+# sanitizer that keeps prose formatting but strips active markup.
+
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+# Tags allowed in article bodies (prose + basic media/table markup).
+_BODY_ALLOWED_TAGS = {
+    "p", "br", "hr", "h2", "h3", "h4", "h5", "h6",
+    "ul", "ol", "li", "blockquote", "strong", "b", "em", "i", "u",
+    "a", "code", "pre", "figure", "figcaption", "img",
+    "table", "thead", "tbody", "tr", "th", "td", "span", "div",
+}
+
+
+def esc(text) -> str:
+    """HTML-escape a plain-text field (element + attribute safe)."""
+    return html.escape("" if text is None else str(text), quote=True)
+
+
+def sanitize_body(raw: str) -> str:
+    """Allowlist-sanitize rich HTML body: strip <script>/<style> blocks,
+    on*= event handlers, and javascript:/vbscript: URLs, and drop any tag
+    not on the prose allowlist. Deliberately dependency-free (stdlib only)."""
+    if not raw:
+        return ""
+    s = str(raw)
+    # 1. Remove entire <script>/<style>...</style> blocks incl. content.
+    s = re.sub(r"(?is)<\s*(script|style)\b.*?<\s*/\s*\1\s*>", "", s)
+    # 2. Strip inline event handlers:  onclick="..."  onerror='...'  onx=y
+    s = re.sub(r"(?is)\son[a-z]+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", "", s)
+    # 3. Neutralize javascript:/vbscript: in href/src.
+    s = re.sub(r"(?is)((?:href|src)\s*=\s*[\"']?)\s*(?:javascript|vbscript)\s*:", r"\1#", s)
+    # 4. Drop any tag whose name isn't on the allowlist (keeps its text).
+    def _tag(m):
+        name = (m.group(1) or "").lower()
+        return m.group(0) if name in _BODY_ALLOWED_TAGS else ""
+    s = re.sub(r"(?is)</?\s*([a-z0-9]+)\b[^>]*>", _tag, s)
+    return s
+
+
+def jsonld_safe(obj) -> str:
+    """Serialize JSON-LD so it cannot break out of the <script> block."""
+    return (
+        json.dumps(obj, ensure_ascii=False, indent=2)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+    )
 
 ORIGIN = "https://gloversal.com"
 SITE_NAME = "Gloversal, Inc."
@@ -300,16 +354,12 @@ def render_page(section, slug, item, prev_item, next_item):
     thumbnail = item.get("thumbnail", "")
     video = item.get("video", "")
 
-    full_title = f"{seo_title or title_ja} | {SITE_NAME}"
-    desc = (seo_description or excerpt_ja).replace('"', "&quot;")
-    title_attr = (seo_title or title_ja).replace('"', "&quot;")
+    full_title = esc(f"{seo_title or title_ja} | {SITE_NAME}")
+    desc = esc(seo_description or excerpt_ja)
+    title_attr = esc(seo_title or title_ja)
     twitter_card = "summary_large_image" if (og_w / max(og_h, 1)) >= 1.5 else "summary"
 
-    jsonld = json.dumps(
-        build_jsonld(section, slug, item, canonical, og_image_url),
-        ensure_ascii=False,
-        indent=2,
-    )
+    jsonld = jsonld_safe(build_jsonld(section, slug, item, canonical, og_image_url))
 
     # Detail pages live one directory deep, so static asset paths use ../
     asset_prefix = "../"
@@ -333,12 +383,12 @@ def render_page(section, slug, item, prev_item, next_item):
     )
 
     prev_html = (
-        f'<a class="detail-nav__prev" href="{prev_item["slug"]}.html"><small data-i18n="detail.prev">&larr; 前の記事</small><span>{prev_item["title"]["ja"]}</span></a>'
+        f'<a class="detail-nav__prev" href="{esc(prev_item["slug"])}.html"><small data-i18n="detail.prev">&larr; 前の記事</small><span>{esc(prev_item["title"]["ja"])}</span></a>'
         if prev_item
         else '<span class="detail-nav__prev" aria-hidden="true" style="visibility:hidden"></span>'
     )
     next_html = (
-        f'<a class="detail-nav__next" href="{next_item["slug"]}.html"><small data-i18n="detail.next">次の記事 &rarr;</small><span>{next_item["title"]["ja"]}</span></a>'
+        f'<a class="detail-nav__next" href="{esc(next_item["slug"])}.html"><small data-i18n="detail.next">次の記事 &rarr;</small><span>{esc(next_item["title"]["ja"])}</span></a>'
         if next_item
         else '<span class="detail-nav__next" aria-hidden="true" style="visibility:hidden"></span>'
     )
@@ -583,13 +633,13 @@ document.querySelectorAll('.lite-youtube').forEach(function(btn){
   <div class="detail-hero__mesh" aria-hidden="true"></div>
   <div class="container">
     <a href="{asset_prefix}{info['list_path'].lstrip('/')}" class="detail-back">&larr; {info['back_label']}</a>
-    <span class="detail-tag edge-label">{tag}</span>
-    <h1 class="detail-title">{title_ja}</h1>
+    <span class="detail-tag edge-label">{esc(tag)}</span>
+    <h1 class="detail-title">{esc(title_ja)}</h1>
     <div class="detail-meta">
-      <span class="detail-date">{date_label}</span>
+      <span class="detail-date">{esc(date_label)}</span>
     </div>
     {thumbnail_html}
-    <p class="detail-lead">{excerpt_ja}</p>
+    <p class="detail-lead">{esc(excerpt_ja)}</p>
     {video_html}
   </div>
 </section>
@@ -598,7 +648,7 @@ document.querySelectorAll('.lite-youtube').forEach(function(btn){
 
 <article class="section">
   <div class="container detail-body">
-{body_ja}
+{sanitize_body(body_ja)}
   </div>
 </article>
 
@@ -749,13 +799,32 @@ def main():
         info = SECTIONS[section]
         out_dir = SITE / info["dir"]
         out_dir.mkdir(parents=True, exist_ok=True)
+
+        generated = set()
         for i, item in enumerate(items):
             slug = item["slug"]
+            # Containment: slug becomes a filename under out_dir, so it must be
+            # strict kebab-case. Reject traversal / stray characters outright.
+            if not SLUG_RE.match(slug or ""):
+                print(f"  [!] {section}: skipping invalid slug {slug!r} (must match {SLUG_RE.pattern})")
+                sys.exit(1)
+            dest = (out_dir / f"{slug}.html").resolve()
+            if dest.parent != out_dir.resolve():
+                print(f"  [!] {section}: slug {slug!r} escapes {out_dir} — aborting.")
+                sys.exit(1)
             prev_item = items[i - 1] if i > 0 else None
             next_item = items[i + 1] if i + 1 < len(items) else None
             html = render_page(section, slug, item, prev_item, next_item)
-            (out_dir / f"{slug}.html").write_text(html, encoding="utf-8")
+            dest.write_text(html, encoding="utf-8")
+            generated.add(dest.name)
             total += 1
+
+        # Prune orphaned detail pages: a deleted content item must not leave a
+        # publicly reachable HTML file behind.
+        for existing in out_dir.glob("*.html"):
+            if existing.name not in generated:
+                existing.unlink()
+                print(f"  [-] {section}: pruned orphaned {existing.name}")
         print(f"  [+] {section}: {len(items)} pages -> site/{info['dir']}/")
     print(f"\n  Total: {total} static detail pages.")
 

@@ -45,22 +45,37 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build site (same chain as local admin)
-        run: python build_pages.py
-
-      - name: Commit & push regenerated site
+      - name: Build, sync with main, and push regenerated site
         env:
           MSG: "${{ inputs.commit_message || 'chore(admin-web): build & deploy' }}"
         run: |
           git config user.name "gloversal-admin-bot"
           git config user.email "admin-bot@users.noreply.github.com"
-          git add site/
-          if git diff --cached --quiet; then
-            echo "No changes to deploy — site is already up to date."
-          else
+
+          # Retry loop: if content-data.js (or anything else) lands on main
+          # while we build, discard the generated output, re-sync, and rebuild
+          # from the new head — never publish HTML built from stale content.
+          for attempt in 1 2 3 4 5; do
+            git checkout -- site/ 2>/dev/null || true
+            git clean -fd site/ >/dev/null 2>&1 || true
+            git pull --rebase --autostash origin main
+
+            python build_pages.py
+
+            git add site/
+            if git diff --cached --quiet; then
+              echo "No changes to deploy — site is already up to date."
+              exit 0
+            fi
             git commit -m "$MSG"
-            # Content may have been saved while this run was building;
-            # rebase on top so the push is fast-forward.
-            git pull --rebase origin main
-            git push origin main
-          fi
+
+            if git push origin main; then
+              echo "Deployed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected (main moved) — resetting and rebuilding (attempt $attempt)."
+            git reset --hard HEAD~1
+          done
+
+          echo "::error::Failed to push after 5 attempts (main kept moving)."
+          exit 1
