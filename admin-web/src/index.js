@@ -20,7 +20,9 @@ const VALID_SECTIONS = new Set(['insights', 'speaking', 'cases']);
 const CONTENT_PATH = 'site/js/content-data.js';
 const UPLOAD_DIR = 'site/assets/images/uploads';
 const ALLOWED_EXTENSIONS = new Set([
-  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+  // .svg deliberately excluded: SVGs served from the public origin can carry
+  // inline script (stored XSS). Use PNG/WebP for raster art.
+  '.jpg', '.jpeg', '.png', '.gif', '.webp',
   '.mp4', '.webm', '.mov',
 ]);
 const VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.mov']);
@@ -786,7 +788,20 @@ const OEMBED_ENDPOINTS = {
   'note.com':      null,
 };
 
-function buildManualEmbed(url, platform) {
+function escapeHtmlAttr(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildManualEmbed(rawUrl, platform) {
+  // The URL is embedded into iframe/blockquote markup that the admin — and
+  // ultimately the public site — renders as HTML. Escape it so a crafted
+  // import URL can't break out into active markup.
+  const url = escapeHtmlAttr(rawUrl);
   if (platform === 'linkedin') {
     return `<iframe src="https://www.linkedin.com/embed/feed/update/${url.split('/').pop()}" height="399" width="504" frameborder="0" allowfullscreen></iframe>`;
   }
@@ -954,10 +969,12 @@ app.post('/api/content/:section', async (c) => {
   validateSection(section);
   const item = await c.req.json();
 
-  if (!item.slug) {
-    if (item.title?.en) item.slug = slugify(item.title.en);
-    else throw new ApiError(400, 'Slug or English title is required');
-  }
+  // Always normalize the slug — it becomes a static filename in build_pages.py
+  // and a URL on the public site, so it must be safe kebab-case regardless of
+  // what the client sent.
+  const rawSlug = item.slug || item.title?.en || '';
+  item.slug = slugify(rawSlug);
+  if (!item.slug) throw new ApiError(400, 'Slug or English title is required');
 
   const slug = item.slug;
   await mutateContent(c.env, (data) => {
@@ -1190,6 +1207,8 @@ app.post('/api/settings', async (c) => {
 
   for (const [prov, cfg] of Object.entries(incomingProviders)) {
     if (typeof cfg !== 'object' || cfg === null) continue;
+    // Only known provider ids — blocks prototype pollution via crafted keys.
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_SETTINGS.providers, prov)) continue;
     const bucket = current.providers[prov] || (current.providers[prov] = {});
     for (const [k, v] of Object.entries(cfg)) {
       // Preserve the existing key if the UI sent back the masked placeholder.

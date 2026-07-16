@@ -1,7 +1,12 @@
 # Admin panel — never index, never cache HTML.
+# CSP note: the admin pages rely on inline scripts/handlers, so 'unsafe-inline'
+# stays for script/style. The load-bearing directive is connect-src 'self' —
+# even if a stored/DOM XSS fired, it cannot exfiltrate the localStorage token
+# to a third-party host. object-src/base-uri/frame-ancestors are locked down.
 /*
   X-Robots-Tag: noindex, nofollow
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Cache-Control: no-store
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self'; frame-src https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
