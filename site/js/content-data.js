@@ -10,7 +10,7 @@ window.__GLV_CONTENT__ = {
         "ja": "2026�N7��",
         "en": "July 2026"
       },
-      "tag": "E2E",
+      "tag": "E2E-UPDATED",
       "title": {
         "ja": "E2E�e�X�g",
         "en": "E2E Test"
