@@ -895,7 +895,7 @@ const LOGIN_WINDOW_SECONDS = 900;
 
 app.post('/api/auth/login', async (c) => {
   const env = c.env;
-  const ip = c.req.header('cf-connecting-ip') || 'unknown';
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-real-ip') || 'unknown';
   const rlKey = `rl:login:${ip}`;
 
   const failures = parseInt((await env.SETTINGS.get(rlKey)) || '0', 10);
