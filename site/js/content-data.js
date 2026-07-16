@@ -4,31 +4,6 @@
 window.__GLV_CONTENT__ = {
   "insights": [
     {
-      "slug": "e2e-roundtrip-test",
-      "date": "2026-07",
-      "dateLabel": {
-        "ja": "2026�N7��",
-        "en": "July 2026"
-      },
-      "tag": "E2E-UPDATED",
-      "title": {
-        "ja": "E2E�e�X�g",
-        "en": "E2E Test"
-      },
-      "excerpt": {
-        "ja": "�����e�X�g",
-        "en": "Roundtrip test"
-      },
-      "body": {
-        "ja": "<p>test</p>",
-        "en": "<p>test</p>"
-      },
-      "media": [],
-      "images": [],
-      "seo_keywords": [],
-      "sources": []
-    },
-    {
       "slug": "medical-ai-accuracy-gap",
       "date": "2026-04-10",
       "dateLabel": {
