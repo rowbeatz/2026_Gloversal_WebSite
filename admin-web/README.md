@@ -60,13 +60,33 @@ npx wrangler dev                 # http://localhost:8787
 
 ## セキュリティメモ
 
-- ログインは IP ごとに 15 分 8 回で 429（KV ベース、ベストエフォート）。
-- トークンは HS256 JWT・24h 失効。Bearer ヘッダ方式なので CSRF 対象外。
-- `_headers` で noindex / no-store / X-Frame-Options DENY。robots.txt も拒否。
-- さらに固くするなら Cloudflare Zero Trust (Access) をこの Worker の
-  ルートに被せる（メール OTP など）— 公開サイト側には影響しない。
-- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。fine-grained PAT に
-  しておけば漏洩時の影響が単一リポジトリに限定される。
+2つの独立レビュー（Claude security-auditor / Codex GPT-5.6-Sol）を経て対応済み:
+
+- **認証**: HS256 JWT・24h 失効、Bearer 方式（CSRF 非該当）。トークンは現
+  `ADMIN_USER` に束縛（ユーザー名変更で旧トークン失効）。secrets 未設定なら
+  ログインを 503 で fail-closed（空パスワード認証を防止）。認証情報比較は
+  定時間 HMAC。
+- **公開サイト XSS 対策**（`tools/build_detail_pages.py`）: title/tag/excerpt
+  等のプレーンフィールドは全て HTML エスケープ、リッチな `body` は依存ゼロの
+  allowlist サニタイザ（`<script>`/`on*=`/`javascript:` 除去）、JSON-LD は
+  `</script>` ブレイク不能な unicode エスケープ。
+- **入力検証**: create/update は section 対応の型スキーマ検証（不正ペイロード
+  でビルドが壊れない）。slug は strict kebab-case（パストラバーサル防止）。
+- **SSRF/鍵漏洩対策**: クラウドプロバイダの `base_url` は固定（custom/ollama/
+  lmstudio のみ変更可）、プロバイダ呼び出しは `redirect: 'manual'`。
+- **レート制限**: IP ごと 15 分 8 回で 429（KV ベース、ベストエフォート）。
+  KV は原子的でないため並列総当たりには弱い — パスワード強度（約72bit）が
+  一次防御。より固くするなら Cloudflare Access（下記）。
+- `_headers`: CSP（`connect-src 'self'` でトークン持ち出しを遮断）+ noindex /
+  no-store / X-Frame-Options DENY。robots.txt も全拒否。
+- **推奨（未実施）**: Cloudflare Zero Trust (Access) をこの Worker のルートに
+  被せる（メール OTP など）。公開サイト側には無影響。KV レート制限の非原子性・
+  総当たり耐性を一挙に解消する最短の追加防御。
+- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。現状は `gh` CLI の広域
+  classic PAT。**fine-grained PAT（リポジトリ `2026_Gloversal_WebSite` のみ、
+  Contents RW + Actions RW）への差し替えを推奨** — 漏洩時の影響を単一リポジトリ
+  に限定できる。差し替え: `gh auth token` の代わりに新 PAT を
+  `npx wrangler secret put GH_TOKEN` で投入。
 
 ## ローカル版との違い
 
