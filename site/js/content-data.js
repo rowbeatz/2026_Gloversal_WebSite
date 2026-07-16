@@ -4,20 +4,6 @@
 window.__GLV_CONTENT__ = {
   "insights": [
     {
-      "slug": "etcpasswd",
-      "title": {
-        "en": "Path Test"
-      },
-      "excerpt": {
-        "ja": "x",
-        "en": "x"
-      },
-      "body": {
-        "ja": "x",
-        "en": "x"
-      }
-    },
-    {
       "slug": "medical-ai-accuracy-gap",
       "date": "2026-04-10",
       "dateLabel": {
