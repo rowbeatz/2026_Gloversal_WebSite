@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — AI Playground</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <style>
+    /* ─── Playground-specific styles ─── */
+    .pg-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .pg-layout { grid-template-columns: 1fr; }
+    }
+
+    .pg-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .pg-panel h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .pg-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .pg-textarea:focus { outline: none; border-color: var(--accent); }
+
+    .pg-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .pg-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    /* Result cards with animation */
+    .pg-result { display: none; }
+    .pg-result.is-visible { display: block; }
+
+    .pg-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 12px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: pgSlideIn 0.3s var(--ease, ease-out) forwards;
+    }
+    .pg-card:nth-child(1) { animation-delay: 0s; }
+    .pg-card:nth-child(2) { animation-delay: 0.05s; }
+    .pg-card:nth-child(3) { animation-delay: 0.1s; }
+    .pg-card:nth-child(4) { animation-delay: 0.15s; }
+    .pg-card:nth-child(5) { animation-delay: 0.2s; }
+    .pg-card:nth-child(6) { animation-delay: 0.25s; }
+    .pg-card:nth-child(7) { animation-delay: 0.3s; }
+    .pg-card:nth-child(8) { animation-delay: 0.35s; }
+    .pg-card:nth-child(9) { animation-delay: 0.4s; }
+    .pg-card:nth-child(10) { animation-delay: 0.45s; }
+
+    @keyframes pgSlideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pg-card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .pg-card-value {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .pg-card-value.html-preview {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: var(--mono);
+      white-space: pre-wrap;
+    }
+
+    .pg-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .pg-copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    .pg-suggestion-box {
+      background: rgba(79, 142, 247, 0.08);
+      border: 1px solid rgba(79, 142, 247, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .pg-suggestion-box.is-visible { display: block; }
+
+    .pg-suggestion-box .suggestion-section {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .pg-suggestion-box .suggestion-reason {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .pg-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .pg-actions-label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .pg-section-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .pg-section-btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pg-section-btn:hover {
+      background: var(--hover-strong);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .pg-section-btn .pg-section-icon {
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .pg-section-btn.is-suggested {
+      background: var(--hover-strong);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-soft);
+    }
+    .pg-section-btn.is-suggested .pg-section-icon { color: var(--success); }
+    .pg-section-suggested-tag {
+      position: absolute;
+      top: -8px;
+      right: 6px;
+      background: var(--success);
+      color: #0a0e2a;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .pg-actions-secondary {
+      display: flex;
+      justify-content: flex-end;
+    }
+    @media (max-width: 640px) {
+      .pg-section-buttons { grid-template-columns: 1fr; }
+    }
+
+    /* Loading overlay */
+    .pg-loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .pg-loading.is-visible { display: block; }
+
+    .pg-loading-spinner {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .pg-loading-text {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SNS Import section */
+    .pg-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    .pg-sns-row {
+      display: flex;
+      gap: 8px;
+    }
+    .pg-sns-row input {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+    }
+    .pg-sns-row input:focus { outline: none; border-color: var(--accent); }
+
+    .pg-embed-preview {
+      margin-top: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      min-height: 50px;
+      display: none;
+    }
+    .pg-embed-preview.is-visible { display: block; }
+    .pg-embed-preview iframe { max-width: 100%; }
+
+    .pg-error {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+    .pg-error.is-visible { display: block; }
+
+    .pg-model-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 720px) {
+      .pg-model-row { grid-template-columns: 1fr; }
+    }
+    .pg-no-providers {
+      background: rgba(210, 153, 34, 0.08);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .pg-no-providers.is-visible { display: block; }
+    .pg-provider-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+      letter-spacing: 0.4px;
+      margin-left: 8px;
+    }
+
+    /* ─── Custom provider picker (SVG-friendly replacement for native select) ─── */
+    .provider-picker {
+      position: relative;
+      width: 100%;
+    }
+    .provider-picker-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .provider-picker-btn:hover { border-color: var(--accent); }
+    .provider-picker-btn .caret { margin-left: auto; opacity: 0.6; }
+    .provider-picker-btn .pp-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-picker-btn .pp-icon svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .provider-picker-list {
+      position: absolute;
+      z-index: 50;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+      max-height: 280px;
+      overflow-y: auto;
+      display: none;
+    }
+    .provider-picker-list.is-open { display: block; }
+    .provider-picker-list .pp-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .provider-picker-list .pp-item:hover { background: var(--surface-alt); }
+    .provider-picker-list .pp-item.active {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
+    .provider-picker-list .pp-item .pp-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-picker-list .pp-item .pp-icon svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+    .pg-best-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--success);
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">AI Playground</h1>
+        <div class="top-bar-actions">
+          <a href="/admin/settings.html" class="btn btn-sm">Provider Settings</a>
+        </div>
+      </div>
+      <div class="content-area" id="content-area">
+
+        <div class="pg-layout">
+          <!-- ─── Left: Input Panel ─── -->
+          <div>
+            <div class="pg-panel">
+              <h3>Content Input</h3>
+
+              <div class="pg-no-providers" id="pg-no-providers">
+                No AI providers are enabled. <a href="/admin/settings.html" style="color:inherit;text-decoration:underline">Configure providers in Settings →</a>
+              </div>
+
+              <div class="pg-model-row">
+                <div class="form-group" style="margin-bottom:0">
+                  <label>AI Provider</label>
+                  <div class="provider-picker" id="pg-provider-picker">
+                    <button type="button" class="provider-picker-btn" id="pg-provider-btn" onclick="toggleProviderPicker()">
+                      <span class="pp-icon" id="pg-provider-btn-icon"></span>
+                      <span id="pg-provider-btn-label">Loading…</span>
+                      <span class="caret">▾</span>
+                    </button>
+                    <div class="provider-picker-list" id="pg-provider-list"></div>
+                  </div>
+                  <!-- Hidden field to keep an authoritative value for callers. -->
+                  <input type="hidden" id="pg-provider" value="">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label for="pg-model">Model</label>
+                  <select id="pg-model">
+                    <option value="">-- Select provider first --</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label>&nbsp;</label>
+                  <a href="/admin/settings.html" class="btn btn-sm" style="display:block;text-align:center">Settings</a>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0">
+                <label for="pg-section-hint">Section Hint</label>
+                <select id="pg-section-hint">
+                  <option value="" selected>Auto (AI decides)</option>
+                  <option value="insights">Insights</option>
+                  <option value="speaking">Activities</option>
+                  <option value="cases">Case Studies</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-top:12px">
+                <label for="pg-input">Paste rough notes, ideas, or transcripts (any language)</label>
+                <textarea id="pg-input" class="pg-textarea" placeholder="Paste your rough notes, meeting transcripts, article ideas, or any text in any language. The AI will transform it into structured, publication-ready bilingual content for Gloversal's site."></textarea>
+                <div class="pg-meta">
+                  <span id="pg-char-count">0 characters</span>
+                  <span id="pg-word-count">0 words</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="pg-generate-btn" onclick="generateContent()">
+                Generate Content
+              </button>
+
+              <div class="pg-error" id="pg-error"></div>
+            </div>
+
+            <!-- SNS Import -->
+            <div class="pg-panel" style="margin-top:16px">
+              <h3>SNS / URL Import</h3>
+              <div class="pg-sns-row">
+                <input type="url" id="pg-sns-url" placeholder="Paste YouTube, X, LinkedIn, Instagram, Bluesky, note.com URL...">
+                <button class="btn btn-primary" onclick="importSNS()">Import</button>
+              </div>
+              <div class="pg-embed-preview" id="pg-embed-preview"></div>
+              <div class="pg-actions" id="pg-embed-actions" style="display:none">
+                <button class="btn btn-sm" onclick="copyEmbedToClipboard()">Copy Embed Code</button>
+                <button class="btn btn-sm btn-primary" onclick="useEmbedInEditor()">Use in Editor</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── Right: Generated Preview ─── -->
+          <div>
+            <div class="pg-loading" id="pg-loading">
+              <div class="pg-loading-spinner"></div>
+              <div class="pg-loading-text">Generating content with AI...</div>
+            </div>
+
+            <div class="pg-result" id="pg-result">
+              <div class="pg-panel">
+                <h3>Generated Content</h3>
+
+                <div class="pg-suggestion-box" id="pg-suggestion">
+                  <span class="suggestion-section" id="pg-suggested-section"></span>
+                  <div class="suggestion-reason" id="pg-suggested-reason"></div>
+                </div>
+
+                <div id="pg-cards"></div>
+
+                <div class="pg-actions">
+                  <div class="pg-actions-label">送信先タブを選んで Editor で続ける:</div>
+                  <div class="pg-section-buttons">
+                    <button class="btn pg-section-btn" data-section="insights" onclick="editInEditor('insights')">
+                      <span class="pg-section-icon">&#9998;</span>
+                      <span>Insights</span>
+                      <span class="pg-section-suggested-tag" data-for="insights" hidden>★ Suggested</span>
+                    </button>
+                    <button class="btn pg-section-btn" data-section="speaking" onclick="editInEditor('speaking')">
+                      <span class="pg-section-icon">&#9733;</span>
+                      <span>Activities</span>
+                      <span class="pg-section-suggested-tag" data-for="speaking" hidden>★ Suggested</span>
+                    </button>
+                    <button class="btn pg-section-btn" data-section="cases" onclick="editInEditor('cases')">
+                      <span class="pg-section-icon">&#9670;</span>
+                      <span>Case Studies</span>
+                      <span class="pg-section-suggested-tag" data-for="cases" hidden>★ Suggested</span>
+                    </button>
+                  </div>
+                  <div class="pg-actions-secondary">
+                    <button class="btn btn-success" onclick="saveToSite()">Save directly to suggested section</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar (NHP-inspired: brand mark + SVG icons + user info)
+    initPage('playground');
+
+    // ─── State ───
+    let generatedData = null;
+    let embedData = null;
+    let providersCatalog = [];      // [{id, enabled, models, dynamic_models, ...}]
+    let dynamicModelsCache = {};    // { ollama: [...], lmstudio: [...] }
+
+    const PROVIDER_LABEL = {
+      anthropic: 'Anthropic Claude',
+      openai: 'OpenAI GPT',
+      google: 'Google Gemini',
+      mistral: 'Mistral AI',
+      groq: 'Groq',
+      together: 'Together AI',
+      perplexity: 'Perplexity',
+      cohere: 'Cohere',
+      deepseek: 'DeepSeek',
+      ollama: 'Ollama',
+      lmstudio: 'LM Studio',
+      custom: 'Custom',
+    };
+
+    // ─── Provider picker (custom, SVG-friendly) ───
+    function toggleProviderPicker(forceState) {
+      const list = document.getElementById('pg-provider-list');
+      const open = forceState != null ? forceState : !list.classList.contains('is-open');
+      list.classList.toggle('is-open', open);
+    }
+    // Close picker when clicking outside.
+    document.addEventListener('click', (e) => {
+      const picker = document.getElementById('pg-provider-picker');
+      if (picker && !picker.contains(e.target)) toggleProviderPicker(false);
+    });
+
+    function renderProviderPicker(enabledProviders, selectedId) {
+      const list = document.getElementById('pg-provider-list');
+      const btnIcon = document.getElementById('pg-provider-btn-icon');
+      const btnLabel = document.getElementById('pg-provider-btn-label');
+      list.innerHTML = '';
+      enabledProviders.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'pp-item' + (p.id === selectedId ? ' active' : '');
+        item.innerHTML = `
+          <span class="pp-icon">${PROVIDER_ICONS[p.id] || ''}</span>
+          <span>${escapeHtml(PROVIDER_LABEL[p.id] || p.id)}</span>
+        `;
+        item.onclick = () => {
+          setProvider(p.id);
+          toggleProviderPicker(false);
+        };
+        list.appendChild(item);
+      });
+      // Update the trigger button.
+      if (selectedId) {
+        btnIcon.innerHTML = PROVIDER_ICONS[selectedId] || '';
+        btnLabel.textContent = PROVIDER_LABEL[selectedId] || selectedId;
+      } else {
+        btnIcon.innerHTML = '';
+        btnLabel.textContent = '-- Select provider --';
+      }
+    }
+
+    async function setProvider(pid) {
+      document.getElementById('pg-provider').value = pid || '';
+      const enabled = providersCatalog.filter(p => p.enabled);
+      renderProviderPicker(enabled, pid);
+      await onProviderChange();
+    }
+
+    async function loadProviders() {
+      const res = await apiFetch('/api/ai/providers');
+      if (!res || !res.ok) {
+        document.getElementById('pg-no-providers').classList.add('is-visible');
+        return;
+      }
+      const data = await res.json();
+      providersCatalog = data.providers || [];
+      const enabled = providersCatalog.filter(p => p.enabled);
+
+      if (!enabled.length) {
+        document.getElementById('pg-no-providers').classList.add('is-visible');
+        renderProviderPicker([], null);
+        document.getElementById('pg-provider-btn-label').textContent = '-- No providers enabled --';
+        document.getElementById('pg-model').innerHTML = '<option value="">--</option>';
+        document.getElementById('pg-generate-btn').disabled = true;
+        return;
+      }
+
+      // Pre-select the configured default if it's enabled, else the first.
+      let selected = enabled[0].id;
+      if (data.default_provider && enabled.some(p => p.id === data.default_provider)) {
+        selected = data.default_provider;
+      }
+      document.getElementById('pg-provider').value = selected;
+      renderProviderPicker(enabled, selected);
+      await onProviderChange();
+
+      // Honor the saved default model if present in the freshly-loaded list.
+      if (data.default_model) {
+        const modelSel = document.getElementById('pg-model');
+        if ([...modelSel.options].some(o => o.value === data.default_model)) {
+          modelSel.value = data.default_model;
+        }
+      }
+    }
+
+    async function onProviderChange() {
+      const pid = document.getElementById('pg-provider').value;
+      const modelSel = document.getElementById('pg-model');
+      modelSel.innerHTML = '<option value="">Loading live models…</option>';
+      if (!pid) {
+        modelSel.innerHTML = '<option value="">--</option>';
+        return;
+      }
+      // Always fetch live; fall back is handled server-side.
+      let models = dynamicModelsCache[pid];
+      let bestId = '';
+      if (!models) {
+        const res = await apiFetch(`/api/ai/models/${pid}`);
+        if (res && res.ok) {
+          const data = await res.json();
+          models = data.models || [];
+          bestId = data.best || '';
+          dynamicModelsCache[pid] = models;
+        } else {
+          models = [];
+        }
+      }
+      modelSel.innerHTML = '';
+      if (!models.length) {
+        modelSel.innerHTML = '<option value="">(no models — check Settings)</option>';
+        return;
+      }
+      // Sort by score desc; mark the top one as "Best available".
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      sorted.forEach((m, idx) => {
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = idx === 0 ? `★ Best available — ${label}` : label;
+        modelSel.appendChild(opt);
+      });
+      // Auto-select the best.
+      const top = bestId || (typeof sorted[0] === 'string' ? sorted[0] : sorted[0].id);
+      if (top) modelSel.value = top;
+    }
+
+    // ─── Character / word counter ───
+    const pgInput = document.getElementById('pg-input');
+    const charCount = document.getElementById('pg-char-count');
+    const wordCount = document.getElementById('pg-word-count');
+
+    pgInput.addEventListener('input', () => {
+      const val = pgInput.value;
+      charCount.textContent = `${val.length} characters`;
+      const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words} words`;
+    });
+
+    // ─── Generate Content ───
+    async function generateContent() {
+      const input = pgInput.value.trim();
+      if (!input) {
+        showError('Please enter some content to transform.');
+        return;
+      }
+
+      const provider = document.getElementById('pg-provider').value;
+      const model = document.getElementById('pg-model').value;
+      const sectionHint = document.getElementById('pg-section-hint').value;
+
+      if (!provider) {
+        showError('Please select an AI provider (configure one in Settings).');
+        return;
+      }
+      if (!model) {
+        showError('Please select a model.');
+        return;
+      }
+
+      // Show loading
+      hideError();
+      document.getElementById('pg-result').classList.remove('is-visible');
+      document.getElementById('pg-loading').classList.add('is-visible');
+      document.getElementById('pg-generate-btn').disabled = true;
+      document.getElementById('pg-generate-btn').innerHTML = '<span class="spinner"></span> Generating...';
+
+      try {
+        const res = await apiFetch('/api/playground/generate', {
+          method: 'POST',
+          body: JSON.stringify({ input, section_hint: sectionHint, provider, model })
+        });
+
+        if (!res) return;
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Generation failed');
+        }
+
+        const data = await res.json();
+        generatedData = data.content;
+        renderResult(generatedData, data.provider || provider, data.model || model);
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        document.getElementById('pg-loading').classList.remove('is-visible');
+        document.getElementById('pg-generate-btn').disabled = false;
+        document.getElementById('pg-generate-btn').textContent = 'Generate Content';
+      }
+    }
+
+    // ─── Render Result ───
+    function renderResult(data, providerId, modelId) {
+      // Suggestion box
+      const suggBox = document.getElementById('pg-suggestion');
+      if (data.suggested_section) {
+        const sectionLabels = { insights: 'Insights', speaking: 'Activities', cases: 'Case Studies' };
+        const provLabel = providerId ? (PROVIDER_LABEL[providerId] || providerId) : '';
+        const badge = providerId
+          ? `<span class="pg-provider-badge">Generated by ${provLabel}${modelId ? ' · ' + modelId : ''}</span>`
+          : '';
+        document.getElementById('pg-suggested-section').innerHTML =
+          'Suggested: ' + (sectionLabels[data.suggested_section] || data.suggested_section) + badge;
+        document.getElementById('pg-suggested-reason').textContent = data.reasoning || '';
+        suggBox.classList.add('is-visible');
+        markSuggestedSection(data.suggested_section);
+      } else {
+        suggBox.classList.remove('is-visible');
+        markSuggestedSection(null);
+      }
+
+      // Build cards
+      const cards = document.getElementById('pg-cards');
+      cards.innerHTML = '';
+
+      const fields = [
+        { key: 'slug', label: 'Slug' },
+        { key: 'tag', label: 'Tag' },
+        { key: 'date', label: 'Date' },
+        { key: 'title', label: 'Title', bilingual: true },
+        { key: 'excerpt', label: 'Excerpt', bilingual: true },
+        { key: 'body', label: 'Body', bilingual: true, html: true },
+        { key: 'seo_keywords', label: 'SEO Keywords', array: true },
+        { key: 'seo_description', label: 'Meta Description' },
+        { key: 'share_text', label: 'Share Text' },
+        { key: 'sources', label: 'Sources', array: true },
+      ];
+
+      for (const field of fields) {
+        const val = data[field.key];
+        if (!val || (Array.isArray(val) && val.length === 0)) continue;
+
+        let displayVal = '';
+        if (field.bilingual && typeof val === 'object') {
+          if (field.html) {
+            displayVal =
+              '<strong style="color:var(--accent)">JA:</strong>\n' +
+              (val.ja || '(empty)') +
+              '\n\n<strong style="color:var(--accent)">EN:</strong>\n' +
+              (val.en || '(empty)');
+          } else {
+            displayVal =
+              'JA: ' + (val.ja || '(empty)') +
+              '\nEN: ' + (val.en || '(empty)');
+          }
+        } else if (field.array && Array.isArray(val)) {
+          displayVal = val.join(', ');
+        } else if (typeof val === 'object') {
+          displayVal = JSON.stringify(val, null, 2);
+        } else {
+          displayVal = String(val);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'pg-card';
+        card.innerHTML = `
+          <button class="pg-copy-btn" onclick="copyCardValue(this)" title="Copy">Copy</button>
+          <div class="pg-card-label">${field.label}</div>
+          <div class="pg-card-value${field.html ? ' html-preview' : ''}">${escapeForDisplay(displayVal, field.html)}</div>
+        `;
+        cards.appendChild(card);
+      }
+
+      document.getElementById('pg-result').classList.add('is-visible');
+    }
+
+    function escapeForDisplay(text, allowHtmlTags) {
+      if (allowHtmlTags) return text; // body preview keeps HTML tags visible
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    // ─── Copy card value ───
+    function copyCardValue(btn) {
+      const card = btn.closest('.pg-card');
+      const value = card.querySelector('.pg-card-value').textContent;
+      navigator.clipboard.writeText(value).then(() => {
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    // ─── Edit in Editor (target section overrides AI suggestion) ───
+    function editInEditor(targetSection) {
+      if (!generatedData) return;
+      const section = targetSection || generatedData.suggested_section || 'insights';
+      sessionStorage.setItem('pg_import', JSON.stringify(generatedData));
+      window.location.href = `/admin/editor.html?section=${section}&from=playground`;
+    }
+
+    // ─── Highlight suggested section button after generation ───
+    function markSuggestedSection(suggested) {
+      document.querySelectorAll('.pg-section-btn').forEach(btn => {
+        btn.classList.remove('is-suggested');
+      });
+      document.querySelectorAll('.pg-section-suggested-tag').forEach(tag => {
+        tag.hidden = true;
+      });
+      if (!suggested) return;
+      const btn = document.querySelector(`.pg-section-btn[data-section="${suggested}"]`);
+      const tag = document.querySelector(`.pg-section-suggested-tag[data-for="${suggested}"]`);
+      if (btn) btn.classList.add('is-suggested');
+      if (tag) tag.hidden = false;
+    }
+
+    // ─── Save to Site ───
+    async function saveToSite() {
+      if (!generatedData) return;
+      const section = generatedData.suggested_section || 'insights';
+
+      // Build the payload matching ContentItem schema
+      const payload = {
+        slug: generatedData.slug || '',
+        date: generatedData.date || '',
+        dateLabel: generatedData.dateLabel || { ja: '', en: '' },
+        tag: generatedData.tag || '',
+        title: generatedData.title || { ja: '', en: '' },
+        excerpt: generatedData.excerpt || { ja: '', en: '' },
+        body: generatedData.body || { ja: '', en: '' },
+        embed: '',
+        seo_keywords: generatedData.seo_keywords || [],
+        seo_description: generatedData.seo_description || '',
+        share_text: generatedData.share_text || '',
+        sources: generatedData.sources || [],
+      };
+
+      try {
+        const res = await apiFetch(`/api/content/${section}`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (!res) return;
+
+        if (res.ok) {
+          showToast(`Saved to ${sectionLabel(section)}!`);
+          if (await showConfirm('Build site?', 'Content saved. Would you like to build the site now?')) {
+            const buildRes = await apiFetch('/api/build', { method: 'POST' });
+            if (buildRes && (await buildRes.json()).returncode === 0) {
+              showToast('Site built successfully');
+            } else {
+              showToast('Build failed', 'error');
+            }
+          }
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Save failed', 'error');
+        }
+      } catch (e) {
+        showToast('Save failed: ' + e.message, 'error');
+      }
+    }
+
+    // ─── SNS Import ───
+    async function importSNS() {
+      const url = document.getElementById('pg-sns-url').value.trim();
+      if (!url) return;
+
+      try {
+        const res = await apiFetch('/api/playground/import-url', {
+          method: 'POST',
+          body: JSON.stringify({ url })
+        });
+
+        if (!res) return;
+        const data = await res.json();
+        embedData = data;
+
+        const preview = document.getElementById('pg-embed-preview');
+        if (data.embed) {
+          preview.innerHTML = data.embed;
+          preview.classList.add('is-visible');
+          document.getElementById('pg-embed-actions').style.display = 'flex';
+        } else {
+          preview.innerHTML = '<span class="text-muted text-sm">No embed preview available</span>';
+          preview.classList.add('is-visible');
+        }
+
+        if (data.title) {
+          showToast(`Imported: ${data.title} (${data.platform})`);
+        }
+      } catch (e) {
+        showToast('Import failed: ' + e.message, 'error');
+      }
+    }
+
+    function copyEmbedToClipboard() {
+      if (!embedData || !embedData.embed) return;
+      navigator.clipboard.writeText(embedData.embed).then(() => {
+        showToast('Embed code copied');
+      });
+    }
+
+    function useEmbedInEditor() {
+      if (!embedData) return;
+      // Store embed data for editor to pick up
+      sessionStorage.setItem('pg_embed', JSON.stringify(embedData));
+      window.location.href = `/admin/editor.html?section=insights&from=embed`;
+    }
+
+    // ─── Helpers ───
+    function showError(msg) {
+      const el = document.getElementById('pg-error');
+      el.textContent = msg;
+      el.classList.add('is-visible');
+    }
+
+    function hideError() {
+      document.getElementById('pg-error').classList.remove('is-visible');
+    }
+
+    // ─── Boot ───
+    loadProviders();
+  </script>
+</body>
+</html>

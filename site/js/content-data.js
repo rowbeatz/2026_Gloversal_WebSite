@@ -1,312 +1,340 @@
 /* =============================================================
-   Gloversal — Embedded content data
-   Full article bodies for detail pages (JA / EN)
-   Consumed by content.js / ContentRenderer
+   Gloversal — content-data.js  [managed by admin panel]
    ============================================================= */
 window.__GLV_CONTENT__ = {
-
-  /* ==================== INSIGHTS ==================== */
-  insights: [
+  "insights": [
     {
-      slug: "medical-ai-accuracy-gap",
-      date: "2026-04-10",
-      dateLabel: { ja: "2026 \u00b7 04", en: "2026 \u00b7 04" },
-      tag: "Medical AI",
-      title: {
-        ja: "\u533b\u7642AI\u306f\u300c\u7cbe\u5ea6\u300d\u3060\u3051\u3067\u306f\u5c0e\u5165\u3055\u308c\u306a\u3044",
-        en: "Medical AI isn't adopted for accuracy alone"
+      "slug": "medical-ai-accuracy-gap",
+      "date": "2026-04-10",
+      "dateLabel": {
+        "ja": "2026 · 04",
+        "en": "2026 · 04"
       },
-      excerpt: {
-        ja: "\u5c0e\u5165\u73fe\u5834\u3067\u8d77\u304d\u308b\u201c\u7cbe\u5ea6\u3068\u904b\u7528\u306e\u30ba\u30ec\u201d\u3092\u6574\u7406\u3057\u3001PoC\u3092\u672c\u756a\u904b\u7528\u306b\u6a4b\u6e21\u3057\u3059\u308b\u305f\u3081\u306e\u30c1\u30a7\u30c3\u30af\u30dd\u30a4\u30f3\u30c8\u3092\u89e3\u8aac\u3057\u307e\u3059\u3002",
-        en: "A breakdown of the field-level gap between accuracy and operations, and the checkpoints that turn a PoC into real production use."
+      "tag": "Medical AI",
+      "title": {
+        "ja": "医療AIは「精度」だけでは導入されない",
+        "en": "Medical AI isn't adopted for accuracy alone"
       },
-      body: {
-        ja: "<h2>\u7cbe\u5ea6\u3068\u5c0e\u5165\u306e\u30ae\u30e3\u30c3\u30d7</h2><p>\u533b\u7642AI\u88fd\u54c1\u306f\u8a2d\u8a08\u4e0a\u300c\u611f\u5ea6\u30fb\u7279\u7570\u5ea6\u300d\u3067\u8a55\u4fa1\u3055\u308c\u308b\u3053\u3068\u304c\u591a\u3044\u304c\u3001\u5c0e\u5165\u306e\u53ef\u5426\u3092\u6c7a\u3081\u308b\u306e\u306f\u305d\u308c\u3060\u3051\u3067\u306f\u306a\u3044\u3002\u73fe\u5834\u306e\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u306b\u5b9f\u969b\u306b\u7d44\u307f\u8fbc\u3093\u3060\u3068\u304d\u306b\u3001\u300c\u7cbe\u5ea6\u306f\u9ad8\u3044\u304c\u3001\u4f7f\u3048\u306a\u3044\u300d\u3068\u3044\u3046\u73fe\u8c61\u304c\u8d77\u304d\u308b\u3002\u305d\u306e\u80cc\u666f\u306b\u306f\u3001\u8868\u793a\u901f\u5ea6\u3001\u30a2\u30e9\u30fc\u30c8\u8a2d\u8a08\u3001\u65e2\u5b58\u30b7\u30b9\u30c6\u30e0\u3068\u306e\u7d71\u5408\u8ca0\u8377\u3001\u653e\u5c04\u7dda\u79d1\u533b\u3084\u81e8\u5e8a\u691c\u67fb\u6280\u5e2b\u306e\u696d\u52d9\u8ca0\u62c5\u5897\u3068\u3044\u3063\u305f\u300c\u904b\u7528\u5074\u306e\u73fe\u5b9f\u300d\u304c\u3042\u308b\u3002</p><h2>\u306a\u305c\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u304c\u300c\u7cbe\u5ea6\u306e\u9ad8\u3044AI\u300d\u3092\u62d2\u7d76\u3059\u308b\u306e\u304b</h2><p>\u591a\u304f\u306e\u533b\u7642AI\u304c\u7cbe\u5ea6\u691c\u8a3c\u306f\u901a\u904e\u3059\u308b\u304c\u3001\u73fe\u5834\u5c0e\u5165\u306b\u81f3\u3089\u306a\u3044\u6700\u5927\u306e\u7406\u7531\u306f\u3001\u300c\u73fe\u5834\u5074\u306e\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3092\u5909\u3048\u308b\u30b3\u30b9\u30c8\u300d\u3092\u904e\u5c0f\u8a55\u4fa1\u3057\u3066\u3044\u308b\u304b\u3089\u3060\u3002\u8aad\u5f71\u533b\u306e\u5224\u8aad\u30d5\u30ed\u30fc\u306b\u30a2\u30e9\u30fc\u30c8\u304c\u5165\u308b\u3068\u3001\u305d\u306e\u30a2\u30e9\u30fc\u30c8\u306e\u300c\u4fe1\u983c\u6027\u306e\u5224\u65ad\u300d\u81ea\u4f53\u304c\u65b0\u305f\u306a\u696d\u52d9\u306b\u306a\u308b\u3002\u307e\u305f\u3001AI\u306e\u7d50\u679c\u3092\u305d\u306e\u307e\u307e\u63a1\u7528\u3059\u308b\u306e\u304b\u3001\u53c2\u8003\u306b\u3068\u3069\u3081\u308b\u306e\u304b\u3068\u3044\u3046\u300c\u904b\u7528\u30dd\u30ea\u30b7\u30fc\u300d\u306e\u6b20\u5982\u304c\u5c0e\u5165\u3092\u963b\u3080\u5178\u578b\u7684\u306a\u30d1\u30bf\u30fc\u30f3\u3067\u3042\u308b\u3002</p><h2>PoC\u304b\u3089\u672c\u756a\u904b\u7528\u3078\u306e\u30c1\u30a7\u30c3\u30af\u30dd\u30a4\u30f3\u30c8</h2><p>PoC\u3092\u672c\u756a\u904b\u7528\u306b\u79fb\u884c\u3055\u305b\u308b\u305f\u3081\u306b\u306f\u3001\u4ee5\u4e0b\u306e3\u3064\u306e\u30c1\u30a7\u30c3\u30af\u30dd\u30a4\u30f3\u30c8\u3092\u521d\u671f\u304b\u3089\u8a2d\u8a08\u3059\u308b\u5fc5\u8981\u304c\u3042\u308b\u3002\u7b2c\u4e00\u306b\u3001\u300c\u8ab0\u304c\u3001\u3044\u3064\u3001\u3069\u306e\u753b\u9762\u3067\u300d\u305d\u306eAI\u306e\u7d50\u679c\u3092\u898b\u308b\u306e\u304b\u3068\u3044\u3046\u5229\u7528\u30b7\u30fc\u30f3\u306e\u660e\u78ba\u5316\u3002\u7b2c\u4e8c\u306b\u3001\u300c\u8aa4\u691c\u77e5\u30fb\u898b\u843d\u3068\u3057\u300d\u6642\u306e\u904b\u7528\u30d5\u30ed\u30fc\u3068\u8cac\u4efb\u5206\u62c5\u306e\u8a2d\u8a08\u3002\u7b2c\u4e09\u306b\u3001\u65e2\u5b58\u306eRIS/PACS\u30b7\u30b9\u30c6\u30e0\u3068\u306e\u30a4\u30f3\u30c6\u30b0\u30ec\u30fc\u30b7\u30e7\u30f3\u8a2d\u8a08\u3067\u3042\u308b\u3002\u3053\u308c\u3089\u3092\u300c\u5f8c\u304b\u3089\u3084\u308b\u300d\u3068\u3001\u307b\u307c\u78ba\u5b9f\u306bPoC\u6b62\u307e\u308a\u306b\u306a\u308b\u3002</p><h2>\u6226\u7565\u30a2\u30c9\u30d0\u30a4\u30b6\u30fc\u306e\u5f79\u5272</h2><p>\u533b\u7642AI\u306e\u5c0e\u5165\u306b\u304a\u3044\u3066\u3001\u6280\u8853\u30c1\u30fc\u30e0\u3068\u73fe\u5834\u3092\u3064\u306a\u3050\u300c\u7ffb\u8a33\u8005\u300d\u306e\u5b58\u5728\u304c\u4e0d\u53ef\u6b20\u3067\u3042\u308b\u3002\u958b\u767a\u8005\u306f\u7cbe\u5ea6\u6307\u6a19\u3067\u8a71\u3057\u3001\u73fe\u5834\u306f\u696d\u52d9\u8ca0\u62c5\u3067\u8a71\u3059\u3002\u305d\u306e\u9593\u306b\u5165\u308a\u3001\u300c\u3053\u306eAI\u304c\u73fe\u5834\u3067\u3069\u3046\u4f7f\u308f\u308c\u308b\u304b\u300d\u3092\u5177\u4f53\u7684\u306a\u904b\u7528\u50cf\u306b\u843d\u3068\u3057\u8fbc\u307f\u3001\u4e21\u8005\u304c\u5408\u610f\u3067\u304d\u308b\u5730\u70b9\u3092\u898b\u3064\u3051\u308b\u3053\u3068\u2014\u2014\u305d\u308c\u304c\u6226\u7565\u30a2\u30c9\u30d0\u30a4\u30b6\u30fc\u306e\u4fa1\u5024\u3067\u3042\u308b\u3002\u7cbe\u5ea6\u3068\u904b\u7528\u306e\u6a4b\u6e21\u3057\u306a\u304f\u3057\u3066\u3001\u533b\u7642AI\u306e\u793e\u4f1a\u5b9f\u88c5\u306f\u9032\u307e\u306a\u3044\u3002</p>",
-        en: "<h2>The accuracy-deployment gap</h2><p>Medical AI products are typically evaluated on sensitivity and specificity, but adoption decisions depend on far more. When embedded into real clinical workflows, a product with high accuracy can still be deemed 'unusable'. Behind this lies the reality of display latency, alert design, integration burden with existing systems, and increased workload for radiologists and technicians -- the operational side that bench-level metrics never capture.</p><h2>Why clinical workflows reject accurate AI</h2><p>The primary reason many medical AI products pass validation yet never reach deployment is the underestimation of workflow-change costs. When an AI alert enters a radiologist's reading flow, the very act of judging 'whether to trust this alert' becomes a new task. The absence of an operational policy -- whether to adopt AI results directly or treat them as references -- is a textbook pattern that blocks adoption before it starts.</p><h2>Key checkpoints for PoC-to-production</h2><p>Three design checkpoints must be addressed from day one to move a PoC into production. First, clarify the usage scene: who sees the AI output, when, and on which screen. Second, design the workflow and responsibility split for false positives and misses. Third, plan integration with existing RIS/PACS systems. Leaving these for 'later' almost guarantees the project stalls at PoC.</p><h2>The role of a strategy advisor</h2><p>In medical AI deployment, a translator between the engineering team and the clinical floor is indispensable. Developers speak in accuracy metrics; clinicians speak in workload impact. Stepping into that gap, translating 'how this AI actually gets used on site' into a concrete operational picture, and finding ground both sides can agree on -- that is where a strategy advisor creates value. Without bridging accuracy and operations, medical AI cannot move toward real-world implementation.</p>"
+      "excerpt": {
+        "ja": "導入現場で起きる“精度と運用のズレ”を整理し、PoCを本番運用に橋渡しするためのチェックポイントを解説します。",
+        "en": "A breakdown of the field-level gap between accuracy and operations, and the checkpoints that turn a PoC into real production use."
+      },
+      "body": {
+        "ja": "<h2>精度と導入のギャップ</h2><p>医療AI製品は設計上「感度・特異度」で評価されることが多いが、導入の可否を決めるのはそれだけではない。現場の臨床ワークフローに実際に組み込んだときに、「精度は高いが、使えない」という現象が起きる。その背景には、表示速度、アラート設計、既存システムとの統合負荷、放射線科医や臨床検査技師の業務負担増といった「運用側の現実」がある。</p><h2>なぜ臨床ワークフローが「精度の高いAI」を拒絶するのか</h2><p>多くの医療AIが精度検証は通過するが、現場導入に至らない最大の理由は、「現場側のワークフローを変えるコスト」を過小評価しているからだ。読影医の判読フローにアラートが入ると、そのアラートの「信頼性の判断」自体が新たな業務になる。また、AIの結果をそのまま採用するのか、参考にとどめるのかという「運用ポリシー」の欠如が導入を阻む典型的なパターンである。</p><h2>PoCから本番運用へのチェックポイント</h2><p>PoCを本番運用に移行させるためには、以下の3つのチェックポイントを初期から設計する必要がある。第一に、「誰が、いつ、どの画面で」そのAIの結果を見るのかという利用シーンの明確化。第二に、「誤検知・見落とし」時の運用フローと責任分担の設計。第三に、既存のRIS/PACSシステムとのインテグレーション設計である。これらを「後からやる」と、ほぼ確実にPoC止まりになる。</p><h2>戦略アドバイザーの役割</h2><p>医療AIの導入において、技術チームと現場をつなぐ「翻訳者」の存在が不可欠である。開発者は精度指標で話し、現場は業務負担で話す。その間に入り、「このAIが現場でどう使われるか」を具体的な運用像に落とし込み、両者が合意できる地点を見つけること——それが戦略アドバイザーの価値である。精度と運用の橋渡しなくして、医療AIの社会実装は進まない。</p>",
+        "en": "<h2>The accuracy-deployment gap</h2><p>Medical AI products are typically evaluated on sensitivity and specificity, but adoption decisions depend on far more. When embedded into real clinical workflows, a product with high accuracy can still be deemed 'unusable'. Behind this lies the reality of display latency, alert design, integration burden with existing systems, and increased workload for radiologists and technicians -- the operational side that bench-level metrics never capture.</p><h2>Why clinical workflows reject accurate AI</h2><p>The primary reason many medical AI products pass validation yet never reach deployment is the underestimation of workflow-change costs. When an AI alert enters a radiologist's reading flow, the very act of judging 'whether to trust this alert' becomes a new task. The absence of an operational policy -- whether to adopt AI results directly or treat them as references -- is a textbook pattern that blocks adoption before it starts.</p><h2>Key checkpoints for PoC-to-production</h2><p>Three design checkpoints must be addressed from day one to move a PoC into production. First, clarify the usage scene: who sees the AI output, when, and on which screen. Second, design the workflow and responsibility split for false positives and misses. Third, plan integration with existing RIS/PACS systems. Leaving these for 'later' almost guarantees the project stalls at PoC.</p><h2>The role of a strategy advisor</h2><p>In medical AI deployment, a translator between the engineering team and the clinical floor is indispensable. Developers speak in accuracy metrics; clinicians speak in workload impact. Stepping into that gap, translating 'how this AI actually gets used on site' into a concrete operational picture, and finding ground both sides can agree on -- that is where a strategy advisor creates value. Without bridging accuracy and operations, medical AI cannot move toward real-world implementation.</p>"
       }
     },
     {
-      slug: "global-healthtech-japan-stalls",
-      date: "2026-03-18",
-      dateLabel: { ja: "2026 \u00b7 03", en: "2026 \u00b7 03" },
-      tag: "Market Entry",
-      title: {
-        ja: "\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u304c\u65e5\u672c\u3067\u3064\u307e\u305a\u304f5\u3064\u306e\u8ad6\u70b9",
-        en: "Five reasons global healthtech stalls in Japan"
+      "slug": "global-healthtech-japan-stalls",
+      "date": "2026-03-18",
+      "dateLabel": {
+        "ja": "2026 · 03",
+        "en": "2026 · 03"
       },
-      excerpt: {
-        ja: "\u4fa1\u683c\u8a2d\u8a08\u3001\u5546\u7fd2\u6163\u3001\u533b\u7642\u6a5f\u95a2\u3068\u306e\u95a2\u4fc2\u6027\u3001\u5236\u5ea6\u7406\u89e3\u3001\u73fe\u5834\u904b\u7528\u3002\u6d77\u5916\u767a\u30b5\u30fc\u30d3\u30b9\u304c\u65e5\u672c\u3067\u8a70\u307e\u308a\u3084\u3059\u30445\u3064\u306e\u8ad6\u70b9\u3092\u6574\u7406\u3002",
-        en: "Pricing design, business customs, hospital relationships, regulation, and on-site operations -- five recurring sticking points for overseas-born services."
+      "tag": "Market Entry",
+      "title": {
+        "ja": "海外ヘルステック企業が日本でつまずく5つの論点",
+        "en": "Five reasons global healthtech stalls in Japan"
       },
-      body: {
-        ja: "<h2>\u65e5\u672c\u5e02\u5834\u306e\u7279\u6b8a\u6027\u3092\u7406\u89e3\u3059\u308b</h2><p>\u6d77\u5916\u306e\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u304c\u65e5\u672c\u5e02\u5834\u306b\u53c2\u5165\u3059\u308b\u969b\u3001\u307e\u305a\u76f4\u9762\u3059\u308b\u306e\u304c\u4fa1\u683c\u8a2d\u8a08\u306e\u58c1\u3067\u3042\u308b\u3002\u65e5\u672c\u306e\u533b\u7642\u5236\u5ea6\u306f\u8a3a\u7642\u5831\u916c\u304c\u516c\u5b9a\u3055\u308c\u3066\u304a\u308a\u3001SaaS\u578b\u306e\u6708\u984d\u8ab2\u91d1\u30e2\u30c7\u30eb\u304c\u305d\u306e\u307e\u307e\u9069\u7528\u3067\u304d\u308b\u3068\u306f\u9650\u3089\u306a\u3044\u3002\u307e\u305f\u3001\u5c0e\u5165\u6c7a\u5b9a\u307e\u3067\u306e\u610f\u601d\u6c7a\u5b9a\u30d7\u30ed\u30bb\u30b9\u304c\u9577\u304f\u3001\u5408\u8b70\u5236\u3067\u9032\u3080\u305f\u3081\u3001\u201c\u30c7\u30e2\u2192\u5373\u5c0e\u5165\u201d\u3068\u3044\u3046\u6d77\u5916\u306e\u55b6\u696d\u30b9\u30bf\u30a4\u30eb\u304c\u901a\u7528\u3057\u306a\u3044\u3002</p><h2>\u5546\u7fd2\u6163\u3068\u4fe1\u983c\u69cb\u7bc9</h2><p>\u65e5\u672c\u306e\u533b\u7642\u6a5f\u95a2\u3068\u306e\u53d6\u5f15\u3067\u306f\u3001\u6280\u8853\u7684\u512a\u4f4d\u6027\u3088\u308a\u3082\u300c\u4fe1\u983c\u95a2\u4fc2\u300d\u304c\u91cd\u8996\u3055\u308c\u308b\u3002\u7d39\u4ecb\u8005\u3092\u4ecb\u3057\u305f\u5c0e\u5165\u304c\u4e00\u822c\u7684\u3067\u3042\u308a\u3001\u30b3\u30fc\u30eb\u30c9\u30b3\u30fc\u30eb\u578b\u306e\u30a2\u30d7\u30ed\u30fc\u30c1\u306f\u6575\u610f\u3092\u6301\u305f\u308c\u3084\u3059\u3044\u3002\u307e\u305f\u3001\u5951\u7d04\u524d\u306e\u30c8\u30e9\u30a4\u30a2\u30eb\u671f\u9593\u304c\u6c42\u3081\u3089\u308c\u308b\u3053\u3068\u304c\u591a\u304f\u3001\u305d\u306e\u9593\u306e\u30b5\u30dd\u30fc\u30c8\u4f53\u5236\u304c\u5c0e\u5165\u5224\u65ad\u306b\u76f4\u7d50\u3059\u308b\u3002</p><h2>\u5236\u5ea6\u3068\u904b\u7528\u306e\u58c1</h2><p>\u533b\u7642\u6a5f\u5668\u898f\u5236\u3001\u500b\u4eba\u60c5\u5831\u4fdd\u8b77\u6cd5\u3001\u533b\u7642\u60c5\u5831\u30b7\u30b9\u30c6\u30e0\u306e\u30ac\u30a4\u30c9\u30e9\u30a4\u30f3\u306a\u3069\u3001\u65e5\u672c\u7279\u6709\u306e\u5236\u5ea6\u74b0\u5883\u306b\u5bfe\u5fdc\u3059\u308b\u5fc5\u8981\u304c\u3042\u308b\u3002\u3055\u3089\u306b\u3001\u73fe\u5834\u30ec\u30d9\u30eb\u3067\u306f\u65e5\u672c\u8a9e\u3067\u306e\u30b5\u30dd\u30fc\u30c8\u3001\u65e5\u672c\u8a9e\u306eUI\u3001\u65e5\u672c\u306e\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u306b\u5408\u308f\u305b\u305f\u30ab\u30b9\u30bf\u30de\u30a4\u30ba\u304c\u6c42\u3081\u3089\u308c\u308b\u3002\u3053\u308c\u3089\u306f\u5358\u306a\u308b\u300c\u30ed\u30fc\u30ab\u30e9\u30a4\u30ba\u300d\u3067\u306f\u306a\u304f\u3001\u30b5\u30fc\u30d3\u30b9\u305d\u306e\u3082\u306e\u306e\u518d\u8a2d\u8a08\u3092\u610f\u5473\u3059\u308b\u3002</p><h2>\u4e57\u308a\u8d8a\u3048\u308b\u305f\u3081\u306e\u30a2\u30d7\u30ed\u30fc\u30c1</h2><p>\u3053\u308c\u3089\u306e\u8ad6\u70b9\u3092\u4e57\u308a\u8d8a\u3048\u308b\u306b\u306f\u3001\u65e5\u672c\u5e02\u5834\u306b\u7cbe\u901a\u3057\u305f\u30a2\u30c9\u30d0\u30a4\u30b6\u30fc\u3092\u521d\u671f\u304b\u3089\u5dfb\u304d\u8fbc\u307f\u3001\u300c\u5236\u5ea6\u00d7\u5546\u7fd2\u6163\u00d7\u73fe\u5834\u904b\u7528\u300d\u3092\u4e00\u4f53\u3067\u6574\u7406\u3059\u308b\u3053\u3068\u304c\u6700\u3082\u52b9\u679c\u7684\u3067\u3042\u308b\u3002\u5358\u306a\u308b\u300c\u8a00\u8a9e\u306e\u7ffb\u8a33\u300d\u3067\u306f\u306a\u304f\u3001\u300c\u4e8b\u696d\u306e\u7ffb\u8a33\u300d\u304c\u5fc5\u8981\u306a\u306e\u3060\u3002</p>",
-        en: "<h2>Understanding Japan's market specificity</h2><p>When global healthtech companies enter Japan, the first wall they hit is pricing design. Japan's healthcare system operates on publicly determined reimbursement fees, meaning a standard SaaS subscription model may not apply directly. Additionally, the decision-making process before adoption is long and consensus-driven, so the overseas 'demo to immediate adoption' sales style simply does not work.</p><h2>Business customs and trust-building</h2><p>In dealings with Japanese medical institutions, 'trust relationships' outweigh technical superiority. Introduction through referrers is standard practice, and cold-call approaches are often met with resistance. Pre-contract trial periods are frequently requested, and the quality of support during that trial directly determines the adoption decision.</p><h2>Regulatory and operational barriers</h2><p>Companies must navigate Japan-specific regulatory environments including medical device regulations, personal information protection law, and medical information system guidelines. At the operational level, Japanese-language support, Japanese UI, and customization to Japanese clinical workflows are expected. This is not mere 'localization' -- it means redesigning the service itself.</p><h2>An approach to overcome these barriers</h2><p>The most effective approach is to involve a Japan-market-fluent advisor from the early stages who can address regulation, business customs, and on-site operations as an integrated whole. What is needed is not linguistic translation but business translation.</p>"
+      "excerpt": {
+        "ja": "価格設計、商習慣、医療機関との関係性、制度理解、現場運用。海外発サービスが日本で詰まりやすい5つの論点を整理。",
+        "en": "Pricing design, business customs, hospital relationships, regulation, and on-site operations -- five recurring sticking points for overseas-born services."
+      },
+      "body": {
+        "ja": "<h2>日本市場の特殊性を理解する</h2><p>海外のヘルステック企業が日本市場に参入する際、まず直面するのが価格設計の壁である。日本の医療制度は診療報酬が公定されており、SaaS型の月額課金モデルがそのまま適用できるとは限らない。また、導入決定までの意思決定プロセスが長く、合議制で進むため、“デモ→即導入”という海外の営業スタイルが通用しない。</p><h2>商習慣と信頼構築</h2><p>日本の医療機関との取引では、技術的優位性よりも「信頼関係」が重視される。紹介者を介した導入が一般的であり、コールドコール型のアプローチは敵意を持たれやすい。また、契約前のトライアル期間が求められることが多く、その間のサポート体制が導入判断に直結する。</p><h2>制度と運用の壁</h2><p>医療機器規制、個人情報保護法、医療情報システムのガイドラインなど、日本特有の制度環境に対応する必要がある。さらに、現場レベルでは日本語でのサポート、日本語のUI、日本の臨床ワークフローに合わせたカスタマイズが求められる。これらは単なる「ローカライズ」ではなく、サービスそのものの再設計を意味する。</p><h2>乗り越えるためのアプローチ</h2><p>これらの論点を乗り越えるには、日本市場に精通したアドバイザーを初期から巻き込み、「制度×商習慣×現場運用」を一体で整理することが最も効果的である。単なる「言語の翻訳」ではなく、「事業の翻訳」が必要なのだ。</p>",
+        "en": "<h2>Understanding Japan's market specificity</h2><p>When global healthtech companies enter Japan, the first wall they hit is pricing design. Japan's healthcare system operates on publicly determined reimbursement fees, meaning a standard SaaS subscription model may not apply directly. Additionally, the decision-making process before adoption is long and consensus-driven, so the overseas 'demo to immediate adoption' sales style simply does not work.</p><h2>Business customs and trust-building</h2><p>In dealings with Japanese medical institutions, 'trust relationships' outweigh technical superiority. Introduction through referrers is standard practice, and cold-call approaches are often met with resistance. Pre-contract trial periods are frequently requested, and the quality of support during that trial directly determines the adoption decision.</p><h2>Regulatory and operational barriers</h2><p>Companies must navigate Japan-specific regulatory environments including medical device regulations, personal information protection law, and medical information system guidelines. At the operational level, Japanese-language support, Japanese UI, and customization to Japanese clinical workflows are expected. This is not mere 'localization' -- it means redesigning the service itself.</p><h2>An approach to overcome these barriers</h2><p>The most effective approach is to involve a Japan-market-fluent advisor from the early stages who can address regulation, business customs, and on-site operations as an integrated whole. What is needed is not linguistic translation but business translation.</p>"
       }
     },
     {
-      slug: "poc-stall-hospital-business",
-      date: "2026-03-05",
-      dateLabel: { ja: "2026 \u00b7 03", en: "2026 \u00b7 03" },
-      tag: "Business Development",
-      title: {
-        ja: "\u533b\u7642\u6a5f\u95a2\u5411\u3051\u65b0\u898f\u4e8b\u696d\u306f\u3001\u306a\u305cPoC\u6b62\u307e\u308a\u306b\u306a\u308b\u306e\u304b",
-        en: "Why new businesses for hospitals stall at PoC"
+      "slug": "poc-stall-hospital-business",
+      "date": "2026-03-05",
+      "dateLabel": {
+        "ja": "2026 · 03",
+        "en": "2026 · 03"
       },
-      excerpt: {
-        ja: "PoC\u3092\u4e8b\u696d\u5316\u306b\u9032\u3081\u308b\u306b\u306f\u3001\u691c\u8a0e\u4e3b\u4f53\u3001\u8a55\u4fa1\u6307\u6a19\u3001\u73fe\u5834\u5408\u610f\u5f62\u6210\u306e3\u70b9\u3092\u521d\u671f\u304b\u3089\u8a2d\u8a08\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002",
-        en: "To move a PoC into a real business, decision ownership, evaluation metrics, and on-site consensus must be designed from day one."
+      "tag": "Business Development",
+      "title": {
+        "ja": "医療機関向け新規事業は、なぜPoC止まりになるのか",
+        "en": "Why new businesses for hospitals stall at PoC"
       },
-      body: {
-        ja: "<h2>PoC\u304c\u4e8b\u696d\u5316\u3057\u306a\u3044\u69cb\u9020\u7684\u539f\u56e0</h2><p>\u533b\u7642\u6a5f\u95a2\u5411\u3051\u306e\u65b0\u898f\u4e8b\u696d\u304c\u300cPoC\u307e\u3067\u306f\u9032\u3080\u304c\u3001\u305d\u306e\u5148\u306b\u884c\u304b\u306a\u3044\u300d\u3068\u3044\u3046\u73fe\u8c61\u306f\u3001\u533b\u7642\u30fb\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u696d\u754c\u3067\u306f\u6975\u3081\u3066\u4e00\u822c\u7684\u3067\u3042\u308b\u3002\u305d\u306e\u6839\u672c\u7684\u306a\u539f\u56e0\u306f\u3001\u300c\u691c\u8a0e\u4e3b\u4f53\u304c\u66d6\u6627\u300d\u300c\u8a55\u4fa1\u6307\u6a19\u304c\u5b9a\u7fa9\u3055\u308c\u3066\u3044\u306a\u3044\u300d\u300c\u73fe\u5834\u5408\u610f\u304c\u5f8c\u56de\u3057\u300d\u3068\u3044\u30463\u3064\u306e\u69cb\u9020\u7684\u554f\u984c\u306b\u96c6\u7d04\u3055\u308c\u308b\u3002</p><h2>\u691c\u8a0e\u4e3b\u4f53\u306e\u8a2d\u8a08</h2><p>\u533b\u7642\u6a5f\u95a2\u3067\u306f\u3001\u65b0\u3057\u3044\u30bd\u30ea\u30e5\u30fc\u30b7\u30e7\u30f3\u306e\u5c0e\u5165\u3092\u8ab0\u304c\u4e3b\u5c0e\u3059\u308b\u304b\u304c\u4e0d\u660e\u78ba\u306a\u3053\u3068\u304c\u591a\u3044\u3002IT\u90e8\u9580\u3001\u4e8b\u52d9\u5c40\u3001\u8a3a\u7642\u79d1\u3001\u7d4c\u55b6\u5c64\u306e\u305d\u308c\u305e\u308c\u304c\u90e8\u5206\u7684\u306b\u95a2\u4e0e\u3057\u3001\u300c\u8ab0\u304c\u6700\u7d42\u7684\u306b\u6c7a\u3081\u308b\u306e\u304b\u300d\u304c\u66d6\u6627\u306a\u307e\u307ePoC\u304c\u59cb\u307e\u308b\u30b1\u30fc\u30b9\u304c\u5c11\u306a\u304f\u306a\u3044\u3002\u305d\u306e\u7d50\u679c\u3001PoC\u5f8c\u306b\u300c\u6b21\u306e\u30b9\u30c6\u30c3\u30d7\u3092\u8ab0\u304c\u63a8\u9032\u3059\u308b\u304b\u300d\u304c\u6c7a\u307e\u3089\u305a\u3001\u505c\u6ede\u3059\u308b\u3002</p><h2>\u8a55\u4fa1\u6307\u6a19\u3068\u73fe\u5834\u5408\u610f</h2><p>\u300cPoC\u3067\u4f55\u304c\u78ba\u8a8d\u3067\u304d\u308c\u3070\u300c\u6210\u529f\u300d\u306a\u306e\u304b\u300d\u3092\u4e8b\u524d\u306b\u5b9a\u7fa9\u3057\u3066\u3044\u306a\u3044\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u306f\u3001\u3069\u3093\u306a\u306b\u826f\u3044\u7d50\u679c\u304c\u51fa\u3066\u3082\u300c\u6b21\u306b\u9032\u3081\u306a\u3044\u300d\u72b6\u614b\u306b\u9665\u308b\u3002\u540c\u6642\u306b\u3001\u73fe\u5834\u306e\u30b9\u30bf\u30c3\u30d5\uff08\u770b\u8b77\u5e2b\u3001\u6280\u5e2b\u3001\u533b\u5e2b\uff09\u304c\u300cPoC\u306e\u5b58\u5728\u3092\u77e5\u3089\u306a\u3044\u300d\u307e\u307e\u9032\u884c\u3057\u3001\u672c\u756a\u5316\u6bb5\u968e\u3067\u521d\u3081\u3066\u53cd\u767a\u3092\u53d7\u3051\u308b\u3068\u3044\u3046\u30d1\u30bf\u30fc\u30f3\u3082\u5178\u578b\u7684\u3067\u3042\u308b\u3002</p><h2>\u521d\u671f\u8a2d\u8a08\u306e\u91cd\u8981\u6027</h2><p>\u3053\u308c\u3089\u306e\u554f\u984c\u306f\u3001PoC\u306e\u300c\u5f8c\u300d\u3067\u306f\u306a\u304f\u300c\u524d\u300d\u306b\u8a2d\u8a08\u3059\u308b\u5fc5\u8981\u304c\u3042\u308b\u3002\u691c\u8a0e\u4e3b\u4f53\u3001\u8a55\u4fa1\u6307\u6a19\u3001\u73fe\u5834\u30b9\u30c6\u30fc\u30af\u30db\u30eb\u30c0\u30fc\u306e\u5dfb\u304d\u8fbc\u307f\u3092\u300cPoC\u8a2d\u8a08\u300d\u306e\u6bb5\u968e\u3067\u884c\u3046\u3053\u3068\u304c\u3001\u4e8b\u696d\u5316\u3078\u306e\u552f\u4e00\u306e\u78ba\u5b9f\u306a\u9053\u7b4b\u3067\u3042\u308b\u3002</p>",
-        en: "<h2>Structural reasons PoCs fail to scale</h2><p>The pattern of 'the PoC went fine but nothing happened next' is extremely common in healthcare and healthtech. The root causes converge on three structural problems: ambiguous decision ownership, undefined evaluation criteria, and belated on-site consensus.</p><h2>Designing decision ownership</h2><p>In medical institutions, it is often unclear who leads the adoption of a new solution. IT, administration, clinical departments, and management each participate partially, and PoCs frequently begin without clarity on who ultimately decides. The result: after the PoC, no one drives the next step and the project stalls.</p><h2>Evaluation criteria and on-site consensus</h2><p>A project that has not pre-defined 'what constitutes PoC success' will struggle to move forward no matter how good the results. Equally typical is the pattern where frontline staff -- nurses, technicians, physicians -- are unaware the PoC even exists until the scaling stage, at which point they push back.</p><h2>The importance of upfront design</h2><p>These problems must be designed before the PoC, not after. Incorporating decision ownership, evaluation metrics, and on-site stakeholder involvement at the PoC design stage is the only reliable path to commercialization.</p>"
+      "excerpt": {
+        "ja": "PoCを事業化に進めるには、検討主体、評価指標、現場合意形成の3点を初期から設計する必要があります。",
+        "en": "To move a PoC into a real business, decision ownership, evaluation metrics, and on-site consensus must be designed from day one."
+      },
+      "body": {
+        "ja": "<h2>PoCが事業化しない構造的原因</h2><p>医療機関向けの新規事業が「PoCまでは進むが、その先に行かない」という現象は、医療・ヘルステック業界では極めて一般的である。その根本的な原因は、「検討主体が曖昧」「評価指標が定義されていない」「現場合意が後回し」という3つの構造的問題に集約される。</p><h2>検討主体の設計</h2><p>医療機関では、新しいソリューションの導入を誰が主導するかが不明確なことが多い。IT部門、事務局、診療科、経営層のそれぞれが部分的に関与し、「誰が最終的に決めるのか」が曖昧なままPoCが始まるケースが少なくない。その結果、PoC後に「次のステップを誰が推進するか」が決まらず、停滞する。</p><h2>評価指標と現場合意</h2><p>「PoCで何が確認できれば「成功」なのか」を事前に定義していないプロジェクトは、どんなに良い結果が出ても「次に進めない」状態に陥る。同時に、現場のスタッフ（看護師、技師、医師）が「PoCの存在を知らない」まま進行し、本番化段階で初めて反発を受けるというパターンも典型的である。</p><h2>初期設計の重要性</h2><p>これらの問題は、PoCの「後」ではなく「前」に設計する必要がある。検討主体、評価指標、現場ステークホルダーの巻き込みを「PoC設計」の段階で行うことが、事業化への唯一の確実な道筋である。</p>",
+        "en": "<h2>Structural reasons PoCs fail to scale</h2><p>The pattern of 'the PoC went fine but nothing happened next' is extremely common in healthcare and healthtech. The root causes converge on three structural problems: ambiguous decision ownership, undefined evaluation criteria, and belated on-site consensus.</p><h2>Designing decision ownership</h2><p>In medical institutions, it is often unclear who leads the adoption of a new solution. IT, administration, clinical departments, and management each participate partially, and PoCs frequently begin without clarity on who ultimately decides. The result: after the PoC, no one drives the next step and the project stalls.</p><h2>Evaluation criteria and on-site consensus</h2><p>A project that has not pre-defined 'what constitutes PoC success' will struggle to move forward no matter how good the results. Equally typical is the pattern where frontline staff -- nurses, technicians, physicians -- are unaware the PoC even exists until the scaling stage, at which point they push back.</p><h2>The importance of upfront design</h2><p>These problems must be designed before the PoC, not after. Incorporating decision ownership, evaluation metrics, and on-site stakeholder involvement at the PoC design stage is the only reliable path to commercialization.</p>"
       }
     },
     {
-      slug: "remote-healthcare-imaging-business",
-      date: "2026-02-12",
-      dateLabel: { ja: "2026 \u00b7 02", en: "2026 \u00b7 02" },
-      tag: "Remote Healthcare",
-      title: {
-        ja: "\u9060\u9694\u533b\u7642\u30fb\u753b\u50cf\u8a3a\u65ad\u9818\u57df\u3067\u4e8b\u696d\u3092\u4f5c\u308b\u3068\u304d\u306b\u6700\u521d\u306b\u6574\u7406\u3059\u3079\u304d\u3053\u3068",
-        en: "Framing a remote-healthcare or imaging business"
+      "slug": "remote-healthcare-imaging-business",
+      "date": "2026-02-12",
+      "dateLabel": {
+        "ja": "2026 · 02",
+        "en": "2026 · 02"
       },
-      excerpt: {
-        ja: "\u8aad\u5f71\u30d5\u30ed\u30fc\u3001\u533b\u7642\u6a5f\u95a2\u5074\u306e\u5c0e\u5165\u8cac\u4efb\u3001\u4fdd\u967a\u30fb\u8cbb\u7528\u69cb\u9020\u3001\u753b\u50cf\u30c7\u30fc\u30bf\u9023\u643a\u306e4\u3064\u306e\u8ef8\u3067\u4e8b\u696d\u4eee\u8aac\u3092\u7d44\u3080\u30a2\u30d7\u30ed\u30fc\u30c1\u3002",
-        en: "Reading workflow, hospital-side ownership, reimbursement structure, and imaging data exchange -- four axes for building a credible hypothesis."
+      "tag": "Remote Healthcare",
+      "title": {
+        "ja": "遠隔医療・画像診断領域で事業を作るときに最初に整理すべきこと",
+        "en": "Framing a remote-healthcare or imaging business"
       },
-      body: {
-        ja: "<h2>\u8aad\u5f71\u30d5\u30ed\u30fc\u306e\u7406\u89e3</h2><p>\u9060\u9694\u753b\u50cf\u8a3a\u65ad\u4e8b\u696d\u3092\u8a2d\u8a08\u3059\u308b\u969b\u3001\u6700\u3082\u91cd\u8981\u306a\u306e\u306f\u8aad\u5f71\u30d5\u30ed\u30fc\u5168\u4f53\u3092\u7406\u89e3\u3059\u308b\u3053\u3068\u3067\u3042\u308b\u3002\u4f9d\u983c\u5143\u306e\u533b\u7642\u6a5f\u95a2\u304b\u3089\u753b\u50cf\u304c\u9001\u4fe1\u3055\u308c\u3001\u8aad\u5f71\u533b\u304c\u5224\u8aad\u3057\u3001\u30ec\u30dd\u30fc\u30c8\u304c\u8fd4\u5374\u3055\u308c\u308b\u307e\u3067\u306e\u4e00\u9023\u306e\u30d7\u30ed\u30bb\u30b9\u306b\u304a\u3044\u3066\u3001\u5404\u30b9\u30c6\u30c3\u30d7\u3067\u306e\u6280\u8853\u7684\u30fb\u5236\u5ea6\u7684\u30fb\u904b\u7528\u7684\u306a\u8ab2\u984c\u3092\u628a\u63e1\u3059\u308b\u5fc5\u8981\u304c\u3042\u308b\u3002</p><h2>\u5c0e\u5165\u8cac\u4efb\u3068\u8cbb\u7528\u69cb\u9020</h2><p>\u533b\u7642\u6a5f\u95a2\u5074\u306b\u3068\u3063\u3066\u3001\u9060\u9694\u8aad\u5f71\u30b5\u30fc\u30d3\u30b9\u306e\u5c0e\u5165\u306f\u300c\u8ab0\u306e\u8cac\u4efb\u3067\u5c0e\u5165\u3057\u3001\u8ab0\u304c\u8cbb\u7528\u3092\u8ca0\u62c5\u3059\u308b\u306e\u304b\u300d\u3068\u3044\u3046\u554f\u984c\u3092\u542b\u3093\u3067\u3044\u308b\u3002\u4fdd\u967a\u8a3a\u7642\u306e\u67a0\u7d44\u307f\u306e\u4e2d\u3067\u3001\u9060\u9694\u8aad\u5f71\u306e\u8cbb\u7528\u3092\u3069\u3046\u6b63\u5f53\u5316\u3059\u308b\u304b\u304c\u4e8b\u696d\u6027\u3092\u5de6\u53f3\u3059\u308b\u3002</p><h2>\u753b\u50cf\u30c7\u30fc\u30bf\u9023\u643a\u306e\u8a2d\u8a08</h2><p>DICOM\u753b\u50cf\u306e\u9001\u53d7\u4fe1\u3001\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3\u8981\u4ef6\u3001PACS\u3068\u306e\u63a5\u7d9a\u3001\u753b\u50cf\u306e\u5bb9\u91cf\u3068\u901a\u4fe1\u54c1\u8cea\u306a\u3069\u3001\u6280\u8853\u7684\u306a\u8a2d\u8a08\u9805\u76ee\u306f\u591a\u5c90\u306b\u308f\u305f\u308b\u3002\u3053\u308c\u3089\u3092\u300c\u4e8b\u696d\u4fa1\u5024\u300d\u3068\u3064\u306a\u3052\u3066\u8aac\u660e\u3067\u304d\u308b\u304b\u3069\u3046\u304b\u304c\u3001\u533b\u7642\u6a5f\u95a2\u3078\u306e\u63d0\u6848\u306e\u6210\u5426\u3092\u5206\u3051\u308b\u3002</p><h2>4\u3064\u306e\u8ef8\u3067\u306e\u4e8b\u696d\u4eee\u8aac\u8a2d\u8a08</h2><p>\u8aad\u5f71\u30d5\u30ed\u30fc\u3001\u5c0e\u5165\u8cac\u4efb\u3001\u8cbb\u7528\u69cb\u9020\u3001\u30c7\u30fc\u30bf\u9023\u643a\u3002\u3053\u306e4\u3064\u306e\u8ef8\u3092\u540c\u6642\u306b\u6574\u7406\u3057\u3001\u305d\u308c\u305e\u308c\u306e\u300c\u73fe\u5b9f\u89e3\u300d\u3092\u63d0\u793a\u3067\u304d\u308b\u4e8b\u696d\u4eee\u8aac\u304c\u3001\u9060\u9694\u533b\u7642\u30fb\u753b\u50cf\u8a3a\u65ad\u9818\u57df\u3067\u306e\u4e8b\u696d\u7acb\u3061\u4e0a\u3052\u306b\u4e0d\u53ef\u6b20\u3067\u3042\u308b\u3002</p>",
-        en: "<h2>Understanding the reading workflow</h2><p>When designing a remote diagnostic imaging business, the most critical step is understanding the full reading workflow. From the referring institution sending images, to the radiologist interpreting them, to the report being returned -- at each step, technical, regulatory, and operational challenges must be mapped.</p><h2>Adoption responsibility and cost structure</h2><p>For the hospital side, introducing a remote reading service inherently raises the question of 'who is responsible for adoption and who bears the cost'. How remote reading costs are justified within the insurance reimbursement framework determines the viability of the business.</p><h2>Imaging data integration design</h2><p>Technical design items are numerous: DICOM image transmission and reception, security requirements, PACS connectivity, image volume and communication quality. Whether these can be explained in terms of 'business value' -- not just technical specs -- is what separates a winning proposal from a losing one.</p><h2>Building hypotheses on four axes</h2><p>Reading workflow, adoption responsibility, cost structure, and data integration. Organizing these four axes simultaneously and presenting realistic solutions for each is indispensable when launching a business in the remote healthcare and diagnostic imaging space.</p>"
+      "excerpt": {
+        "ja": "読影フロー、医療機関側の導入責任、保険・費用構造、画像データ連携の4つの軸で事業仮説を組むアプローチ。",
+        "en": "Reading workflow, hospital-side ownership, reimbursement structure, and imaging data exchange -- four axes for building a credible hypothesis."
+      },
+      "body": {
+        "ja": "<h2>読影フローの理解</h2><p>遠隔画像診断事業を設計する際、最も重要なのは読影フロー全体を理解することである。依頼元の医療機関から画像が送信され、読影医が判読し、レポートが返却されるまでの一連のプロセスにおいて、各ステップでの技術的・制度的・運用的な課題を把握する必要がある。</p><h2>導入責任と費用構造</h2><p>医療機関側にとって、遠隔読影サービスの導入は「誰の責任で導入し、誰が費用を負担するのか」という問題を含んでいる。保険診療の枠組みの中で、遠隔読影の費用をどう正当化するかが事業性を左右する。</p><h2>画像データ連携の設計</h2><p>DICOM画像の送受信、セキュリティ要件、PACSとの接続、画像の容量と通信品質など、技術的な設計項目は多岐にわたる。これらを「事業価値」とつなげて説明できるかどうかが、医療機関への提案の成否を分ける。</p><h2>4つの軸での事業仮説設計</h2><p>読影フロー、導入責任、費用構造、データ連携。この4つの軸を同時に整理し、それぞれの「現実解」を提示できる事業仮説が、遠隔医療・画像診断領域での事業立ち上げに不可欠である。</p>",
+        "en": "<h2>Understanding the reading workflow</h2><p>When designing a remote diagnostic imaging business, the most critical step is understanding the full reading workflow. From the referring institution sending images, to the radiologist interpreting them, to the report being returned -- at each step, technical, regulatory, and operational challenges must be mapped.</p><h2>Adoption responsibility and cost structure</h2><p>For the hospital side, introducing a remote reading service inherently raises the question of 'who is responsible for adoption and who bears the cost'. How remote reading costs are justified within the insurance reimbursement framework determines the viability of the business.</p><h2>Imaging data integration design</h2><p>Technical design items are numerous: DICOM image transmission and reception, security requirements, PACS connectivity, image volume and communication quality. Whether these can be explained in terms of 'business value' -- not just technical specs -- is what separates a winning proposal from a losing one.</p><h2>Building hypotheses on four axes</h2><p>Reading workflow, adoption responsibility, cost structure, and data integration. Organizing these four axes simultaneously and presenting realistic solutions for each is indispensable when launching a business in the remote healthcare and diagnostic imaging space.</p>"
       }
     },
     {
-      slug: "invisible-translation-cost",
-      date: "2026-01-20",
-      dateLabel: { ja: "2026 \u00b7 01", en: "2026 \u00b7 01" },
-      tag: "Healthcare Data",
-      title: {
-        ja: "\u533b\u7642\u73fe\u5834\u3068\u958b\u767a\u30c1\u30fc\u30e0\u306e\u3042\u3044\u3060\u306b\u3042\u308b\u201c\u898b\u3048\u306a\u3044\u7ffb\u8a33\u30b3\u30b9\u30c8\u201d",
-        en: "The invisible translation cost between clinical and dev teams"
+      "slug": "invisible-translation-cost",
+      "date": "2026-01-20",
+      "dateLabel": {
+        "ja": "2026 · 01",
+        "en": "2026 · 01"
       },
-      excerpt: {
-        ja: "\u8981\u4ef6\u5b9a\u7fa9\u3067\u898b\u843d\u3068\u3055\u308c\u3084\u3059\u3044\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u30fb\u696d\u52d9\u30d5\u30ed\u30fc\u30fb\u5236\u5ea6\u524d\u63d0\u3092\u3001\u7ffb\u8a33\u8005\u3068\u3057\u3066\u57cb\u3081\u308b\u305f\u3081\u306e\u8996\u70b9\u3002",
-        en: "What requirements discussions tend to miss -- clinical workflow, operational flow, regulatory premises -- and how to fill the gap as a translator."
+      "tag": "Healthcare Data",
+      "title": {
+        "ja": "医療現場と開発チームのあいだにある“見えない翻訳コスト”",
+        "en": "The invisible translation cost between clinical and dev teams"
       },
-      body: {
-        ja: "<h2>\u898b\u3048\u306a\u3044\u7ffb\u8a33\u30b3\u30b9\u30c8\u3068\u306f\u4f55\u304b</h2><p>\u533b\u7642\u7cfb\u30d7\u30ed\u30c0\u30af\u30c8\u306e\u958b\u767a\u3067\u306f\u3001\u6280\u8853\u30c1\u30fc\u30e0\u3068\u73fe\u5834\u306e\u3042\u3044\u3060\u306b\u300c\u898b\u3048\u306a\u3044\u7ffb\u8a33\u30b3\u30b9\u30c8\u300d\u304c\u5b58\u5728\u3059\u308b\u3002\u305d\u308c\u306f\u3001\u73fe\u5834\u304c\u300c\u5f53\u305f\u308a\u524d\u300d\u3068\u3057\u3066\u660e\u8a00\u3057\u306a\u3044\u524d\u63d0\u6761\u4ef6\uff08\u8a3a\u7642\u30d5\u30ed\u30fc\u3001\u8a18\u9332\u69d8\u5f0f\u3001\u591a\u8077\u7a2e\u9023\u643a\u306e\u6163\u884c\uff09\u3068\u3001\u958b\u767a\u5074\u304c\u300c\u8a00\u308f\u308c\u305f\u3053\u3068\u3060\u3051\u3092\u4f5c\u308b\u300d\u59ff\u52e2\u304b\u3089\u751f\u307e\u308c\u308b\u3002</p><h2>\u8981\u4ef6\u5b9a\u7fa9\u3067\u6b20\u843d\u3059\u308b3\u3064\u306e\u524d\u63d0</h2><p>\u7b2c\u4e00\u306b\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3002\u60a3\u8005\u304c\u53d7\u4ed8\u304b\u3089\u8a3a\u5bdf\u3001\u691c\u67fb\u3001\u8a3a\u65ad\u3001\u6cbb\u7642\u3001\u8a18\u9332\u3068\u3044\u3046\u6d41\u308c\u306e\u4e2d\u3067\u3001\u305d\u306e\u30d7\u30ed\u30c0\u30af\u30c8\u304c\u3069\u306e\u30bf\u30a4\u30df\u30f3\u30b0\u3067\u4f7f\u308f\u308c\u308b\u304b\u3002\u7b2c\u4e8c\u306b\u696d\u52d9\u30d5\u30ed\u30fc\u3002\u8a18\u9332\u306e\u5f62\u5f0f\u3001\u627f\u8a8d\u306e\u6d41\u308c\u3001\u4ed6\u30b7\u30b9\u30c6\u30e0\u3068\u306e\u9023\u643a\u30bf\u30a4\u30df\u30f3\u30b0\u306a\u3069\u3002\u7b2c\u4e09\u306b\u5236\u5ea6\u524d\u63d0\u3002\u500b\u4eba\u60c5\u5831\u306e\u53d6\u6271\u3044\u3001\u533b\u7642\u6a5f\u5668\u8a72\u5f53\u6027\u3001\u4fdd\u967a\u8a3a\u7642\u3068\u306e\u95a2\u4fc2\u3002</p><h2>\u7ffb\u8a33\u8005\u3068\u3057\u3066\u306e\u30a2\u30d7\u30ed\u30fc\u30c1</h2><p>\u3053\u306e\u30ae\u30e3\u30c3\u30d7\u3092\u57cb\u3081\u308b\u306b\u306f\u3001\u73fe\u5834\u306e\u300c\u66b4\u9ed9\u306e\u77e5\u8b58\u300d\u3092\u958b\u767a\u8005\u304c\u7406\u89e3\u3067\u304d\u308b\u8a00\u8449\u306b\u5909\u63db\u3059\u308b\u300c\u7ffb\u8a33\u8005\u300d\u304c\u5fc5\u8981\u3067\u3042\u308b\u3002\u305d\u308c\u306f\u5358\u306a\u308b\u901a\u8a33\u3067\u306f\u306a\u304f\u3001\u4e21\u8005\u306e\u6587\u8108\u3092\u7406\u89e3\u3057\u3001\u300c\u4f55\u304c\u300c\u5f53\u305f\u308a\u524d\u300d\u3068\u3057\u3066\u7701\u7565\u3055\u308c\u3066\u3044\u308b\u304b\u300d\u3092\u7a4d\u6975\u7684\u306b\u554f\u3044\u76f4\u3057\u3001\u8981\u4ef6\u3068\u3057\u3066\u53ef\u8996\u5316\u3059\u308b\u5f79\u5272\u3067\u3042\u308b\u3002</p>",
-        en: "<h2>What the invisible translation cost is</h2><p>In medical product development, an 'invisible translation cost' exists between the engineering team and the clinical floor. It emerges from the unstated assumptions clinicians take for granted -- care pathways, documentation conventions, multidisciplinary coordination habits -- combined with the engineering team's tendency to build only what has been explicitly stated.</p><h2>Three premises that drop off in requirements</h2><p>First, clinical workflow: within the patient journey from reception to examination, diagnosis, treatment, and documentation, at which point is the product used? Second, operational flow: documentation formats, approval chains, timing of system integration. Third, regulatory premises: personal data handling, medical device classification, relationship to insured care.</p><h2>Approaching the gap as a translator</h2><p>Bridging this gap requires a translator who can convert the clinical floor's tacit knowledge into language developers understand. This is not simple interpretation but a role that involves understanding both contexts, actively questioning what has been omitted as 'obvious', and making those assumptions visible as explicit requirements.</p>"
+      "excerpt": {
+        "ja": "要件定義で見落とされやすい臨床ワークフロー・業務フロー・制度前提を、翻訳者として埋めるための視点。",
+        "en": "What requirements discussions tend to miss -- clinical workflow, operational flow, regulatory premises -- and how to fill the gap as a translator."
+      },
+      "body": {
+        "ja": "<h2>見えない翻訳コストとは何か</h2><p>医療系プロダクトの開発では、技術チームと現場のあいだに「見えない翻訳コスト」が存在する。それは、現場が「当たり前」として明言しない前提条件（診療フロー、記録様式、多職種連携の慣行）と、開発側が「言われたことだけを作る」姿勢から生まれる。</p><h2>要件定義で欠落する3つの前提</h2><p>第一に臨床ワークフロー。患者が受付から診察、検査、診断、治療、記録という流れの中で、そのプロダクトがどのタイミングで使われるか。第二に業務フロー。記録の形式、承認の流れ、他システムとの連携タイミングなど。第三に制度前提。個人情報の取扱い、医療機器該当性、保険診療との関係。</p><h2>翻訳者としてのアプローチ</h2><p>このギャップを埋めるには、現場の「暴黙の知識」を開発者が理解できる言葉に変換する「翻訳者」が必要である。それは単なる通訳ではなく、両者の文脈を理解し、「何が「当たり前」として省略されているか」を積極的に問い直し、要件として可視化する役割である。</p>",
+        "en": "<h2>What the invisible translation cost is</h2><p>In medical product development, an 'invisible translation cost' exists between the engineering team and the clinical floor. It emerges from the unstated assumptions clinicians take for granted -- care pathways, documentation conventions, multidisciplinary coordination habits -- combined with the engineering team's tendency to build only what has been explicitly stated.</p><h2>Three premises that drop off in requirements</h2><p>First, clinical workflow: within the patient journey from reception to examination, diagnosis, treatment, and documentation, at which point is the product used? Second, operational flow: documentation formats, approval chains, timing of system integration. Third, regulatory premises: personal data handling, medical device classification, relationship to insured care.</p><h2>Approaching the gap as a translator</h2><p>Bridging this gap requires a translator who can convert the clinical floor's tacit knowledge into language developers understand. This is not simple interpretation but a role that involves understanding both contexts, actively questioning what has been omitted as 'obvious', and making those assumptions visible as explicit requirements.</p>"
       }
     },
     {
-      slug: "hospital-startup-alliance-failures",
-      date: "2025-12-08",
-      dateLabel: { ja: "2025 \u00b7 12", en: "2025 \u00b7 12" },
-      tag: "Alliance",
-      title: {
-        ja: "\u533b\u7642\u6a5f\u95a2\u3068\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u306e\u5354\u696d\u3067\u8d77\u304d\u308b\u5178\u578b\u7684\u306a3\u3064\u306e\u5931\u6557",
-        en: "Three common failures in hospital-startup alliances"
+      "slug": "hospital-startup-alliance-failures",
+      "date": "2025-12-08",
+      "dateLabel": {
+        "ja": "2025 · 12",
+        "en": "2025 · 12"
       },
-      excerpt: {
-        ja: "\u610f\u601d\u6c7a\u5b9a\u306e\u4e3b\u4f53\u3001\u6210\u679c\u7269\u306e\u8cac\u4efb\u3001\u95a2\u4fc2\u8005\u5408\u610f\u306e\u9806\u5e8f\u3002\u5354\u696d\u521d\u671f\u3067\u6700\u3082\u8e93\u304d\u3084\u3059\u3044\u8ad6\u70b9\u3092\u6574\u7406\u3057\u307e\u3059\u3002",
-        en: "Decision ownership, deliverable responsibility, stakeholder alignment -- three places early-stage partnerships tend to break."
+      "tag": "Alliance",
+      "title": {
+        "ja": "医療機関とスタートアップの協業で起きる典型的な3つの失敗",
+        "en": "Three common failures in hospital-startup alliances"
       },
-      body: {
-        ja: "<h2>\u5354\u696d\u304c\u58ca\u308c\u308b3\u3064\u306e\u30d1\u30bf\u30fc\u30f3</h2><p>\u533b\u7642\u6a5f\u95a2\u3068\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u306e\u5354\u696d\u306f\u3001\u305d\u306e\u975e\u5bfe\u79f0\u6027\u304b\u3089\u7279\u6709\u306e\u96e3\u3057\u3055\u304c\u3042\u308b\u3002\u610f\u601d\u6c7a\u5b9a\u306e\u30b9\u30d4\u30fc\u30c9\u3001\u30ea\u30b9\u30af\u8a31\u5bb9\u5ea6\u3001\u6210\u679c\u306e\u5b9a\u7fa9\u304c\u6839\u672c\u7684\u306b\u7570\u306a\u308b\u4e2d\u3067\u3001\u53cc\u65b9\u304c\u6e80\u8db3\u3059\u308b\u5354\u696d\u8a2d\u8a08\u3092\u4f5c\u308b\u306b\u306f\u3001\u521d\u671f\u6bb5\u968e\u3067\u306e\u8ad6\u70b9\u6574\u7406\u304c\u4e0d\u53ef\u6b20\u3067\u3042\u308b\u3002</p><h2>\u5931\u6557\u30d1\u30bf\u30fc\u30f3\uff11\uff1a\u610f\u601d\u6c7a\u5b9a\u306e\u4e3b\u4f53\u4e0d\u5728</h2><p>\u533b\u7642\u6a5f\u95a2\u5074\u3067\u306f\u3001\u300c\u8ab0\u304c\u3053\u306e\u5354\u696d\u306e\u6700\u7d42\u610f\u601d\u6c7a\u5b9a\u8005\u306a\u306e\u304b\u300d\u304c\u66d6\u6627\u306a\u307e\u307e\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u304c\u59cb\u307e\u308b\u3053\u3068\u304c\u5c11\u306a\u304f\u306a\u3044\u3002\u7d50\u679c\u3001\u73fe\u5834\u306e\u30c1\u30e3\u30f3\u30d4\u30aa\u30f3\u304c\u7570\u52d5\u3057\u305f\u308a\u3001\u7d44\u7e54\u6539\u7de8\u304c\u3042\u3063\u305f\u308a\u3059\u308b\u3068\u3001\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u304c\u7a81\u7136\u505c\u6b62\u3059\u308b\u3002</p><h2>\u5931\u6557\u30d1\u30bf\u30fc\u30f3\uff12\uff1a\u6210\u679c\u7269\u306e\u8cac\u4efb\u5206\u62c5</h2><p>\u300c\u4f55\u3092\u3001\u3044\u3064\u307e\u3067\u306b\u3001\u8ab0\u306e\u8cac\u4efb\u3067\u300d\u3092\u660e\u78ba\u306b\u3057\u306a\u3044\u307e\u307e\u5354\u696d\u304c\u59cb\u307e\u308b\u3068\u3001\u6210\u679c\u7269\u306e\u54c1\u8cea\u3068\u7d0d\u671f\u3092\u3081\u3050\u308b\u5bfe\u7acb\u304c\u5fc5\u305a\u767a\u751f\u3059\u308b\u3002\u7279\u306b\u533b\u7642\u6a5f\u95a2\u5074\u306e\u300c\u5354\u529b\u300d\u304c\u5fc5\u8981\u306a\u5834\u5408\u3001\u305d\u306e\u5de5\u6570\u3092\u4e8b\u524d\u306b\u5408\u610f\u3059\u308b\u3053\u3068\u304c\u4e0d\u53ef\u6b20\u3067\u3042\u308b\u3002</p><h2>\u5931\u6557\u30d1\u30bf\u30fc\u30f3\uff13\uff1a\u30b9\u30c6\u30fc\u30af\u30db\u30eb\u30c0\u30fc\u5408\u610f\u306e\u9806\u5e8f</h2><p>\u5354\u696d\u306e\u521d\u671f\u306b\u95a2\u4fc2\u8005\u5168\u54e1\u3092\u5dfb\u304d\u8fbc\u307e\u306a\u3044\u3053\u3068\u3067\u3001\u5f8c\u304b\u3089\u300c\u805e\u3044\u3066\u3044\u306a\u3044\u300d\u3068\u3044\u3046\u53cd\u767a\u304c\u8d77\u304d\u308b\u3002\u7279\u306b\u3001\u770b\u8b77\u90e8\u9580\u3001\u4e8b\u52d9\u5c40\u3001\u533b\u4e8b\u8ab2\u306a\u3069\u3001\u76f4\u63a5\u306e\u5f53\u4e8b\u8005\u4ee5\u5916\u306e\u95a2\u4fc2\u8005\u306e\u5408\u610f\u3092\u5f97\u308b\u9806\u5e8f\u304c\u91cd\u8981\u3067\u3042\u308b\u3002</p>",
-        en: "<h2>Three patterns that break partnerships</h2><p>Hospital-startup partnerships carry inherent difficulties due to their asymmetric nature. Decision speed, risk tolerance, and outcome definitions are fundamentally different. Designing a partnership that satisfies both sides requires upfront issue framing at the earliest stage.</p><h2>Failure pattern 1: Absent decision ownership</h2><p>On the hospital side, projects frequently start without clarity on who is the ultimate decision-maker for the partnership. When the on-site champion transfers or an organizational restructuring occurs, the project suddenly halts.</p><h2>Failure pattern 2: Deliverable responsibility</h2><p>Starting a partnership without clarifying 'what, by when, and under whose responsibility' inevitably leads to conflict over deliverable quality and timelines. Especially when hospital-side 'cooperation' is required, pre-agreeing on the effort involved is essential.</p><h2>Failure pattern 3: Stakeholder alignment order</h2><p>Failing to involve all stakeholders at the partnership's inception causes late-stage pushback of the 'we were never told about this' variety. The order of gaining consensus from nursing, administration, and medical affairs -- not just the direct counterparts -- is critical.</p>"
+      "excerpt": {
+        "ja": "意思決定の主体、成果物の責任、関係者合意の順序。協業初期で最も躓きやすい論点を整理します。",
+        "en": "Decision ownership, deliverable responsibility, stakeholder alignment -- three places early-stage partnerships tend to break."
+      },
+      "body": {
+        "ja": "<h2>協業が壊れる3つのパターン</h2><p>医療機関とスタートアップの協業は、その非対称性から特有の難しさがある。意思決定のスピード、リスク許容度、成果の定義が根本的に異なる中で、双方が満足する協業設計を作るには、初期段階での論点整理が不可欠である。</p><h2>失敗パターン１：意思決定の主体不在</h2><p>医療機関側では、「誰がこの協業の最終意思決定者なのか」が曖昧なままプロジェクトが始まることが少なくない。結果、現場のチャンピオンが異動したり、組織改編があったりすると、プロジェクトが突然停止する。</p><h2>失敗パターン２：成果物の責任分担</h2><p>「何を、いつまでに、誰の責任で」を明確にしないまま協業が始まると、成果物の品質と納期をめぐる対立が必ず発生する。特に医療機関側の「協力」が必要な場合、その工数を事前に合意することが不可欠である。</p><h2>失敗パターン３：ステークホルダー合意の順序</h2><p>協業の初期に関係者全員を巻き込まないことで、後から「聞いていない」という反発が起きる。特に、看護部門、事務局、医事課など、直接の当事者以外の関係者の合意を得る順序が重要である。</p>",
+        "en": "<h2>Three patterns that break partnerships</h2><p>Hospital-startup partnerships carry inherent difficulties due to their asymmetric nature. Decision speed, risk tolerance, and outcome definitions are fundamentally different. Designing a partnership that satisfies both sides requires upfront issue framing at the earliest stage.</p><h2>Failure pattern 1: Absent decision ownership</h2><p>On the hospital side, projects frequently start without clarity on who is the ultimate decision-maker for the partnership. When the on-site champion transfers or an organizational restructuring occurs, the project suddenly halts.</p><h2>Failure pattern 2: Deliverable responsibility</h2><p>Starting a partnership without clarifying 'what, by when, and under whose responsibility' inevitably leads to conflict over deliverable quality and timelines. Especially when hospital-side 'cooperation' is required, pre-agreeing on the effort involved is essential.</p><h2>Failure pattern 3: Stakeholder alignment order</h2><p>Failing to involve all stakeholders at the partnership's inception causes late-stage pushback of the 'we were never told about this' variety. The order of gaining consensus from nursing, administration, and medical affairs -- not just the direct counterparts -- is critical.</p>"
       }
     }
   ],
-
-  /* ==================== SPEAKING ==================== */
-  speaking: [
+  "speaking": [
     {
-      slug: "medical-ai-business-keynote",
-      date: "2026-04-15",
-      dateLabel: { ja: "2026 \u00b7 04", en: "2026 \u00b7 04" },
-      tag: "Keynote",
-      title: {
-        ja: "\u533b\u7642AI\u306e\u30d3\u30b8\u30cd\u30b9\u5b9f\u88c5\u30ab\u30f3\u30d5\u30a1\u30ec\u30f3\u30b9 \u57fa\u8abf\u8b1b\u6f14",
-        en: "Keynote -- Medical AI Business Implementation Conference"
+      "slug": "medical-ai-business-keynote",
+      "date": "2026-04-15",
+      "dateLabel": {
+        "ja": "2026 · 04",
+        "en": "2026 · 04"
       },
-      summary: {
-        ja: "\u533b\u7642AI\u306e\u793e\u4f1a\u5b9f\u88c5\u306b\u5411\u3051\u305f\u8ad6\u70b9\u6574\u7406\u3068\u3001PoC\u304b\u3089\u4e8b\u696d\u5316\u3078\u306e\u30b9\u30c6\u30c3\u30d7\u3092\u8b1b\u6f14\u3002",
-        en: "Framing the social implementation of medical AI and the steps from PoC to real business."
+      "tag": "Keynote",
+      "title": {
+        "ja": "医療AIのビジネス実装カンファレンス 基調講演",
+        "en": "Keynote -- Medical AI Business Implementation Conference"
       },
-      body: {
-        ja: "<h2>\u30a4\u30d9\u30f3\u30c8\u6982\u8981</h2><p>\u672c\u30ab\u30f3\u30d5\u30a1\u30ec\u30f3\u30b9\u306f\u3001\u533b\u7642AI\u306e\u793e\u4f1a\u5b9f\u88c5\u3092\u30c6\u30fc\u30de\u306b\u3001\u533b\u7642\u6a5f\u5668\u30e1\u30fc\u30ab\u30fc\u3001AI\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u3001\u533b\u7642\u6a5f\u95a2\u306e\u610f\u601d\u6c7a\u5b9a\u8005\u304c\u4e00\u5802\u306b\u4f1a\u3059\u308b\u5e74\u6b21\u30a4\u30d9\u30f3\u30c8\u3067\u3042\u308b\u3002\u57fa\u8abf\u8b1b\u6f14\u3067\u306f\u3001\u533b\u7642AI\u304c\u300c\u6280\u8853\u7684\u306b\u5b8c\u6210\u3057\u3066\u3044\u308b\u306e\u306b\u73fe\u5834\u3067\u4f7f\u308f\u308c\u306a\u3044\u300d\u3068\u3044\u3046\u69cb\u9020\u7684\u306a\u554f\u984c\u3092\u53d6\u308a\u4e0a\u3052\u305f\u3002</p><h2>\u8b1b\u6f14\u306e\u30c6\u30fc\u30de</h2><p>\u8b1b\u6f14\u3067\u306f\u3001\u300cPoC\u306e\u7cbe\u5ea6\u306f\u5341\u5206\u306a\u306e\u306b\u3001\u306a\u305c\u5c0e\u5165\u304c\u9032\u307e\u306a\u3044\u306e\u304b\u300d\u3068\u3044\u3046\u554f\u3044\u3092\u8d77\u70b9\u306b\u3001\u73fe\u5834\u904b\u7528\u8a2d\u8a08\u3001\u5236\u5ea6\u5bfe\u5fdc\u3001\u610f\u601d\u6c7a\u5b9a\u8005\u306e\u5dfb\u304d\u8fbc\u307f\u65b9\u306e3\u3064\u306e\u8ef8\u304b\u3089\u300c\u5b9f\u88c5\u306b\u5fc5\u8981\u306a\u6761\u4ef6\u300d\u3092\u6574\u7406\u3057\u305f\u3002\u5177\u4f53\u7684\u306a\u30b1\u30fc\u30b9\u3092\u4ea4\u3048\u306a\u304c\u3089\u3001\u300c\u7cbe\u5ea6\u3060\u3051\u3067\u306f\u5c0e\u5165\u3055\u308c\u306a\u3044\u300d\u73fe\u5b9f\u3092\u793a\u3057\u305f\u3002</p><h2>\u4e3b\u306a\u30c6\u30a4\u30af\u30a2\u30a6\u30a7\u30a4</h2><p>\u53c2\u52a0\u8005\u304b\u3089\u7279\u306b\u53cd\u97ff\u304c\u5927\u304d\u304b\u3063\u305f\u306e\u306f\u3001\u300c\u73fe\u5834\u306e\u904b\u7528\u30d5\u30ed\u30fc\u3092\u30c7\u30b6\u30a4\u30f3\u3059\u308b\u3053\u3068\u81ea\u4f53\u304c\u30d7\u30ed\u30c0\u30af\u30c8\u8a2d\u8a08\u306e\u4e00\u90e8\u3067\u3042\u308b\u300d\u3068\u3044\u3046\u8996\u70b9\u3067\u3042\u308b\u3002AI\u306e\u6027\u80fd\u3060\u3051\u3067\u306a\u304f\u3001\u5c0e\u5165\u74b0\u5883\u5168\u4f53\u3092\u8a2d\u8a08\u3059\u308b\u5fc5\u8981\u6027\u304c\u3001\u591a\u304f\u306e\u53c2\u52a0\u8005\u306b\u65b0\u305f\u306a\u6c17\u3065\u304d\u3092\u63d0\u4f9b\u3057\u305f\u3002</p>",
-        en: "<h2>Event overview</h2><p>This annual conference brings together medical device manufacturers, AI startups, and hospital decision-makers under the theme of medical AI social implementation. The keynote addressed the structural problem of medical AI being 'technically complete yet unused on the ground'.</p><h2>Presentation theme</h2><p>Starting from the question 'why does adoption stall when PoC accuracy is sufficient?', the talk organized the conditions for implementation across three axes: on-site operational design, regulatory alignment, and decision-maker engagement. Drawing on concrete cases, it demonstrated the reality that accuracy alone is not enough for adoption.</p><h2>Key takeaways</h2><p>The perspective that resonated most with attendees was that 'designing the on-site operational flow is itself part of product design'. The necessity of designing the entire deployment environment -- not just AI performance -- provided fresh insight for many participants.</p>"
+      "summary": {
+        "ja": "医療AIの社会実装に向けた論点整理と、PoCから事業化へのステップを講演。",
+        "en": "Framing the social implementation of medical AI and the steps from PoC to real business."
+      },
+      "body": {
+        "ja": "<h2>イベント概要</h2><p>本カンファレンスは、医療AIの社会実装をテーマに、医療機器メーカー、AIスタートアップ、医療機関の意思決定者が一堂に会する年次イベントである。基調講演では、医療AIが「技術的に完成しているのに現場で使われない」という構造的な問題を取り上げた。</p><h2>講演のテーマ</h2><p>講演では、「PoCの精度は十分なのに、なぜ導入が進まないのか」という問いを起点に、現場運用設計、制度対応、意思決定者の巻き込み方の3つの軸から「実装に必要な条件」を整理した。具体的なケースを交えながら、「精度だけでは導入されない」現実を示した。</p><h2>主なテイクアウェイ</h2><p>参加者から特に反響が大きかったのは、「現場の運用フローをデザインすること自体がプロダクト設計の一部である」という視点である。AIの性能だけでなく、導入環境全体を設計する必要性が、多くの参加者に新たな気づきを提供した。</p>",
+        "en": "<h2>Event overview</h2><p>This annual conference brings together medical device manufacturers, AI startups, and hospital decision-makers under the theme of medical AI social implementation. The keynote addressed the structural problem of medical AI being 'technically complete yet unused on the ground'.</p><h2>Presentation theme</h2><p>Starting from the question 'why does adoption stall when PoC accuracy is sufficient?', the talk organized the conditions for implementation across three axes: on-site operational design, regulatory alignment, and decision-maker engagement. Drawing on concrete cases, it demonstrated the reality that accuracy alone is not enough for adoption.</p><h2>Key takeaways</h2><p>The perspective that resonated most with attendees was that 'designing the on-site operational flow is itself part of product design'. The necessity of designing the entire deployment environment -- not just AI performance -- provided fresh insight for many participants.</p>"
       }
     },
     {
-      slug: "global-medtech-japan-webinar",
-      date: "2026-03-22",
-      dateLabel: { ja: "2026 \u00b7 03", en: "2026 \u00b7 03" },
-      tag: "Webinar",
-      title: {
-        ja: "\u30b0\u30ed\u30fc\u30d0\u30eb\u533b\u7642\u6a5f\u5668\u4e8b\u696d\u306e\u65e5\u672c\u5c55\u958b\u30a6\u30a7\u30d3\u30ca\u30fc",
-        en: "Webinar -- Japan market entry for global medical technology"
+      "slug": "global-medtech-japan-webinar",
+      "date": "2026-03-22",
+      "dateLabel": {
+        "ja": "2026 · 03",
+        "en": "2026 · 03"
       },
-      summary: {
-        ja: "\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u5411\u3051\u306b\u3001\u65e5\u672c\u5e02\u5834\u306e\u7279\u6b8a\u6027\u3068\u53c2\u5165\u6226\u7565\u3092\u89e3\u8aac\u3002",
-        en: "For international healthtech companies: Japan market specifics and entry strategy."
+      "tag": "Webinar",
+      "title": {
+        "ja": "グローバル医療機器事業の日本展開ウェビナー",
+        "en": "Webinar -- Japan market entry for global medical technology"
       },
-      body: {
-        ja: "<h2>\u30a6\u30a7\u30d3\u30ca\u30fc\u306e\u80cc\u666f</h2><p>\u65e5\u672c\u5e02\u5834\u3078\u306e\u53c2\u5165\u3092\u691c\u8a0e\u3059\u308b\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u304c\u5897\u52a0\u3059\u308b\u4e2d\u3001\u65e5\u672c\u306e\u533b\u7642\u5236\u5ea6\u3001\u5546\u7fd2\u6163\u3001\u610f\u601d\u6c7a\u5b9a\u30d7\u30ed\u30bb\u30b9\u306e\u7279\u6b8a\u6027\u3092\u5305\u62ec\u7684\u306b\u89e3\u8aac\u3059\u308b\u30a6\u30a7\u30d3\u30ca\u30fc\u3092\u958b\u50ac\u3057\u305f\u3002\u53c2\u52a0\u4f01\u696d\u306f\u5317\u7c73\u30fb\u6b27\u5dde\u30fb\u30a4\u30b9\u30e9\u30a8\u30eb\u304b\u3089\u7d0430\u793e\u3002</p><h2>\u8b1b\u6f14\u5185\u5bb9</h2><p>\u65e5\u672c\u306e\u533b\u7642\u5236\u5ea6\u306e\u6982\u8981\u3001\u4fa1\u683c\u8a2d\u8a08\u306e\u5236\u7d04\u3001\u533b\u7642\u6a5f\u95a2\u3068\u306e\u4fe1\u983c\u69cb\u7bc9\u306e\u65b9\u6cd5\u3001\u305d\u3057\u3066\u300c\u30ed\u30fc\u30ab\u30e9\u30a4\u30ba\u300d\u3068\u300c\u30b5\u30fc\u30d3\u30b9\u518d\u8a2d\u8a08\u300d\u306e\u9055\u3044\u306b\u3064\u3044\u3066\u89e3\u8aac\u3057\u305f\u3002\u5b9f\u969b\u306e\u65e5\u672c\u5c55\u958b\u652f\u63f4\u306e\u4e8b\u4f8b\u3092\u4ea4\u3048\u3001\u5177\u4f53\u7684\u306a\u30b9\u30c6\u30c3\u30d7\u3092\u793a\u3057\u305f\u3002</p><h2>\u53cd\u97ff\u3068\u6210\u679c</h2><p>\u30a6\u30a7\u30d3\u30ca\u30fc\u5f8c\u3001\u53c2\u52a0\u4f01\u696d\u306e\u3046\u30615\u793e\u304b\u3089\u5177\u4f53\u7684\u306a\u65e5\u672c\u5c55\u958b\u306e\u76f8\u8ac7\u304c\u5bc4\u305b\u3089\u308c\u3001\u3046\u30611\u793e\u306f\u5b9f\u969b\u306e\u30a2\u30c9\u30d0\u30a4\u30b6\u30ea\u30fc\u5951\u7d04\u306b\u81f3\u3063\u305f\u3002\u300c\u5236\u5ea6\u00d7\u5546\u7fd2\u6163\u00d7\u73fe\u5834\u904b\u7528\u300d\u3092\u4e00\u4f53\u3067\u6574\u7406\u3059\u308b\u30a2\u30d7\u30ed\u30fc\u30c1\u306e\u6709\u52b9\u6027\u304c\u78ba\u8a8d\u3067\u304d\u305f\u3002</p>",
-        en: "<h2>Webinar background</h2><p>As more international healthtech companies consider entering the Japanese market, this webinar was organized to provide a comprehensive overview of Japan's healthcare system, business customs, and decision-making processes. Around 30 companies from North America, Europe, and Israel participated.</p><h2>Presentation content</h2><p>Topics covered included the Japanese healthcare system overview, pricing design constraints, methods for building trust with medical institutions, and the difference between 'localization' and 'service redesign'. Drawing on real Japan-entry advisory cases, the presentation outlined concrete steps.</p><h2>Response and outcomes</h2><p>Following the webinar, five participating companies reached out with specific Japan-entry inquiries, and one proceeded to an actual advisory contract. The effectiveness of the integrated approach -- addressing regulation, business customs, and on-site operations as one -- was confirmed.</p>"
+      "summary": {
+        "ja": "海外ヘルステック企業向けに、日本市場の特殊性と参入戦略を解説。",
+        "en": "For international healthtech companies: Japan market specifics and entry strategy."
+      },
+      "body": {
+        "ja": "<h2>ウェビナーの背景</h2><p>日本市場への参入を検討する海外ヘルステック企業が増加する中、日本の医療制度、商習慣、意思決定プロセスの特殊性を包括的に解説するウェビナーを開催した。参加企業は北米・欧州・イスラエルから約30社。</p><h2>講演内容</h2><p>日本の医療制度の概要、価格設計の制約、医療機関との信頼構築の方法、そして「ローカライズ」と「サービス再設計」の違いについて解説した。実際の日本展開支援の事例を交え、具体的なステップを示した。</p><h2>反響と成果</h2><p>ウェビナー後、参加企業のうち5社から具体的な日本展開の相談が寄せられ、うち1社は実際のアドバイザリー契約に至った。「制度×商習慣×現場運用」を一体で整理するアプローチの有効性が確認できた。</p>",
+        "en": "<h2>Webinar background</h2><p>As more international healthtech companies consider entering the Japanese market, this webinar was organized to provide a comprehensive overview of Japan's healthcare system, business customs, and decision-making processes. Around 30 companies from North America, Europe, and Israel participated.</p><h2>Presentation content</h2><p>Topics covered included the Japanese healthcare system overview, pricing design constraints, methods for building trust with medical institutions, and the difference between 'localization' and 'service redesign'. Drawing on real Japan-entry advisory cases, the presentation outlined concrete steps.</p><h2>Response and outcomes</h2><p>Following the webinar, five participating companies reached out with specific Japan-entry inquiries, and one proceeded to an actual advisory contract. The effectiveness of the integrated approach -- addressing regulation, business customs, and on-site operations as one -- was confirmed.</p>"
       }
     },
     {
-      slug: "healthtech-magazine-interview",
-      date: "2026-02-10",
-      dateLabel: { ja: "2026 \u00b7 02", en: "2026 \u00b7 02" },
-      tag: "Article",
-      title: {
-        ja: "\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u696d\u754c\u8a8c \u30a4\u30f3\u30bf\u30d3\u30e5\u30fc\u5bc4\u7a3f",
-        en: "Feature interview -- Healthtech industry magazine"
+      "slug": "healthtech-magazine-interview",
+      "date": "2026-02-10",
+      "dateLabel": {
+        "ja": "2026 · 02",
+        "en": "2026 · 02"
       },
-      summary: {
-        ja: "\u533b\u7642\u3068\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u306e\u7ffb\u8a33\u8005\u3068\u3057\u3066\u306e\u5f79\u5272\u3001\u30a2\u30e9\u30a4\u30a2\u30f3\u30b9\u8a2d\u8a08\u306e\u5b9f\u4f8b\u3092\u7d39\u4ecb\u3002",
-        en: "The role of a translator between healthcare and technology, with concrete examples of alliance design."
+      "tag": "Article",
+      "title": {
+        "ja": "ヘルステック業界誌 インタビュー寄稿",
+        "en": "Feature interview -- Healthtech industry magazine"
       },
-      body: {
-        ja: "<h2>\u5bc4\u7a3f\u306e\u80cc\u666f</h2><p>\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u696d\u754c\u8a8c\u304b\u3089\u306e\u4f9d\u983c\u3092\u53d7\u3051\u3001\u300c\u533b\u7642\u3068\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u306e\u7ffb\u8a33\u8005\u300d\u3068\u3057\u3066\u306e\u5f79\u5272\u3068\u3001\u30a2\u30e9\u30a4\u30a2\u30f3\u30b9\u8a2d\u8a08\u306e\u5b9f\u4f8b\u3092\u30a4\u30f3\u30bf\u30d3\u30e5\u30fc\u5f62\u5f0f\u3067\u5bc4\u7a3f\u3057\u305f\u3002\u533b\u7642\u73fe\u5834\u3068\u4e8b\u696d\u306e\u4e21\u65b9\u3092\u7406\u89e3\u3059\u308b\u30a2\u30c9\u30d0\u30a4\u30b6\u30fc\u306e\u5fc5\u8981\u6027\u306b\u3064\u3044\u3066\u8a9e\u3063\u305f\u3002</p><h2>\u8a18\u4e8b\u306e\u4e3b\u306a\u8ad6\u70b9</h2><p>\u8a18\u4e8b\u3067\u306f\u3001\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u306e\u65e5\u672c\u5c55\u958b\u652f\u63f4\u306e\u5b9f\u4f8b\u3001\u533b\u7642\u6a5f\u95a2\u3068\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u306e\u5354\u696d\u8a2d\u8a08\u3001\u305d\u3057\u3066\u300c\u6280\u8853\u304c\u3042\u308b\u306e\u306b\u73fe\u5834\u3067\u4f7f\u308f\u308c\u306a\u3044\u300d\u554f\u984c\u306e\u69cb\u9020\u7684\u539f\u56e0\u306b\u3064\u3044\u3066\u63a2\u3063\u305f\u3002\u300c\u7ffb\u8a33\u300d\u3068\u306f\u3001\u8a00\u8a9e\u306e\u7ffb\u8a33\u3067\u306f\u306a\u304f\u3001\u4e8b\u696d\u69cb\u9020\u3068\u73fe\u5834\u904b\u7528\u306e\u7ffb\u8a33\u3067\u3042\u308b\u3053\u3068\u3092\u5f37\u8abf\u3057\u305f\u3002</p>",
-        en: "<h2>Background</h2><p>Invited by a healthtech industry magazine, this feature interview explored the role of a 'translator between healthcare and technology' and shared concrete examples of alliance design. The piece discussed the necessity of advisors who understand both the clinical floor and business realities.</p><h2>Key points in the article</h2><p>The article covered real cases of supporting global healthtech companies' Japan market entry, designing hospital-startup partnerships, and the structural reasons behind the 'technology exists but is not used on site' problem. 'Translation' was emphasized as not linguistic translation but translation of business structure and operational reality.</p>"
+      "summary": {
+        "ja": "医療とテクノロジーの翻訳者としての役割、アライアンス設計の実例を紹介。",
+        "en": "The role of a translator between healthcare and technology, with concrete examples of alliance design."
+      },
+      "body": {
+        "ja": "<h2>寄稿の背景</h2><p>ヘルステック業界誌からの依頼を受け、「医療とテクノロジーの翻訳者」としての役割と、アライアンス設計の実例をインタビュー形式で寄稿した。医療現場と事業の両方を理解するアドバイザーの必要性について語った。</p><h2>記事の主な論点</h2><p>記事では、海外ヘルステック企業の日本展開支援の実例、医療機関とスタートアップの協業設計、そして「技術があるのに現場で使われない」問題の構造的原因について探った。「翻訳」とは、言語の翻訳ではなく、事業構造と現場運用の翻訳であることを強調した。</p>",
+        "en": "<h2>Background</h2><p>Invited by a healthtech industry magazine, this feature interview explored the role of a 'translator between healthcare and technology' and shared concrete examples of alliance design. The piece discussed the necessity of advisors who understand both the clinical floor and business realities.</p><h2>Key points in the article</h2><p>The article covered real cases of supporting global healthtech companies' Japan market entry, designing hospital-startup partnerships, and the structural reasons behind the 'technology exists but is not used on site' problem. 'Translation' was emphasized as not linguistic translation but translation of business structure and operational reality.</p>"
       }
     },
     {
-      slug: "university-hospital-startup-workshop",
-      date: "2026-01-25",
-      dateLabel: { ja: "2026 \u00b7 01", en: "2026 \u00b7 01" },
-      tag: "Workshop",
-      title: {
-        ja: "\u5927\u5b66\u75c5\u9662\u00d7\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7 \u5408\u540c\u30ef\u30fc\u30af\u30b7\u30e7\u30c3\u30d7",
-        en: "Joint workshop -- University hospital x startup"
+      "slug": "university-hospital-startup-workshop",
+      "date": "2026-01-25",
+      "dateLabel": {
+        "ja": "2026 · 01",
+        "en": "2026 · 01"
       },
-      summary: {
-        ja: "\u81e8\u5e8a\u73fe\u5834\u306e\u8ab2\u984c\u304b\u3089\u30d7\u30ed\u30c0\u30af\u30c8\u8981\u4ef6\u3092\u62bd\u51fa\u3059\u308b\u30bb\u30c3\u30b7\u30e7\u30f3\u3092\u8a2d\u8a08\u30fb\u30d5\u30a1\u30b7\u30ea\u30c6\u30fc\u30c8\u3002",
-        en: "Designing and facilitating a session to extract product requirements from clinical field issues."
+      "tag": "Workshop",
+      "title": {
+        "ja": "大学病院×スタートアップ 合同ワークショップ",
+        "en": "Joint workshop -- University hospital x startup"
       },
-      body: {
-        ja: "<h2>\u30ef\u30fc\u30af\u30b7\u30e7\u30c3\u30d7\u306e\u76ee\u7684</h2><p>\u5927\u5b66\u75c5\u9662\u306e\u81e8\u5e8a\u73fe\u5834\u3068\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u306e\u958b\u767a\u30c1\u30fc\u30e0\u304c\u5171\u540c\u3067\u3001\u73fe\u5834\u306e\u8ab2\u984c\u304b\u3089\u30d7\u30ed\u30c0\u30af\u30c8\u306e\u8981\u4ef6\u3092\u62bd\u51fa\u3059\u308b\u30bb\u30c3\u30b7\u30e7\u30f3\u3092\u8a2d\u8a08\u30fb\u30d5\u30a1\u30b7\u30ea\u30c6\u30fc\u30c8\u3057\u305f\u3002\u300c\u73fe\u5834\u306e\u56f0\u308a\u3054\u3068\u300d\u3068\u300c\u6280\u8853\u3067\u89e3\u6c7a\u3067\u304d\u308b\u3053\u3068\u300d\u306e\u63a5\u7d9a\u70b9\u3092\u898b\u3064\u3051\u308b\u3053\u3068\u304c\u76ee\u7684\u3067\u3042\u3063\u305f\u3002</p><h2>\u30d7\u30ed\u30b0\u30e9\u30e0\u8a2d\u8a08</h2><p>\u524d\u534a\u3067\u306f\u533b\u5e2b\u30fb\u770b\u8b77\u5e2b\u30fb\u6280\u5e2b\u304c\u300c\u65e5\u5e38\u696d\u52d9\u306e\u30da\u30a4\u30f3\u30dd\u30a4\u30f3\u30c8\u300d\u3092\u5171\u6709\u3002\u5f8c\u534a\u3067\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u306e\u30a8\u30f3\u30b8\u30cb\u30a2\u304c\u305d\u308c\u3092\u300c\u6280\u8853\u7684\u306b\u89e3\u6c7a\u53ef\u80fd\u306a\u8ab2\u984c\u300d\u306b\u5909\u63db\u3002\u79c1\u306f\u305d\u306e\u9593\u3092\u3064\u306a\u3050\u300c\u7ffb\u8a33\u8005\u300d\u3068\u3057\u3066\u3001\u4e21\u8005\u306e\u8a9e\u5f59\u306e\u5dee\u3092\u57cb\u3081\u308b\u5f79\u5272\u3092\u62c5\u3063\u305f\u3002</p><h2>\u6210\u679c</h2><p>\u30ef\u30fc\u30af\u30b7\u30e7\u30c3\u30d7\u304b\u3089\u3001\u5177\u4f53\u7684\u306a\u30d7\u30ed\u30c0\u30af\u30c8\u8981\u4ef6\u304c3\u4ef6\u62bd\u51fa\u3055\u308c\u3001\u3046\u30611\u4ef6\u306f\u5b9f\u969b\u306b\u958b\u767a\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u3068\u3057\u3066\u59cb\u52d5\u3057\u305f\u3002\u300c\u73fe\u5834\u3068\u958b\u767a\u306e\u3042\u3044\u3060\u306b\u7ffb\u8a33\u8005\u304c\u5165\u308b\u3053\u3068\u3067\u3001\u8981\u4ef6\u306e\u89e3\u50cf\u5ea6\u304c\u683c\u6bb5\u306b\u4e0a\u304c\u308b\u300d\u3068\u3044\u3046\u30d5\u30a3\u30fc\u30c9\u30d0\u30c3\u30af\u3092\u5f97\u305f\u3002</p>",
-        en: "<h2>Workshop purpose</h2><p>Clinical staff at a university hospital and a startup development team jointly designed a session to extract product requirements from on-site challenges. The goal was to find the connection point between 'daily frustrations in clinical work' and 'what technology can solve'.</p><h2>Program design</h2><p>The first half had physicians, nurses, and technicians share their 'daily pain points'. In the second half, startup engineers converted these into 'technically solvable challenges'. I served as the translator between both sides, bridging the vocabulary gap.</p><h2>Outcomes</h2><p>Three concrete product requirements were extracted from the workshop, and one actually launched as a development project. The feedback received was that 'having a translator between the field and development dramatically increases requirements resolution'.</p>"
+      "summary": {
+        "ja": "臨床現場の課題からプロダクト要件を抽出するセッションを設計・ファシリテート。",
+        "en": "Designing and facilitating a session to extract product requirements from clinical field issues."
+      },
+      "body": {
+        "ja": "<h2>ワークショップの目的</h2><p>大学病院の臨床現場とスタートアップの開発チームが共同で、現場の課題からプロダクトの要件を抽出するセッションを設計・ファシリテートした。「現場の困りごと」と「技術で解決できること」の接続点を見つけることが目的であった。</p><h2>プログラム設計</h2><p>前半では医師・看護師・技師が「日常業務のペインポイント」を共有。後半でスタートアップのエンジニアがそれを「技術的に解決可能な課題」に変換。私はその間をつなぐ「翻訳者」として、両者の語彙の差を埋める役割を担った。</p><h2>成果</h2><p>ワークショップから、具体的なプロダクト要件が3件抽出され、うち1件は実際に開発プロジェクトとして始動した。「現場と開発のあいだに翻訳者が入ることで、要件の解像度が格段に上がる」というフィードバックを得た。</p>",
+        "en": "<h2>Workshop purpose</h2><p>Clinical staff at a university hospital and a startup development team jointly designed a session to extract product requirements from on-site challenges. The goal was to find the connection point between 'daily frustrations in clinical work' and 'what technology can solve'.</p><h2>Program design</h2><p>The first half had physicians, nurses, and technicians share their 'daily pain points'. In the second half, startup engineers converted these into 'technically solvable challenges'. I served as the translator between both sides, bridging the vocabulary gap.</p><h2>Outcomes</h2><p>Three concrete product requirements were extracted from the workshop, and one actually launched as a development project. The feedback received was that 'having a translator between the field and development dramatically increases requirements resolution'.</p>"
       }
     },
     {
-      slug: "ai-agent-executive-seminar",
-      date: "2025-12-15",
-      dateLabel: { ja: "2025 \u00b7 12", en: "2025 \u00b7 12" },
-      tag: "Seminar",
-      title: {
-        ja: "\u7d4c\u55b6\u8005\u5411\u3051AI\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u6d3b\u7528\u30bb\u30df\u30ca\u30fc",
-        en: "Executive seminar -- AI agents in practice"
+      "slug": "ai-agent-executive-seminar",
+      "date": "2025-12-15",
+      "dateLabel": {
+        "ja": "2025 · 12",
+        "en": "2025 · 12"
       },
-      summary: {
-        ja: "LangGraph/CrewAI\u7b49\u3092\u7528\u3044\u305f\u81ea\u5f8b\u578bAI\u7d44\u7e54\u306e\u53ef\u80fd\u6027\u3068\u5b9f\u88c5\u4e0a\u306e\u8ad6\u70b9\u3092\u5171\u6709\u3002",
-        en: "Autonomous AI organizations built on LangGraph/CrewAI: opportunities and implementation issues."
+      "tag": "Seminar",
+      "title": {
+        "ja": "経営者向けAIエージェント活用セミナー",
+        "en": "Executive seminar -- AI agents in practice"
       },
-      body: {
-        ja: "<h2>\u30bb\u30df\u30ca\u30fc\u306e\u80cc\u666f</h2><p>AI\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u6280\u8853\u306e\u6025\u901f\u306a\u9032\u5316\u3092\u53d7\u3051\u3001\u7d4c\u55b6\u8005\u5c64\u5411\u3051\u306b\u300c\u81ea\u5f8b\u578bAI\u7d44\u7e54\u300d\u306e\u53ef\u80fd\u6027\u3068\u5b9f\u88c5\u4e0a\u306e\u8ad6\u70b9\u3092\u5171\u6709\u3059\u308b\u30bb\u30df\u30ca\u30fc\u3092\u958b\u50ac\u3057\u305f\u3002LangGraph\u3001CrewAI\u3001Ollama\u7b49\u306e\u30b9\u30bf\u30c3\u30af\u3092\u7528\u3044\u305f\u5177\u4f53\u4f8b\u3092\u4ea4\u3048\u3001\u300c\u4eba\u9593\u304c\u3084\u308b\u3079\u304d\u3053\u3068\u300d\u3068\u300cAI\u304c\u62c5\u3048\u308b\u3053\u3068\u300d\u306e\u5883\u754c\u7dda\u3092\u63cf\u3044\u305f\u3002</p><h2>\u4e3b\u306a\u8b70\u8ad6\u30c6\u30fc\u30de</h2><p>\u300cAI\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u306f\u4eba\u3092\u7f6e\u304d\u63db\u3048\u308b\u306e\u304b\uff1f\u300d\u3068\u3044\u3046\u554f\u3044\u306b\u5bfe\u3057\u3001\u300c\u7f6e\u304d\u63db\u3048\u308b\u306e\u3067\u306f\u306a\u304f\u3001\u4eba\u9593\u306e\u5224\u65ad\u3092\u62e1\u5f35\u3059\u308b\u300d\u3068\u3044\u3046\u4f4d\u7f6e\u3065\u3051\u3067\u8b70\u8ad6\u3092\u5c55\u958b\u3002\u7279\u306b\u533b\u7642\u9818\u57df\u3067\u306f\u3001AI\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u306e\u81ea\u5f8b\u6027\u3068\u4eba\u9593\u306e\u76e3\u7763\u306e\u30d0\u30e9\u30f3\u30b9\u304c\u91cd\u8981\u3067\u3042\u308b\u3053\u3068\u3092\u5f37\u8abf\u3057\u305f\u3002</p>",
-        en: "<h2>Seminar background</h2><p>Responding to the rapid evolution of AI agent technology, this executive-level seminar shared the potential of 'autonomous AI organizations' and practical implementation issues. Using concrete examples built on LangGraph, CrewAI, and Ollama stacks, the session mapped the boundary between 'what humans should do' and 'what AI can handle'.</p><h2>Key discussion themes</h2><p>In response to the question 'Will AI agents replace people?', the discussion was framed around 'not replacing but extending human judgment'. Especially in healthcare, the balance between AI agent autonomy and human oversight was emphasized as critical.</p>"
+      "summary": {
+        "ja": "LangGraph/CrewAI等を用いた自律型AI組織の可能性と実装上の論点を共有。",
+        "en": "Autonomous AI organizations built on LangGraph/CrewAI: opportunities and implementation issues."
+      },
+      "body": {
+        "ja": "<h2>セミナーの背景</h2><p>AIエージェント技術の急速な進化を受け、経営者層向けに「自律型AI組織」の可能性と実装上の論点を共有するセミナーを開催した。LangGraph、CrewAI、Ollama等のスタックを用いた具体例を交え、「人間がやるべきこと」と「AIが担えること」の境界線を描いた。</p><h2>主な議論テーマ</h2><p>「AIエージェントは人を置き換えるのか？」という問いに対し、「置き換えるのではなく、人間の判断を拡張する」という位置づけで議論を展開。特に医療領域では、AIエージェントの自律性と人間の監督のバランスが重要であることを強調した。</p>",
+        "en": "<h2>Seminar background</h2><p>Responding to the rapid evolution of AI agent technology, this executive-level seminar shared the potential of 'autonomous AI organizations' and practical implementation issues. Using concrete examples built on LangGraph, CrewAI, and Ollama stacks, the session mapped the boundary between 'what humans should do' and 'what AI can handle'.</p><h2>Key discussion themes</h2><p>In response to the question 'Will AI agents replace people?', the discussion was framed around 'not replacing but extending human judgment'. Especially in healthcare, the balance between AI agent autonomy and human oversight was emphasized as critical.</p>"
       }
     },
     {
-      slug: "overseas-startup-mentorship",
-      date: "2025-11-08",
-      dateLabel: { ja: "2025 \u00b7 11", en: "2025 \u00b7 11" },
-      tag: "Mentor",
-      title: {
-        ja: "\u6d77\u5916\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u5411\u3051\u30e1\u30f3\u30bf\u30fc\u6d3b\u52d5",
-        en: "Mentorship -- Overseas startups"
+      "slug": "overseas-startup-mentorship",
+      "date": "2025-11-08",
+      "dateLabel": {
+        "ja": "2025 · 11",
+        "en": "2025 · 11"
       },
-      summary: {
-        ja: "\u65e5\u672c\u9032\u51fa\u3092\u691c\u8a0e\u3059\u308b\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u306e\u30d4\u30c3\u30c1\u652f\u63f4\u3068\u6226\u7565\u30a2\u30c9\u30d0\u30a4\u30b6\u30ea\u30fc\u3002",
-        en: "Pitch coaching and strategic advisory for overseas healthtech companies exploring Japan."
+      "tag": "Mentor",
+      "title": {
+        "ja": "海外スタートアップ向けメンター活動",
+        "en": "Mentorship -- Overseas startups"
       },
-      body: {
-        ja: "<h2>\u30e1\u30f3\u30bf\u30fc\u6d3b\u52d5\u306e\u6982\u8981</h2><p>\u6d77\u5916\u306e\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u30a2\u30af\u30bb\u30e9\u30ec\u30fc\u30bf\u30fc\u3068\u9023\u643a\u3057\u3001\u65e5\u672c\u9032\u51fa\u3092\u691c\u8a0e\u3059\u308b3\u793e\u306e\u30e1\u30f3\u30bf\u30ea\u30f3\u30b0\u3092\u62c5\u5f53\u3002\u30d4\u30c3\u30c1\u8cc7\u6599\u306e\u65e5\u672c\u5e02\u5834\u5411\u3051\u30ea\u30d5\u30ec\u30fc\u30df\u30f3\u30b0\u3001\u63d0\u643a\u5148\u5019\u88dc\u306e\u9078\u5b9a\u3001\u521d\u56de\u9762\u8ac7\u306e\u8ad6\u70b9\u8a2d\u8a08\u3092\u652f\u63f4\u3057\u305f\u3002</p><h2>\u652f\u63f4\u5185\u5bb9\u3068\u6210\u679c</h2><p>3\u793e\u305d\u308c\u305e\u308c\u306e\u30d7\u30ed\u30c0\u30af\u30c8\u3068\u30bf\u30fc\u30b2\u30c3\u30c8\u5e02\u5834\u306b\u5fdc\u3058\u305f\u30e1\u30c3\u30bb\u30fc\u30b8\u30f3\u30b0\u3092\u8a2d\u8a08\u3057\u3001\u65e5\u672c\u5074\u306e\u30d1\u30fc\u30c8\u30ca\u30fc\u5019\u88dc\u3068\u306e\u63a5\u7d9a\u3092\u652f\u63f4\u3002\u7d50\u679c\u3068\u3057\u3066\u30012\u793e\u304c\u65e5\u672c\u306e\u533b\u7642\u6a5f\u95a2\u3068\u306e\u521d\u56de\u9762\u8ac7\u306b\u6210\u529f\u3057\u3001\u305d\u306e\u3046\u30611\u793e\u306f\u30d1\u30a4\u30ed\u30c3\u30c8\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u3092\u958b\u59cb\u3057\u305f\u3002</p>",
-        en: "<h2>Mentorship overview</h2><p>Partnering with an overseas healthtech accelerator, I mentored three companies considering Japan market entry. Support included reframing pitch materials for the Japanese market, selecting partnership candidates, and designing first-meeting discussion points.</p><h2>Support content and outcomes</h2><p>For each of the three companies, I designed messaging tailored to their product and target market, and facilitated connections with Japanese-side partner candidates. As a result, two companies secured initial meetings with Japanese medical institutions, and one of them launched a pilot project.</p>"
+      "summary": {
+        "ja": "日本進出を検討する海外ヘルステック企業のピッチ支援と戦略アドバイザリー。",
+        "en": "Pitch coaching and strategic advisory for overseas healthtech companies exploring Japan."
+      },
+      "body": {
+        "ja": "<h2>メンター活動の概要</h2><p>海外のヘルステックアクセラレーターと連携し、日本進出を検討する3社のメンタリングを担当。ピッチ資料の日本市場向けリフレーミング、提携先候補の選定、初回面談の論点設計を支援した。</p><h2>支援内容と成果</h2><p>3社それぞれのプロダクトとターゲット市場に応じたメッセージングを設計し、日本側のパートナー候補との接続を支援。結果として、2社が日本の医療機関との初回面談に成功し、そのうち1社はパイロットプロジェクトを開始した。</p>",
+        "en": "<h2>Mentorship overview</h2><p>Partnering with an overseas healthtech accelerator, I mentored three companies considering Japan market entry. Support included reframing pitch materials for the Japanese market, selecting partnership candidates, and designing first-meeting discussion points.</p><h2>Support content and outcomes</h2><p>For each of the three companies, I designed messaging tailored to their product and target market, and facilitated connections with Japanese-side partner candidates. As a result, two companies secured initial meetings with Japanese medical institutions, and one of them launched a pilot project.</p>"
       }
     }
   ],
-
-  /* ==================== CASES ==================== */
-  cases: [
+  "cases": [
     {
-      slug: "global-healthtech-japan-entry",
-      num: "01",
-      date: "2026-03-01",
-      tag: "Market Entry",
-      title: {
-        ja: "\u6d77\u5916\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u306e\u65e5\u672c\u5e02\u5834\u5c55\u958b\u652f\u63f4",
-        en: "Japan market entry for a global healthtech"
+      "slug": "global-healthtech-japan-entry",
+      "num": "01",
+      "date": "2026-03-01",
+      "tag": "Market Entry",
+      "title": {
+        "ja": "海外ヘルステック企業の日本市場展開支援",
+        "en": "Japan market entry for a global healthtech"
       },
-      issue: {
-        ja: "\u65e5\u672c\u5e02\u5834\u306e\u5c0e\u5165\u30cf\u30fc\u30c9\u30eb\u304c\u9ad8\u304f\u3001\u8a34\u6c42\u5148\u3068\u4fa1\u5024\u63d0\u6848\u304c\u66d6\u6627\u3002",
-        en: "High barriers to entry in the Japanese market; unclear value proposition and target buyers."
+      "issue": {
+        "ja": "日本市場の導入ハードルが高く、訴求先と価値提案が曖昧。",
+        "en": "High barriers to entry in the Japanese market; unclear value proposition and target buyers."
       },
-      work: {
-        ja: "\u5e02\u5834\u6574\u7406\u3001\u63d0\u643a\u4eee\u8aac\u8a2d\u8a08\u3001\u8a34\u6c42\u518d\u5b9a\u7fa9\u3001\u9762\u8ac7\u8ad6\u70b9\u6574\u7406\u3002",
-        en: "Market mapping, alliance hypothesis design, narrative re-framing, and meeting preparation."
+      "work": {
+        "ja": "市場整理、提携仮説設計、訴求再定義、面談論点整理。",
+        "en": "Market mapping, alliance hypothesis design, narrative re-framing, and meeting preparation."
       },
-      result: {
-        ja: "\u55b6\u696d\u30b9\u30c8\u30fc\u30ea\u30fc\u306e\u660e\u78ba\u5316\u3001\u63d0\u643a\u5019\u88dc\u3068\u306e\u5bfe\u8a71\u524d\u9032\u3001\u521d\u671f\u5546\u8ac7\u306e\u8cea\u5411\u4e0a\u3002",
-        en: "A clearer sales story, real progress with alliance candidates, and higher quality early conversations."
+      "result": {
+        "ja": "営業ストーリーの明確化、提携候補との対話前進、初期商談の質向上。",
+        "en": "A clearer sales story, real progress with alliance candidates, and higher quality early conversations."
       },
-      body: {
-        ja: "<h2>\u80cc\u666f\u3068\u8ab2\u984c</h2><p>\u6d77\u5916\u767a\u306e\u30d8\u30eb\u30b9\u30c6\u30c3\u30af\u4f01\u696d\u304c\u65e5\u672c\u5e02\u5834\u3078\u306e\u53c2\u5165\u3092\u691c\u8a0e\u3057\u3066\u3044\u305f\u304c\u3001\u65e5\u672c\u306e\u533b\u7642\u5236\u5ea6\u30fb\u5546\u7fd2\u6163\u30fb\u4fa1\u683c\u8a2d\u8a08\u306e\u7279\u6b8a\u6027\u304b\u3089\u3001\u300c\u8ab0\u306b\u3001\u4f55\u3092\u3001\u3069\u3046\u58f2\u308b\u306e\u304b\u300d\u304c\u660e\u78ba\u306b\u306a\u3063\u3066\u3044\u306a\u304b\u3063\u305f\u3002\u73fe\u5730\u306e\u5546\u7fd2\u6163\u3092\u7406\u89e3\u305b\u305a\u306b\u55b6\u696d\u6d3b\u52d5\u3092\u59cb\u3081\u305f\u7d50\u679c\u3001\u521d\u56de\u5546\u8ac7\u304c\u7a7a\u56de\u308a\u3059\u308b\u72b6\u614b\u304c\u7d9a\u3044\u3066\u3044\u305f\u3002</p><h2>\u652f\u63f4\u30a2\u30d7\u30ed\u30fc\u30c1</h2><p>\u307e\u305a\u3001\u65e5\u672c\u306e\u533b\u7642\u5e02\u5834\u306e\u69cb\u9020\u3092\u6574\u7406\u3057\u3001\u540c\u793e\u30d7\u30ed\u30c0\u30af\u30c8\u304c\u5024\u3092\u767a\u63ee\u3067\u304d\u308b\u30bb\u30b0\u30e1\u30f3\u30c8\u3092\u7279\u5b9a\u3057\u305f\u3002\u6b21\u306b\u3001\u63d0\u643a\u4eee\u8aac\u3092\u8a2d\u8a08\u3057\u3001\u300c\u8ab0\u3068\u7d44\u3081\u3070\u65e5\u672c\u5e02\u5834\u3067\u6a5f\u80fd\u3059\u308b\u304b\u300d\u3092\u660e\u78ba\u306b\u3057\u305f\u3002\u3055\u3089\u306b\u3001\u55b6\u696d\u30b9\u30c8\u30fc\u30ea\u30fc\u3092\u65e5\u672c\u5e02\u5834\u5411\u3051\u306b\u518d\u69cb\u6210\u3057\u3001\u521d\u56de\u9762\u8ac7\u6642\u306e\u8ad6\u70b9\u3092\u6574\u7406\u3057\u305f\u3002</p><h2>\u6210\u679c</h2><p>\u7d50\u679c\u3068\u3057\u3066\u3001\u55b6\u696d\u30b9\u30c8\u30fc\u30ea\u30fc\u304c\u660e\u78ba\u5316\u3055\u308c\u3001\u63d0\u643a\u5019\u88dc\u3068\u306e\u5bfe\u8a71\u304c\u524d\u9032\u3057\u3001\u521d\u671f\u5546\u8ac7\u306e\u8cea\u304c\u5411\u4e0a\u3057\u305f\u3002\u30003\u30f6\u6708\u4ee5\u5185\u306b2\u793e\u306e\u63d0\u643a\u5019\u88dc\u3068\u5177\u4f53\u7684\u306a\u5354\u696d\u8b70\u8ad6\u306b\u5165\u308b\u3053\u3068\u304c\u3067\u304d\u305f\u3002</p>",
-        en: "<h2>Background and challenge</h2><p>A global healthtech company was evaluating entry into the Japanese market but, due to the specificities of Japan's healthcare system, business customs, and pricing design, could not clarify 'who to sell to, what to sell, and how to sell it'. Having started sales activities without understanding local customs, initial meetings were consistently unproductive.</p><h2>Advisory approach</h2><p>First, we mapped the structure of Japan's healthcare market and identified the segments where the company's product could deliver real value. Next, we designed alliance hypotheses to clarify 'who to partner with for the product to work in Japan'. Finally, we reconstructed the sales story for the Japanese market and organized the discussion points for initial meetings.</p><h2>Outcomes</h2><p>The sales story was clarified, dialogue with alliance candidates advanced, and the quality of early-stage meetings improved. Within three months, concrete partnership discussions began with two alliance candidates.</p>"
+      "body": {
+        "ja": "<h2>背景と課題</h2><p>海外発のヘルステック企業が日本市場への参入を検討していたが、日本の医療制度・商習慣・価格設計の特殊性から、「誰に、何を、どう売るのか」が明確になっていなかった。現地の商習慣を理解せずに営業活動を始めた結果、初回商談が空回りする状態が続いていた。</p><h2>支援アプローチ</h2><p>まず、日本の医療市場の構造を整理し、同社プロダクトが値を発揮できるセグメントを特定した。次に、提携仮説を設計し、「誰と組めば日本市場で機能するか」を明確にした。さらに、営業ストーリーを日本市場向けに再構成し、初回面談時の論点を整理した。</p><h2>成果</h2><p>結果として、営業ストーリーが明確化され、提携候補との対話が前進し、初期商談の質が向上した。　3ヶ月以内に2社の提携候補と具体的な協業議論に入ることができた。</p>",
+        "en": "<h2>Background and challenge</h2><p>A global healthtech company was evaluating entry into the Japanese market but, due to the specificities of Japan's healthcare system, business customs, and pricing design, could not clarify 'who to sell to, what to sell, and how to sell it'. Having started sales activities without understanding local customs, initial meetings were consistently unproductive.</p><h2>Advisory approach</h2><p>First, we mapped the structure of Japan's healthcare market and identified the segments where the company's product could deliver real value. Next, we designed alliance hypotheses to clarify 'who to partner with for the product to work in Japan'. Finally, we reconstructed the sales story for the Japanese market and organized the discussion points for initial meetings.</p><h2>Outcomes</h2><p>The sales story was clarified, dialogue with alliance candidates advanced, and the quality of early-stage meetings improved. Within three months, concrete partnership discussions began with two alliance candidates.</p>"
       }
     },
     {
-      slug: "medical-imaging-service-framing",
-      num: "02",
-      date: "2026-02-01",
-      tag: "Business Development",
-      title: {
-        ja: "\u533b\u7642\u753b\u50cf\u95a2\u9023\u30b5\u30fc\u30d3\u30b9\u306e\u4e8b\u696d\u6574\u7406\u3068\u63d0\u6848\u8a2d\u8a08",
-        en: "Business framing & proposal design for a medical imaging service"
+      "slug": "medical-imaging-service-framing",
+      "num": "02",
+      "date": "2026-02-01",
+      "tag": "Business Development",
+      "title": {
+        "ja": "医療画像関連サービスの事業整理と提案設計",
+        "en": "Business framing & proposal design for a medical imaging service"
       },
-      issue: {
-        ja: "\u30b5\u30fc\u30d3\u30b9\u306e\u4fa1\u5024\u304c\u4f1d\u308f\u308a\u306b\u304f\u304f\u3001\u8aac\u660e\u8cc7\u6599\u304c\u5206\u6563\u3057\u3066\u3044\u305f\u3002",
-        en: "The value of the service was hard to communicate and sales materials were fragmented."
+      "issue": {
+        "ja": "サービスの価値が伝わりにくく、説明資料が分散していた。",
+        "en": "The value of the service was hard to communicate and sales materials were fragmented."
       },
-      work: {
-        ja: "\u69cb\u9020\u6574\u7406\u3001\u8a34\u6c42\u8ef8\u518d\u8a2d\u8a08\u3001\u8cc7\u6599\u30b9\u30c8\u30fc\u30ea\u30fc\u5316\u3001\u5c0e\u5165\u30e1\u30ea\u30c3\u30c8\u306e\u8a00\u8a9e\u5316\u3002",
-        en: "Structural framing, value-axis redesign, narrative material design, and articulation of customer benefits."
+      "work": {
+        "ja": "構造整理、訴求軸再設計、資料ストーリー化、導入メリットの言語化。",
+        "en": "Structural framing, value-axis redesign, narrative material design, and articulation of customer benefits."
       },
-      result: {
-        ja: "\u9867\u5ba2\u8aac\u660e\u306e\u4e00\u8cab\u6027\u5411\u4e0a\u3001\u55b6\u696d\u4f1a\u8a71\u306e\u77ed\u7e2e\u3001\u8aac\u660e\u6642\u306e\u8ff7\u3044\u6e1b\u5c11\u3002",
-        en: "More consistent customer explanations, shorter sales conversations, and fewer dead-ends in presentations."
+      "result": {
+        "ja": "顧客説明の一貫性向上、営業会話の短縮、説明時の迷い減少。",
+        "en": "More consistent customer explanations, shorter sales conversations, and fewer dead-ends in presentations."
       },
-      body: {
-        ja: "<h2>\u80cc\u666f\u3068\u8ab2\u984c</h2><p>\u533b\u7642\u753b\u50cf\u306b\u95a2\u308f\u308b\u30b5\u30fc\u30d3\u30b9\u3092\u63d0\u4f9b\u3059\u308b\u4f01\u696d\u304c\u3001\u300c\u30b5\u30fc\u30d3\u30b9\u306e\u4fa1\u5024\u3092\u3046\u307e\u304f\u4f1d\u3048\u3089\u308c\u306a\u3044\u300d\u3068\u3044\u3046\u8ab2\u984c\u3092\u62b1\u3048\u3066\u3044\u305f\u3002\u55b6\u696d\u8cc7\u6599\u304c\u8907\u6570\u5b58\u5728\u3057\u3001\u305d\u308c\u305e\u308c\u304c\u7570\u306a\u308b\u30e1\u30c3\u30bb\u30fc\u30b8\u3092\u767a\u4fe1\u3057\u3066\u304a\u308a\u3001\u9867\u5ba2\u3078\u306e\u8aac\u660e\u306b\u4e00\u8cab\u6027\u304c\u306a\u304b\u3063\u305f\u3002</p><h2>\u652f\u63f4\u30a2\u30d7\u30ed\u30fc\u30c1</h2><p>\u307e\u305a\u30b5\u30fc\u30d3\u30b9\u306e\u69cb\u9020\u3092\u6574\u7406\u3057\u3001\u300c\u8ab0\u306b\u3001\u3069\u306e\u4fa1\u5024\u3092\u3001\u3069\u3046\u4f1d\u3048\u308b\u304b\u300d\u3092\u518d\u5b9a\u7fa9\u3057\u305f\u3002\u6b21\u306b\u3001\u55b6\u696d\u63d0\u6848\u8cc7\u6599\u3092\u4e00\u672c\u306e\u30b9\u30c8\u30fc\u30ea\u30fc\u30e9\u30a4\u30f3\u306b\u518d\u69cb\u6210\u3057\u3001\u300c\u8ab2\u984c\u2192\u89e3\u6c7a\u7b56\u2192\u5c0e\u5165\u30e1\u30ea\u30c3\u30c8\u300d\u306e\u6d41\u308c\u3067\u8aac\u660e\u3067\u304d\u308b\u5f62\u306b\u3057\u305f\u3002</p><h2>\u6210\u679c</h2><p>\u55b6\u696d\u62c5\u5f53\u8005\u304c\u300c\u8ff7\u308f\u305a\u306b\u8aac\u660e\u3067\u304d\u308b\u3088\u3046\u306b\u306a\u3063\u305f\u300d\u3068\u3044\u3046\u30d5\u30a3\u30fc\u30c9\u30d0\u30c3\u30af\u3092\u5f97\u305f\u3002\u9867\u5ba2\u8aac\u660e\u306e\u6642\u9593\u304c\u77ed\u7e2e\u3055\u308c\u3001\u300c\u4f55\u3092\u3084\u3063\u3066\u3044\u308b\u4f1a\u793e\u306a\u306e\u304b\u300d\u304c\u660e\u78ba\u306b\u4f1d\u308f\u308b\u3088\u3046\u306b\u306a\u3063\u305f\u3002\u8a34\u6c42\u306e\u518d\u8a2d\u8a08\u306b\u3088\u308a\u3001\u521d\u56de\u5546\u8ac7\u306e\u8ee2\u63db\u7387\u304c\u5411\u4e0a\u3057\u305f\u3002</p>",
-        en: "<h2>Background and challenge</h2><p>A company providing medical imaging services was struggling to communicate its value effectively. Multiple sales materials existed, each delivering a different message, resulting in inconsistent customer explanations.</p><h2>Advisory approach</h2><p>We first reorganized the service structure and redefined 'who receives what value, communicated how'. Then, we restructured the sales proposal materials into a single storyline that follows a 'challenge to solution to adoption benefit' flow.</p><h2>Outcomes</h2><p>Sales representatives reported they could now 'explain without hesitation'. Customer explanation time shortened, and 'what the company does' became clearly communicated. The redesigned value proposition improved the conversion rate of initial meetings.</p>"
+      "body": {
+        "ja": "<h2>背景と課題</h2><p>医療画像に関わるサービスを提供する企業が、「サービスの価値をうまく伝えられない」という課題を抱えていた。営業資料が複数存在し、それぞれが異なるメッセージを発信しており、顧客への説明に一貫性がなかった。</p><h2>支援アプローチ</h2><p>まずサービスの構造を整理し、「誰に、どの価値を、どう伝えるか」を再定義した。次に、営業提案資料を一本のストーリーラインに再構成し、「課題→解決策→導入メリット」の流れで説明できる形にした。</p><h2>成果</h2><p>営業担当者が「迷わずに説明できるようになった」というフィードバックを得た。顧客説明の時間が短縮され、「何をやっている会社なのか」が明確に伝わるようになった。訴求の再設計により、初回商談の転換率が向上した。</p>",
+        "en": "<h2>Background and challenge</h2><p>A company providing medical imaging services was struggling to communicate its value effectively. Multiple sales materials existed, each delivering a different message, resulting in inconsistent customer explanations.</p><h2>Advisory approach</h2><p>We first reorganized the service structure and redefined 'who receives what value, communicated how'. Then, we restructured the sales proposal materials into a single storyline that follows a 'challenge to solution to adoption benefit' flow.</p><h2>Outcomes</h2><p>Sales representatives reported they could now 'explain without hesitation'. Customer explanation time shortened, and 'what the company does' became clearly communicated. The redesigned value proposition improved the conversion rate of initial meetings.</p>"
       }
     },
     {
-      slug: "medical-ai-implementation-planning",
-      num: "03",
-      date: "2026-01-15",
-      tag: "Medical AI",
-      title: {
-        ja: "\u533b\u7642AI\u30d7\u30ed\u30c0\u30af\u30c8\u306e\u5c0e\u5165\u69cb\u60f3\u652f\u63f4",
-        en: "Implementation planning for a medical AI product"
+      "slug": "medical-ai-implementation-planning",
+      "num": "03",
+      "date": "2026-01-15",
+      "tag": "Medical AI",
+      "title": {
+        "ja": "医療AIプロダクトの導入構想支援",
+        "en": "Implementation planning for a medical AI product"
       },
-      issue: {
-        ja: "\u6280\u8853\u306f\u3042\u308b\u304c\u3001\u5c0e\u5165\u73fe\u5834\u306e\u30d5\u30ed\u30fc\u3068\u5f79\u5272\u5206\u62c5\u304c\u898b\u3048\u306a\u3044\u3002",
-        en: "Strong technology, but the clinical workflow and role assignments were unclear."
+      "issue": {
+        "ja": "技術はあるが、導入現場のフローと役割分担が見えない。",
+        "en": "Strong technology, but the clinical workflow and role assignments were unclear."
       },
-      work: {
-        ja: "\u904b\u7528\u6574\u7406\u3001PoC\u8a2d\u8a08\u3001\u5c0e\u5165\u8ad6\u70b9\u306e\u53ef\u8996\u5316\u3001\u73fe\u5834\u5411\u3051\u8aac\u660e\u6574\u7406\u3002",
-        en: "Operational framing, PoC design, implementation issue mapping, and on-site communication."
+      "work": {
+        "ja": "運用整理、PoC設計、導入論点の可視化、現場向け説明整理。",
+        "en": "Operational framing, PoC design, implementation issue mapping, and on-site communication."
       },
-      result: {
-        ja: "\u691c\u8a0e\u30d5\u30a7\u30fc\u30ba\u304b\u3089\u5b9f\u88c5\u30d5\u30a7\u30fc\u30ba\u3078\u306e\u79fb\u884c\u3092\u652f\u63f4\u3057\u3001\u793e\u5185\u5408\u610f\u5f62\u6210\u3092\u52a0\u901f\u3002",
-        en: "Moved from evaluation to implementation, accelerating internal consensus."
+      "result": {
+        "ja": "検討フェーズから実装フェーズへの移行を支援し、社内合意形成を加速。",
+        "en": "Moved from evaluation to implementation, accelerating internal consensus."
       },
-      body: {
-        ja: "<h2>\u80cc\u666f\u3068\u8ab2\u984c</h2><p>\u533b\u7642AI\u30d7\u30ed\u30c0\u30af\u30c8\u3092\u6301\u3064\u30b9\u30bf\u30fc\u30c8\u30a2\u30c3\u30d7\u304c\u3001\u300c\u6280\u8853\u306f\u3042\u308b\u304c\u3001\u73fe\u5834\u3067\u3069\u3046\u4f7f\u308f\u308c\u308b\u304b\u304c\u898b\u3048\u306a\u3044\u300d\u3068\u3044\u3046\u8ab2\u984c\u3092\u62b1\u3048\u3066\u3044\u305f\u3002\u7cbe\u5ea6\u306f\u5341\u5206\u3060\u304c\u3001\u5c0e\u5165\u73fe\u5834\u306e\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3001\u5f79\u5272\u5206\u62c5\u3001\u8cac\u4efb\u4f53\u5236\u304c\u672a\u8a2d\u8a08\u306e\u307e\u307e\u3060\u3063\u305f\u3002</p><h2>\u652f\u63f4\u30a2\u30d7\u30ed\u30fc\u30c1</h2><p>\u73fe\u5834\u306e\u81e8\u5e8a\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3092\u30d2\u30a2\u30ea\u30f3\u30b0\u3057\u3001\u300cAI\u304c\u3069\u306e\u30bf\u30a4\u30df\u30f3\u30b0\u3067\u3001\u8ab0\u306b\u3001\u3069\u306e\u5f62\u3067\u7d50\u679c\u3092\u8fd4\u3059\u306e\u304b\u300d\u3092\u5177\u4f53\u5316\u3002\u8aa4\u691c\u77e5\u30fb\u898b\u843d\u3068\u3057\u6642\u306e\u904b\u7528\u30d5\u30ed\u30fc\u3068\u8cac\u4efb\u5206\u62c5\u3092\u8a2d\u8a08\u3057\u3001\u65e2\u5b58\u30b7\u30b9\u30c6\u30e0\u3068\u306e\u7d71\u5408\u8a2d\u8a08\u3082\u4f75\u305b\u3066\u884c\u3063\u305f\u3002</p><h2>\u6210\u679c</h2><p>\u300c\u6280\u8853\u306f\u3042\u308b\u304c\u4f7f\u3044\u65b9\u304c\u898b\u3048\u306a\u3044\u300d\u72b6\u614b\u304b\u3089\u3001\u300c\u73fe\u5834\u3067\u5177\u4f53\u7684\u306b\u3069\u3046\u4f7f\u308f\u308c\u308b\u304b\u300d\u304c\u660e\u78ba\u306b\u306a\u308a\u3001\u691c\u8a0e\u30d5\u30a7\u30fc\u30ba\u304b\u3089\u5b9f\u88c5\u30d5\u30a7\u30fc\u30ba\u3078\u306e\u79fb\u884c\u304c\u5b9f\u73fe\u3057\u305f\u3002\u793e\u5185\u306e\u610f\u601d\u6c7a\u5b9a\u8005\u3078\u306e\u8aac\u660e\u8cc7\u6599\u3082\u6574\u5099\u3055\u308c\u3001\u5408\u610f\u5f62\u6210\u304c\u52a0\u901f\u3057\u305f\u3002</p>",
-        en: "<h2>Background and challenge</h2><p>A startup with a medical AI product was struggling with the gap between 'having the technology' and 'understanding how it would be used on site'. Accuracy was sufficient, but the deployment-side workflow, role assignments, and responsibility structure remained undesigned.</p><h2>Advisory approach</h2><p>We interviewed the clinical workflow to concretize 'at what point, to whom, and in what form does the AI deliver its results'. We designed operational flows for false positives and missed detections with clear responsibility allocation, and also addressed integration design with existing systems.</p><h2>Outcomes</h2><p>The status shifted from 'technology exists but usage is unclear' to 'specifically how it will be used on site' being well-defined. The project moved from evaluation to implementation phase. Explanatory materials for internal decision-makers were also prepared, accelerating consensus building.</p>"
+      "body": {
+        "ja": "<h2>背景と課題</h2><p>医療AIプロダクトを持つスタートアップが、「技術はあるが、現場でどう使われるかが見えない」という課題を抱えていた。精度は十分だが、導入現場のワークフロー、役割分担、責任体制が未設計のままだった。</p><h2>支援アプローチ</h2><p>現場の臨床ワークフローをヒアリングし、「AIがどのタイミングで、誰に、どの形で結果を返すのか」を具体化。誤検知・見落とし時の運用フローと責任分担を設計し、既存システムとの統合設計も併せて行った。</p><h2>成果</h2><p>「技術はあるが使い方が見えない」状態から、「現場で具体的にどう使われるか」が明確になり、検討フェーズから実装フェーズへの移行が実現した。社内の意思決定者への説明資料も整備され、合意形成が加速した。</p>",
+        "en": "<h2>Background and challenge</h2><p>A startup with a medical AI product was struggling with the gap between 'having the technology' and 'understanding how it would be used on site'. Accuracy was sufficient, but the deployment-side workflow, role assignments, and responsibility structure remained undesigned.</p><h2>Advisory approach</h2><p>We interviewed the clinical workflow to concretize 'at what point, to whom, and in what form does the AI deliver its results'. We designed operational flows for false positives and missed detections with clear responsibility allocation, and also addressed integration design with existing systems.</p><h2>Outcomes</h2><p>The status shifted from 'technology exists but usage is unclear' to 'specifically how it will be used on site' being well-defined. The project moved from evaluation to implementation phase. Explanatory materials for internal decision-makers were also prepared, accelerating consensus building.</p>"
       }
     }
   ]

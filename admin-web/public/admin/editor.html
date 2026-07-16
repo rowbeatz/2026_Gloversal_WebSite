@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — Editor</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">Editor</h1>
+        <div class="top-bar-actions">
+          <a href="/admin/dashboard.html" class="btn btn-sm">← Back to Dashboard</a>
+        </div>
+      </div>
+      <div class="content-area" id="content-area">
+
+        <form id="editor-form">
+          <!-- Section + Slug -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="section">Section</label>
+              <select id="section">
+                <option value="insights">Insights</option>
+                <option value="speaking">Activities</option>
+                <option value="cases">Case Studies</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="slug">Slug</label>
+              <input type="text" id="slug" placeholder="auto-generated-from-title">
+            </div>
+          </div>
+
+          <!-- Tag + Date -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tag">Tag</label>
+              <input type="text" id="tag" placeholder="Medical AI, Market Entry, etc.">
+            </div>
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="month" id="date">
+            </div>
+          </div>
+
+          <!-- Date labels -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dateLabel-ja">Date Label JA</label>
+              <input type="text" id="dateLabel-ja" placeholder="2026 . 04">
+            </div>
+            <div class="form-group">
+              <label for="dateLabel-en">Date Label EN</label>
+              <input type="text" id="dateLabel-en" placeholder="2026 . 04">
+            </div>
+          </div>
+
+          <!-- Titles -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title-ja">Title JA</label>
+              <input type="text" id="title-ja" placeholder="Japanese title">
+            </div>
+            <div class="form-group">
+              <label for="title-en">Title EN</label>
+              <input type="text" id="title-en" placeholder="English title">
+            </div>
+          </div>
+
+          <!-- Excerpts -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="excerpt-ja">Excerpt JA</label>
+              <textarea id="excerpt-ja" placeholder="Short Japanese summary..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="excerpt-en">Excerpt EN</label>
+              <textarea id="excerpt-en" placeholder="Short English summary..."></textarea>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="body-ja">Body JA (HTML)</label>
+              <textarea id="body-ja" class="large" placeholder="<h2>...</h2><p>...</p>"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="body-en">Body EN (HTML)</label>
+              <textarea id="body-en" class="large" placeholder="<h2>...</h2><p>...</p>"></textarea>
+            </div>
+          </div>
+
+          <!-- ═══ Media Section (unified ordered list) ═══ -->
+          <div class="section-header" style="margin-top:24px"><h3>Media</h3></div>
+          <p class="text-muted text-sm" style="margin-top:-4px;margin-bottom:12px">
+            Add images, videos, or paste YouTube/Vimeo URLs. Drag to reorder. The first item appears as the hero.
+          </p>
+
+          <div id="media-list" class="media-editor-list"></div>
+
+          <div class="media-editor-actions" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-sm" onclick="addMediaImage()">+ Image URL</button>
+            <button type="button" class="btn btn-sm" onclick="addMediaVideo()">+ Video URL</button>
+            <button type="button" class="btn btn-sm" onclick="addMediaExternal()">+ YouTube / Vimeo</button>
+            <button type="button" class="btn btn-sm" onclick="openMediaPicker('media')">Library</button>
+            <button type="button" class="btn btn-sm" onclick="uploadMedia('media')">Upload File</button>
+          </div>
+
+          <!-- Hidden legacy fields, kept in sync for backward compatibility -->
+          <input type="hidden" id="thumbnail">
+          <input type="hidden" id="video">
+          <div id="gallery-list" style="display:none"></div>
+          <input type="hidden" id="gallery-url-input">
+
+          <!-- ═══ SEO / AEO Section ═══ -->
+          <div class="section-header" style="margin-top:24px"><h3>SEO / AEO Settings</h3></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="seo-title">SEO Title (overrides display title)</label>
+              <input type="text" id="seo-title" placeholder="Leave blank to use article title" maxlength="60">
+              <span class="text-muted text-sm" id="seo-title-count">0/60</span>
+            </div>
+            <div class="form-group">
+              <label for="seo-keywords">SEO Keywords</label>
+              <input type="text" id="seo-keywords" placeholder="keyword1, keyword2, keyword3">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="seo-description">Meta Description (SEO/AEO)</label>
+            <textarea id="seo-description" rows="2" placeholder="155 chars max — used for search snippets and AI citations" maxlength="155" style="min-height:60px"></textarea>
+            <span class="text-muted text-sm" id="seo-desc-count">0/155</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="og-image">OG Image URL (social preview)</label>
+              <input type="url" id="og-image" placeholder="/assets/images/gloversal-og.png">
+            </div>
+            <div class="form-group">
+              <label for="share-text">SNS Share Text</label>
+              <input type="text" id="share-text" placeholder="Custom share copy (under 280 chars)" maxlength="280">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Citation Sources (for AEO credibility)</label>
+            <div id="sources-list"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="url" id="source-url-input" placeholder="https://...">
+              <button type="button" class="btn btn-sm" onclick="addSource()">+ Add Source</button>
+            </div>
+          </div>
+
+          <!-- Embed -->
+          <div class="section-header" style="margin-top:24px"><h3>Embed</h3></div>
+          <div class="form-group">
+            <label for="embed">Embed Code (optional: YouTube, LinkedIn, Instagram, X, Notion, note, Substack, Bluesky, Threads, etc.)</label>
+            <textarea id="embed" placeholder='<iframe src="..." ...></iframe>&#10;&#10;<!-- Substack: <iframe src="https://yourname.substack.com/embed" ...> -->&#10;<!-- Bluesky: <blockquote class="bluesky-embed" data-bluesky-uri="at://..."> -->&#10;<!-- Threads: <blockquote class="text-post-media" ...> -->'></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Embed Preview</label>
+            <div class="embed-preview" id="embed-preview">
+              <span class="text-muted text-sm">Paste embed code above to preview</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="deploy-actions mt-24">
+            <button type="submit" class="btn btn-primary" id="save-btn">Save</button>
+            <button type="button" class="btn" id="save-build-btn" style="display:none">Save &amp; Build</button>
+            <a href="/admin/dashboard.html" class="btn">Cancel</a>
+          </div>
+        </form>
+
+        <div id="build-log" class="hidden mt-24">
+          <div class="section-header"><h2>Build Output</h2></div>
+          <div class="terminal" id="log-output"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file upload input -->
+  <input type="file" id="file-upload-input" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.mp4,.webm,.mov" style="display:none">
+
+  <!-- Media Picker Modal -->
+  <div id="media-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center">
+    <div style="background:var(--surface,#161b22);border:1px solid var(--border,#30363d);border-radius:8px;width:90%;max-width:700px;max-height:80vh;overflow-y:auto;padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="font-size:14px;font-weight:700;color:var(--accent,#4F8EF7)">Media Library</h3>
+        <button class="btn btn-sm" onclick="closeMediaPicker()">Close</button>
+      </div>
+      <div id="media-modal-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+        <span class="text-muted text-sm">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+
+    // Inject sidebar (NHP-inspired)
+    initPage('editor');
+
+    const params = getParams();
+    const section = params.get('section') || 'insights';
+    const slug = params.get('slug') || '';
+    const fromPlayground = params.get('from');
+    const isEditing = !!slug;
+
+    const sectionEl = document.getElementById('section');
+    const slugEl = document.getElementById('slug');
+    const pageTitle = document.getElementById('page-title');
+
+    // ─── Gallery and sources state ───
+    let galleryImages = [];
+    let sourcesList = [];
+
+    // ─── Unified media state (Sprint 3) ───
+    // Each entry: {type, src, id, poster, alt, title}
+    // type ∈ "image" | "video" | "youtube" | "vimeo"
+    let mediaItems = [];
+
+    // Lock section and slug if editing
+    if (isEditing) {
+      pageTitle.textContent = `Edit: ${slug}`;
+      sectionEl.value = section;
+      sectionEl.disabled = true;
+      slugEl.value = slug;
+      slugEl.readOnly = true;
+    } else {
+      pageTitle.textContent = `New ${sectionLabel(section)} Article`;
+      sectionEl.value = section;
+    }
+
+    // Auto-generate slug from English title
+    const titleEnEl = document.getElementById('title-en');
+    titleEnEl.addEventListener('input', () => {
+      if (!isEditing && !slugEl.dataset.manual) {
+        const val = titleEnEl.value
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/[\s_]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+        slugEl.value = val;
+      }
+    });
+
+    // Mark slug as manually edited
+    slugEl.addEventListener('input', () => {
+      slugEl.dataset.manual = 'true';
+    });
+
+    // Auto-generate date labels from date
+    const dateEl = document.getElementById('date');
+    dateEl.addEventListener('change', () => {
+      const val = dateEl.value; // YYYY-MM
+      if (val) {
+        const [y, m] = val.split('-');
+        const monthInt = parseInt(m, 10);
+        const label = `${y} · ${m}`;
+        document.getElementById('dateLabel-ja').value = label;
+        document.getElementById('dateLabel-en').value = label;
+      }
+    });
+
+    // Embed preview
+    const embedEl = document.getElementById('embed');
+    const embedPreview = document.getElementById('embed-preview');
+    embedEl.addEventListener('input', () => {
+      const code = embedEl.value.trim();
+      if (code) {
+        embedPreview.innerHTML = code;
+      } else {
+        embedPreview.innerHTML = '<span class="text-muted text-sm">Paste embed code above to preview</span>';
+      }
+    });
+
+    // ─── SEO character counters ───
+    const seoTitleEl = document.getElementById('seo-title');
+    const seoDescEl = document.getElementById('seo-description');
+
+    seoTitleEl.addEventListener('input', () => {
+      document.getElementById('seo-title-count').textContent = `${seoTitleEl.value.length}/60`;
+    });
+    seoDescEl.addEventListener('input', () => {
+      document.getElementById('seo-desc-count').textContent = `${seoDescEl.value.length}/155`;
+    });
+
+    // ─── Thumbnail (now a hidden field, kept for backward compat) ───
+    // The visible "thumbnail preview" was removed in favor of the unified
+    // media editor. The hidden #thumbnail field is still synced from the
+    // first media item so legacy code paths (renderer fallback, og:image)
+    // keep working. We expose `thumbnailEl` and a no-op input handler so
+    // the existing import flows (Playground / file upload) don't break.
+    const thumbnailEl = document.getElementById('thumbnail');
+    thumbnailEl.addEventListener('input', () => { /* no-op: handled by syncLegacyFields() */ });
+
+    // ─── Gallery management ───
+    function renderGallery() {
+      const list = document.getElementById('gallery-list');
+      list.innerHTML = galleryImages.map((url, i) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;background:var(--bg);padding:6px 10px;border-radius:4px;border:1px solid var(--border)">
+          <img src="${url}" style="width:40px;height:40px;object-fit:cover;border-radius:3px" onerror="this.style.display='none'">
+          <span style="flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${url}</span>
+          <button type="button" class="btn btn-sm btn-danger" onclick="removeGalleryImage(${i})" style="padding:2px 6px;font-size:11px">X</button>
+        </div>
+      `).join('');
+    }
+
+    function addGalleryImage() {
+      const input = document.getElementById('gallery-url-input');
+      const url = input.value.trim();
+      if (url) {
+        galleryImages.push(url);
+        input.value = '';
+        renderGallery();
+      }
+    }
+
+    function removeGalleryImage(index) {
+      galleryImages.splice(index, 1);
+      renderGallery();
+    }
+
+    // ─── Unified media editor (Sprint 3) ───
+    // Mirror of admin/backend/media_helpers.py: build a media[] from legacy
+    // thumbnail/video/images fields when the saved item has no media[].
+    const YT_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/;
+    const VIMEO_RES = [
+      /vimeo\.com\/(?:video\/|channels\/[^/]+\/)?(\d+)/,
+      /player\.vimeo\.com\/video\/(\d+)/,
+    ];
+    function detectMediaTypeClient(url) {
+      if (!url) return {type: 'image', id: '', src: '', poster: '', alt: '', title: ''};
+      const yt = url.match(YT_RE);
+      if (yt) {
+        return {type: 'youtube', id: yt[1], src: '', poster: `https://i.ytimg.com/vi/${yt[1]}/maxresdefault.jpg`, alt: '', title: ''};
+      }
+      for (const re of VIMEO_RES) {
+        const m = url.match(re);
+        if (m) return {type: 'vimeo', id: m[1], src: '', poster: '', alt: '', title: ''};
+      }
+      const lower = url.toLowerCase();
+      if (['.mp4', '.webm', '.mov'].some(ext => lower.endsWith(ext))) {
+        return {type: 'video', id: '', src: url, poster: '', alt: '', title: ''};
+      }
+      return {type: 'image', id: '', src: url, poster: '', alt: '', title: ''};
+    }
+    function buildMediaFromLegacy(item) {
+      const out = [];
+      const titleAlt = (item.title && (item.title.ja || item.title.en)) || '';
+      if (item.thumbnail) {
+        out.push({type: 'image', src: item.thumbnail, id: '', poster: '', alt: titleAlt, title: ''});
+      }
+      if (item.video) {
+        out.push(detectMediaTypeClient(item.video));
+      }
+      if (Array.isArray(item.images)) {
+        item.images.forEach(img => {
+          if (img) out.push({type: 'image', src: img, id: '', poster: '', alt: '', title: ''});
+        });
+      }
+      return out;
+    }
+
+    function escapeAttr(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;');
+    }
+
+    function mediaPreviewHTML(m) {
+      if (m.type === 'image' && m.src) {
+        return `<img class="media-thumb" src="${escapeAttr(m.src)}" alt="" onerror="this.outerHTML='<div class=&quot;media-thumb media-thumb--placeholder&quot;>IMG</div>'">`;
+      }
+      if (m.type === 'youtube' && m.id) {
+        return `<img class="media-thumb" src="https://i.ytimg.com/vi/${escapeAttr(m.id)}/mqdefault.jpg" alt="" onerror="this.outerHTML='<div class=&quot;media-thumb media-thumb--placeholder&quot;>YT</div>'">`;
+      }
+      if (m.type === 'vimeo' && m.id) {
+        return `<div class="media-thumb media-thumb--placeholder">VIMEO</div>`;
+      }
+      if (m.type === 'video' && m.src) {
+        return `<div class="media-thumb media-thumb--placeholder">VIDEO</div>`;
+      }
+      return `<div class="media-thumb media-thumb--placeholder">…</div>`;
+    }
+
+    function renderMediaList() {
+      const list = document.getElementById('media-list');
+      if (!list) return;
+      if (!mediaItems.length) {
+        list.innerHTML = '<div class="media-empty">No media yet. Add an image or video above.</div>';
+        syncLegacyFields();
+        return;
+      }
+      list.innerHTML = mediaItems.map((m, i) => {
+        const preview = mediaPreviewHTML(m);
+        const typeBadge = `<span class="media-type-badge">${escapeAttr(m.type)}</span>`;
+        const valueField = (m.type === 'youtube' || m.type === 'vimeo')
+          ? `<input type="text" value="${escapeAttr(m.id || '')}" oninput="updateMedia(${i},'id',this.value)" placeholder="${escapeAttr(m.type)} ID">`
+          : `<input type="text" value="${escapeAttr(m.src || '')}" oninput="updateMedia(${i},'src',this.value)" placeholder="URL or path">`;
+        const altField = `<input type="text" value="${escapeAttr(m.alt || '')}" oninput="updateMedia(${i},'alt',this.value)" placeholder="Alt text / caption">`;
+        return `
+          <div class="media-row" draggable="true" data-idx="${i}">
+            <span class="media-handle" title="Drag to reorder">&#x22EE;&#x22EE;</span>
+            ${preview}
+            <div class="media-fields">
+              ${typeBadge}
+              ${valueField}
+              ${altField}
+            </div>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeMedia(${i})" title="Remove" style="padding:2px 8px">×</button>
+          </div>`;
+      }).join('');
+      attachDragHandlers();
+      syncLegacyFields();
+    }
+
+    function updateMedia(i, key, value) {
+      if (mediaItems[i]) {
+        mediaItems[i][key] = value;
+        syncLegacyFields();
+      }
+    }
+
+    function removeMedia(i) {
+      mediaItems.splice(i, 1);
+      renderMediaList();
+    }
+
+    function addMediaImage() {
+      const url = prompt('Image URL or path (e.g., /assets/images/uploads/foo.jpg):', '');
+      if (!url) return;
+      mediaItems.push({type: 'image', src: url.trim(), id: '', poster: '', alt: '', title: ''});
+      renderMediaList();
+    }
+
+    function addMediaVideo() {
+      const url = prompt('Video file URL (mp4, webm, mov):', '');
+      if (!url) return;
+      mediaItems.push({type: 'video', src: url.trim(), id: '', poster: '', alt: '', title: ''});
+      renderMediaList();
+    }
+
+    async function addMediaExternal() {
+      const url = prompt('YouTube or Vimeo URL:', '');
+      if (!url) return;
+      try {
+        const res = await apiFetch('/api/media/extract', {
+          method: 'POST',
+          body: JSON.stringify({url: url.trim()})
+        });
+        if (res && res.ok) {
+          const m = await res.json();
+          mediaItems.push(m);
+          renderMediaList();
+        } else if (res) {
+          let detail = 'Could not detect media type for that URL.';
+          try { const err = await res.json(); detail = err.detail || detail; } catch (_) {}
+          showToast(detail, 'error');
+        }
+      } catch (e) {
+        showToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    let dragIdx = null;
+    function attachDragHandlers() {
+      document.querySelectorAll('.media-row').forEach(row => {
+        row.addEventListener('dragstart', () => { dragIdx = +row.dataset.idx; row.classList.add('dragging'); });
+        row.addEventListener('dragend', () => { row.classList.remove('dragging'); dragIdx = null; });
+        row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+        row.addEventListener('drop', e => {
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          const targetIdx = +row.dataset.idx;
+          if (dragIdx === null || dragIdx === targetIdx) return;
+          const [moved] = mediaItems.splice(dragIdx, 1);
+          mediaItems.splice(targetIdx, 0, moved);
+          renderMediaList();
+        });
+      });
+    }
+
+    // Keep hidden legacy fields (thumbnail / video / images) in sync with
+    // mediaItems so the static page renderer's legacy fallback still works
+    // and any code that reads those fields (search, sitemap, og:image) is happy.
+    function syncLegacyFields() {
+      const firstImage = mediaItems.find(m => m.type === 'image' && m.src);
+      const thumb = document.getElementById('thumbnail');
+      if (thumb) thumb.value = firstImage ? firstImage.src : '';
+
+      const firstVideo = mediaItems.find(m => m.type === 'youtube' || m.type === 'vimeo' || m.type === 'video');
+      const vid = document.getElementById('video');
+      if (vid) {
+        if (firstVideo) {
+          if (firstVideo.type === 'youtube') vid.value = `https://www.youtube.com/watch?v=${firstVideo.id}`;
+          else if (firstVideo.type === 'vimeo') vid.value = `https://vimeo.com/${firstVideo.id}`;
+          else vid.value = firstVideo.src || '';
+        } else {
+          vid.value = '';
+        }
+      }
+
+      // Mirror image entries (after the first) into the legacy gallery state.
+      // The first image already plays the role of "thumbnail/hero".
+      const galleryFromMedia = mediaItems
+        .filter(m => m.type === 'image' && m.src)
+        .slice(1)
+        .map(m => m.src);
+      if (galleryFromMedia.length || (firstImage && mediaItems.filter(m => m.type === 'image').length === 1)) {
+        // Replace galleryImages whenever the user is actively driving things
+        // through the media editor. The save handler still serializes both
+        // the legacy `images` array and the unified `media` array.
+        galleryImages = galleryFromMedia;
+      }
+    }
+
+    // ─── Sources management ───
+    function renderSources() {
+      const list = document.getElementById('sources-list');
+      list.innerHTML = sourcesList.map((url, i) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;background:var(--bg);padding:6px 10px;border-radius:4px;border:1px solid var(--border)">
+          <span style="flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${url}</span>
+          <button type="button" class="btn btn-sm btn-danger" onclick="removeSource(${i})" style="padding:2px 6px;font-size:11px">X</button>
+        </div>
+      `).join('');
+    }
+
+    function addSource() {
+      const input = document.getElementById('source-url-input');
+      const url = input.value.trim();
+      if (url) {
+        sourcesList.push(url);
+        input.value = '';
+        renderSources();
+      }
+    }
+
+    function removeSource(index) {
+      sourcesList.splice(index, 1);
+      renderSources();
+    }
+
+    // ─── Media picker (modal) ───
+    let mediaPickerTarget = null;
+
+    async function openMediaPicker(target) {
+      mediaPickerTarget = target;
+      const modal = document.getElementById('media-modal');
+      modal.style.display = 'flex';
+
+      const list = document.getElementById('media-modal-list');
+      list.innerHTML = '<span class="text-muted text-sm">Loading...</span>';
+
+      const res = await apiFetch('/api/media/list');
+      if (!res) { closeMediaPicker(); return; }
+      const data = await res.json();
+      const files = data.files || [];
+
+      if (files.length === 0) {
+        list.innerHTML = '<span class="text-muted text-sm">No uploaded files yet. Use the Upload button to add media.</span>';
+        return;
+      }
+
+      list.innerHTML = files.map(f => {
+        if (f.type === 'video') {
+          return `<div onclick="selectMedia('${f.url}')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center;transition:border-color .15s">
+            <div style="font-size:32px;margin-bottom:4px">&#9654;</div>
+            <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.filename}</div>
+            <div style="font-size:10px;color:var(--muted)">${f.size_mb}MB</div>
+          </div>`;
+        }
+        return `<div onclick="selectMedia('${f.url}')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center;transition:border-color .15s">
+          <img src="${f.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px" onerror="this.outerHTML='<div style=\\'font-size:32px\\'>&#128444;</div>'">
+          <div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px">${f.filename}</div>
+          <div style="font-size:10px;color:var(--muted)">${f.size_mb}MB</div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectMedia(url) {
+      // All picker selections now feed the unified media editor.
+      // Detect type from extension so videos still register as video.
+      const lower = (url || '').toLowerCase();
+      const isVideo = ['.mp4', '.webm', '.mov'].some(ext => lower.endsWith(ext));
+      mediaItems.push({
+        type: isVideo ? 'video' : 'image',
+        src: url,
+        id: '',
+        poster: '',
+        alt: '',
+        title: ''
+      });
+      renderMediaList();
+      closeMediaPicker();
+    }
+
+    function closeMediaPicker() {
+      document.getElementById('media-modal').style.display = 'none';
+      mediaPickerTarget = null;
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('media-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('media-modal')) closeMediaPicker();
+    });
+
+    // ─── File upload ───
+    let uploadTarget = null;
+    const fileInput = document.getElementById('file-upload-input');
+
+    function uploadMedia(target) {
+      uploadTarget = target;
+      fileInput.click();
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const token = localStorage.getItem('glv_admin_token');
+        const res = await fetch('/api/media/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        if (res.status === 401) { logout(); return; }
+
+        if (res.ok) {
+          const data = await res.json();
+          showToast(`Uploaded: ${data.original}`);
+
+          // All upload targets feed the unified media editor. The server's
+          // detected type (image/video) drives which media-row gets added.
+          const t = data.type === 'video' ? 'video' : 'image';
+          mediaItems.push({
+            type: t,
+            src: data.url,
+            id: '',
+            poster: '',
+            alt: data.original || '',
+            title: ''
+          });
+          renderMediaList();
+        } else {
+          const err = await res.json();
+          showToast(err.detail || 'Upload failed', 'error');
+        }
+      } catch (e) {
+        showToast('Upload failed: ' + e.message, 'error');
+      }
+
+      fileInput.value = '';
+    });
+
+    // ─── Import from Playground ───
+    if (fromPlayground === 'playground') {
+      try {
+        const pgData = JSON.parse(sessionStorage.getItem('pg_import') || 'null');
+        if (pgData) {
+          sessionStorage.removeItem('pg_import');
+          if (pgData.slug) slugEl.value = pgData.slug;
+          if (pgData.tag) document.getElementById('tag').value = pgData.tag;
+          if (pgData.date) dateEl.value = pgData.date;
+          if (pgData.dateLabel) {
+            document.getElementById('dateLabel-ja').value = pgData.dateLabel.ja || '';
+            document.getElementById('dateLabel-en').value = pgData.dateLabel.en || '';
+          }
+          if (pgData.title) {
+            document.getElementById('title-ja').value = pgData.title.ja || '';
+            document.getElementById('title-en').value = pgData.title.en || '';
+          }
+          if (pgData.excerpt) {
+            document.getElementById('excerpt-ja').value = pgData.excerpt.ja || '';
+            document.getElementById('excerpt-en').value = pgData.excerpt.en || '';
+          }
+          if (pgData.body) {
+            document.getElementById('body-ja').value = pgData.body.ja || '';
+            document.getElementById('body-en').value = pgData.body.en || '';
+          }
+          if (pgData.seo_keywords && pgData.seo_keywords.length) {
+            document.getElementById('seo-keywords').value = pgData.seo_keywords.join(', ');
+          }
+          if (pgData.seo_description) {
+            seoDescEl.value = pgData.seo_description;
+            seoDescEl.dispatchEvent(new Event('input'));
+          }
+          if (pgData.share_text) document.getElementById('share-text').value = pgData.share_text;
+          if (pgData.sources && pgData.sources.length) {
+            sourcesList = pgData.sources;
+            renderSources();
+          }
+          showToast('Content imported from AI Playground');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    if (fromPlayground === 'embed') {
+      try {
+        const embedImport = JSON.parse(sessionStorage.getItem('pg_embed') || 'null');
+        if (embedImport && embedImport.embed) {
+          sessionStorage.removeItem('pg_embed');
+          embedEl.value = embedImport.embed;
+          embedPreview.innerHTML = embedImport.embed;
+          if (embedImport.thumbnail) {
+            mediaItems.push({type: 'image', src: embedImport.thumbnail, id: '', poster: '', alt: '', title: ''});
+            renderMediaList();
+          }
+          showToast('Embed imported from Playground');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // Render the empty-state media list so the editor surface is visible
+    // even when creating a brand-new item (no item.media[] to load yet).
+    renderMediaList();
+
+    // Load existing content if editing
+    if (isEditing) {
+      loadItem();
+    }
+
+    async function loadItem() {
+      const res = await apiFetch(`/api/content/${section}`);
+      if (!res) return;
+      const data = await res.json();
+      const item = (data.items || []).find(i => i.slug === slug);
+      if (!item) {
+        showToast('Item not found', 'error');
+        return;
+      }
+
+      // Populate form — original fields
+      document.getElementById('tag').value = item.tag || '';
+
+      const dateRaw = item.date || '';
+      if (dateRaw.length === 7) {
+        dateEl.value = dateRaw;
+      } else if (dateRaw.length >= 10) {
+        dateEl.value = dateRaw.substring(0, 7);
+      }
+
+      if (item.dateLabel) {
+        document.getElementById('dateLabel-ja').value = item.dateLabel.ja || '';
+        document.getElementById('dateLabel-en').value = item.dateLabel.en || '';
+      }
+      if (item.title) {
+        document.getElementById('title-ja').value = item.title.ja || '';
+        document.getElementById('title-en').value = item.title.en || '';
+      }
+      if (item.excerpt) {
+        document.getElementById('excerpt-ja').value = item.excerpt.ja || '';
+        document.getElementById('excerpt-en').value = item.excerpt.en || '';
+      }
+      if (item.body) {
+        document.getElementById('body-ja').value = item.body.ja || '';
+        document.getElementById('body-en').value = item.body.en || '';
+      }
+      embedEl.value = item.embed || '';
+      if (item.embed) {
+        embedPreview.innerHTML = item.embed;
+      }
+
+      // ─── Unified media (Sprint 3) ───
+      // Source of truth: item.media[]. If empty, fall back to building it
+      // from the legacy thumbnail/video/images fields so any saved-before-
+      // Sprint-3 article still loads with editable media rows.
+      if (item.media && item.media.length) {
+        mediaItems = item.media.map(m => ({
+          type: m.type || 'image',
+          src: m.src || '',
+          id: m.id || '',
+          poster: m.poster || '',
+          alt: m.alt || '',
+          title: m.title || ''
+        }));
+      } else {
+        mediaItems = buildMediaFromLegacy(item);
+      }
+      // Keep the legacy fields populated (defense-in-depth).
+      if (item.thumbnail) document.getElementById('thumbnail').value = item.thumbnail;
+      if (item.video) document.getElementById('video').value = item.video;
+      if (item.images && item.images.length) {
+        galleryImages = [...item.images];
+        renderGallery();
+      }
+      renderMediaList();
+
+      // New fields — SEO/AEO
+      if (item.seo_title) {
+        seoTitleEl.value = item.seo_title;
+        seoTitleEl.dispatchEvent(new Event('input'));
+      }
+      if (item.seo_keywords && item.seo_keywords.length) {
+        document.getElementById('seo-keywords').value = item.seo_keywords.join(', ');
+      }
+      if (item.seo_description) {
+        seoDescEl.value = item.seo_description;
+        seoDescEl.dispatchEvent(new Event('input'));
+      }
+      if (item.og_image) {
+        document.getElementById('og-image').value = item.og_image;
+      }
+      if (item.share_text) {
+        document.getElementById('share-text').value = item.share_text;
+      }
+      if (item.sources && item.sources.length) {
+        sourcesList = [...item.sources];
+        renderSources();
+      }
+    }
+
+    // Save handler
+    const form = document.getElementById('editor-form');
+    const saveBtn = document.getElementById('save-btn');
+    const saveBuildBtn = document.getElementById('save-build-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await saveItem();
+    });
+
+    async function saveItem() {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+      const currentSection = isEditing ? section : sectionEl.value;
+      const dateVal = dateEl.value;
+
+      // Parse SEO keywords from comma-separated string
+      const kwRaw = document.getElementById('seo-keywords').value.trim();
+      const keywords = kwRaw ? kwRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      const payload = {
+        slug: slugEl.value,
+        date: dateVal,
+        dateLabel: {
+          ja: document.getElementById('dateLabel-ja').value,
+          en: document.getElementById('dateLabel-en').value
+        },
+        tag: document.getElementById('tag').value,
+        title: {
+          ja: document.getElementById('title-ja').value,
+          en: document.getElementById('title-en').value
+        },
+        excerpt: {
+          ja: document.getElementById('excerpt-ja').value,
+          en: document.getElementById('excerpt-en').value
+        },
+        body: {
+          ja: document.getElementById('body-ja').value,
+          en: document.getElementById('body-en').value
+        },
+        embed: embedEl.value,
+        // Sprint 3 — unified media[]. Source of truth.
+        media: mediaItems.map(m => ({
+          type: m.type || 'image',
+          src: m.src || '',
+          id: m.id || '',
+          poster: m.poster || '',
+          alt: m.alt || '',
+          title: m.title || ''
+        })),
+        // Legacy fields kept in sync for backward compat (renderer fallback,
+        // og:image priority, search index). syncLegacyFields() updates the
+        // hidden inputs and galleryImages whenever mediaItems changes.
+        thumbnail: document.getElementById('thumbnail').value.trim(),
+        images: galleryImages,
+        video: document.getElementById('video').value.trim(),
+        seo_keywords: keywords,
+        seo_title: seoTitleEl.value.trim(),
+        seo_description: seoDescEl.value.trim(),
+        og_image: document.getElementById('og-image').value.trim(),
+        reading_time: 0,
+        sources: sourcesList,
+        share_text: document.getElementById('share-text').value.trim()
+      };
+
+      let res;
+      if (isEditing) {
+        res = await apiFetch(`/api/content/${currentSection}/${slug}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await apiFetch(`/api/content/${currentSection}`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+
+      if (res && res.ok) {
+        showToast(isEditing ? 'Updated successfully' : 'Created successfully');
+        saveBuildBtn.style.display = 'inline-flex';
+      } else if (res) {
+        const err = await res.json();
+        showToast(err.detail || 'Save failed', 'error');
+      }
+    }
+
+    // Save & Build
+    saveBuildBtn.addEventListener('click', async () => {
+      await saveItem();
+      saveBuildBtn.disabled = true;
+      saveBuildBtn.innerHTML = '<span class="spinner"></span> Building...';
+
+      const logWrap = document.getElementById('build-log');
+      const logEl = document.getElementById('log-output');
+      logWrap.classList.remove('hidden');
+      logEl.textContent = 'Building...\n';
+
+      const res = await apiFetch('/api/build', { method: 'POST' });
+      if (res) {
+        const data = await res.json();
+        logEl.textContent = '';
+        if (data.stdout) logEl.textContent += data.stdout;
+        if (data.stderr) logEl.textContent += data.stderr;
+        if (data.returncode === 0) {
+          showToast('Build completed');
+        } else {
+          showToast('Build failed', 'error');
+        }
+      }
+
+      saveBuildBtn.disabled = false;
+      saveBuildBtn.textContent = 'Save & Build';
+    });
+  </script>
+</body>
+</html>

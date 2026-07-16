@@ -6,6 +6,8 @@ node_modules/
 .env
 used_keys.txt
 admin/settings.json
+admin-web/.dev.vars
+admin-web/.wrangler/
 
 # Source/workspace docs (not for deployment)
 *.zip
@@ -19,3 +21,4 @@ gloversal_palette_tokens_2026-04-15.css
 gloversal_palette_tokens_2026-04-15.json
 G.png
 Gloversal_Logo_SML*.png
+admin-web/*.log

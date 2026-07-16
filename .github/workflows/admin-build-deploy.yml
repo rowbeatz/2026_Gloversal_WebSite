@@ -1,0 +1,66 @@
+# Admin Build & Deploy
+# ---------------------------------------------------------------
+# Triggered by the web admin panel (gloversal-admin Worker) via
+# workflow_dispatch, or manually from the Actions tab.
+#
+# Runs the exact same build chain as the local admin panel:
+#   python build_pages.py
+#     -> tools/build_detail_pages.py  (per-slug static pages)
+#     -> tools/build_sitemap.py       (sitemap.xml)
+#     -> tools/seo_inject.py          (SEO/AEO head + JSON-LD)
+# then commits the regenerated site/ and pushes to main.
+# Cloudflare Pages picks up the push and deploys automatically.
+#
+# If the build produces no changes, the run succeeds with no commit
+# (and therefore no redeploy) — safe to trigger any time.
+
+name: Admin Build & Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: "Commit message for the rebuilt site"
+        required: false
+        default: "chore(admin-web): build & deploy"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: admin-build-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build site (same chain as local admin)
+        run: python build_pages.py
+
+      - name: Commit & push regenerated site
+        env:
+          MSG: ${{ inputs.commit_message || 'chore(admin-web): build & deploy' }}
+        run: |
+          git config user.name "gloversal-admin-bot"
+          git config user.email "admin-bot@users.noreply.github.com"
+          git add site/
+          if git diff --cached --quiet; then
+            echo "No changes to deploy — site is already up to date."
+          else
+            git commit -m "$MSG"
+            # Content may have been saved while this run was building;
+            # rebase on top so the push is fast-forward.
+            git pull --rebase origin main
+            git push origin main
+          fi

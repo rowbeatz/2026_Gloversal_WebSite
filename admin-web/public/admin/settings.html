@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gloversal Admin — Settings</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <style>
+    /* ─── Settings-specific styles ─── */
+    .settings-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .settings-section {
+      margin-bottom: 32px;
+    }
+    .settings-section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+    .settings-section-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .provider-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .provider-card.is-enabled {
+      border-color: rgba(63, 185, 80, 0.45);
+      box-shadow: 0 0 0 1px rgba(63, 185, 80, 0.18) inset;
+    }
+    .provider-card.is-error {
+      border-color: var(--danger);
+    }
+
+    .provider-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .provider-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .provider-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    .provider-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+    }
+    .provider-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      transition: 0.18s;
+    }
+    .switch .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px; height: 16px;
+      left: 2px; bottom: 2px;
+      background: var(--muted);
+      border-radius: 50%;
+      transition: 0.18s;
+    }
+    .switch input:checked + .slider {
+      background: rgba(63, 185, 80, 0.18);
+      border-color: var(--success);
+    }
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+      background: var(--success);
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .field-row label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .input-with-action {
+      display: flex;
+      gap: 6px;
+    }
+    .input-with-action input {
+      flex: 1;
+    }
+    .input-with-action button {
+      flex-shrink: 0;
+    }
+    input[type=text], input[type=password], input[type=url], select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+    }
+    input[type=text]:focus, input[type=password]:focus, input[type=url]:focus,
+    select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .test-result {
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      display: none;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+    .test-result.is-visible { display: block; }
+    .test-result.ok {
+      color: var(--success);
+      background: rgba(63, 185, 80, 0.08);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+    }
+    .test-result.err {
+      color: var(--danger);
+      background: rgba(248, 81, 73, 0.08);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+
+    .model-list {
+      font-size: 11px;
+      color: var(--muted);
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 6px 8px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      display: none;
+    }
+    .model-list.is-visible { display: block; }
+    .model-list code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text);
+    }
+    .model-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 2px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .model-row:last-child { border-bottom: none; }
+    .model-row .score {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .recommended-badge {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--success);
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+
+    .provider-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .provider-actions .btn {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+
+    .defaults-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) {
+      .defaults-card { grid-template-columns: 1fr; }
+    }
+
+    .save-bar {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, var(--bg) 75%, transparent);
+      padding: 16px 0 8px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 24px;
+      z-index: 5;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+    .badge.green { background: rgba(63, 185, 80, 0.18); color: var(--success); }
+    .badge.gray  { background: var(--surface-alt); color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app-layout" id="app">
+    <div class="main-content">
+      <div class="top-bar">
+        <h1 id="page-title">Settings</h1>
+        <div class="top-bar-actions">
+          <a href="/admin/playground.html" class="btn btn-sm">Open Playground</a>
+        </div>
+      </div>
+      <div class="content-area">
+        <div class="settings-wrap">
+
+          <div class="settings-section">
+            <div class="settings-section-title">AI Providers</div>
+            <div class="settings-section-desc">
+              Configure API keys and endpoints for each AI provider. Toggle enable/disable to control which providers
+              are available in the playground. Local providers (Ollama, LM Studio) auto-discover models from their endpoint.
+              <br><strong>Web 版の注意:</strong> この管理画面は Cloudflare 上で動作しているため、ローカル専用プロバイダ
+              （Ollama / LM Studio）には接続できません（公開トンネル URL を base_url に設定した場合を除く）。
+              クラウドプロバイダ（Anthropic / OpenAI / Google など）をご利用ください。API キーは Cloudflare KV に保存されます。
+            </div>
+            <div class="provider-grid" id="provider-grid">
+              <div class="provider-card"><span class="text-muted">Loading providers…</span></div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Default AI</div>
+            <div class="settings-section-desc">
+              Default provider and model used by the playground when no override is specified.
+            </div>
+            <div class="defaults-card">
+              <div class="field-row">
+                <label for="default-provider">Default Provider</label>
+                <select id="default-provider" onchange="onDefaultProviderChange()">
+                  <option value="">—</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <label for="default-model">Default Model</label>
+                <select id="default-model">
+                  <option value="">—</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="save-bar">
+            <button class="btn" onclick="loadSettings()">Reload</button>
+            <button class="btn btn-primary" id="save-btn" onclick="saveSettings()">Save Settings</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/assets/admin.js"></script>
+  <script>
+    requireAuth();
+    initPage('settings');
+
+    // ─── Static metadata about each provider ───
+    // icon = inline SVG markup (from PROVIDER_ICONS in admin.js)
+    const PROVIDER_META = {
+      anthropic:  { name: "Anthropic Claude",   icon: PROVIDER_ICONS.anthropic,  desc: "Claude Opus/Sonnet/Haiku — 高品質・日本語強い", type: "key" },
+      openai:     { name: "OpenAI GPT",         icon: PROVIDER_ICONS.openai,     desc: "GPT-4o / o1 / o3 — 汎用性最高",            type: "key" },
+      google:     { name: "Google Gemini",      icon: PROVIDER_ICONS.google,     desc: "Gemini 2.5 Pro / Flash — 高速・長文対応",   type: "key" },
+      mistral:    { name: "Mistral AI",         icon: PROVIDER_ICONS.mistral,    desc: "Mistral Large — 欧州製・プライバシー重視", type: "key" },
+      groq:       { name: "Groq",               icon: PROVIDER_ICONS.groq,       desc: "Llama / Mixtral — 世界最速推論",            type: "key" },
+      together:   { name: "Together AI",        icon: PROVIDER_ICONS.together,   desc: "Llama / DeepSeek — オープンモデル",         type: "key" },
+      perplexity: { name: "Perplexity",         icon: PROVIDER_ICONS.perplexity, desc: "Web検索付き生成 — 最新情報対応",            type: "key" },
+      cohere:     { name: "Cohere",             icon: PROVIDER_ICONS.cohere,     desc: "Command R+ — RAG特化",                     type: "key" },
+      deepseek:   { name: "DeepSeek",           icon: PROVIDER_ICONS.deepseek,   desc: "DeepSeek V3 / R1 — 中国発・高精度",         type: "key" },
+      ollama:     { name: "Ollama (ローカル)",    icon: PROVIDER_ICONS.ollama,     desc: "ローカルLLM — プライベート・無料",          type: "url" },
+      lmstudio:   { name: "LM Studio (ローカル)", icon: PROVIDER_ICONS.lmstudio,   desc: "ローカルLLM — GUI付き",                     type: "url" },
+      custom:     { name: "カスタム API",         icon: PROVIDER_ICONS.custom,     desc: "OpenAI互換エンドポイント",                 type: "custom" },
+    };
+
+    // ─── Local state — mirrors what's on the server with masked keys ───
+    let settingsCache = null;        // { providers: {...}, default_provider, default_model }
+    let providerCatalog = [];        // [{id, models: [...], dynamic_models, ...}, ...]
+    let dynamicModelsCache = {};     // { ollama: [...], lmstudio: [...] }
+
+    // ───────────── Load ─────────────
+    async function loadSettings() {
+      const [settingsRes, providersRes] = await Promise.all([
+        apiFetch('/api/settings'),
+        apiFetch('/api/ai/providers'),
+      ]);
+      if (!settingsRes || !providersRes) return;
+      if (!settingsRes.ok || !providersRes.ok) {
+        showToast('Failed to load settings', 'error');
+        return;
+      }
+      settingsCache = await settingsRes.json();
+      const provData = await providersRes.json();
+      providerCatalog = provData.providers || [];
+      renderProviderGrid();
+      renderDefaults();
+    }
+
+    function renderProviderGrid() {
+      const grid = document.getElementById('provider-grid');
+      grid.innerHTML = '';
+      // Render in the canonical order from PROVIDER_META.
+      const order = Object.keys(PROVIDER_META);
+      for (const pid of order) {
+        const meta = PROVIDER_META[pid];
+        const cfg = (settingsCache.providers || {})[pid] || {};
+        const enabled = !!cfg.enabled;
+        const apiKey = cfg.api_key || '';
+        const baseUrl = cfg.base_url || '';
+        const modelIds = cfg.model_ids || '';
+
+        const card = document.createElement('div');
+        card.className = 'provider-card' + (enabled ? ' is-enabled' : '');
+        card.dataset.provider = pid;
+
+        // Build inputs based on provider type.
+        let fields = '';
+        if (meta.type === 'key' || meta.type === 'custom') {
+          fields += `
+            <div class="field-row">
+              <label>API Key</label>
+              <div class="input-with-action">
+                <input type="password" data-field="api_key" value="${escapeAttr(apiKey)}" placeholder="sk-…">
+                <button type="button" class="btn btn-sm" onclick="toggleKeyVisibility(this)">Show</button>
+              </div>
+            </div>
+          `;
+        }
+        if (meta.type === 'url' || meta.type === 'custom') {
+          const defaultUrl = pid === 'ollama' ? 'http://host.docker.internal:11434'
+                            : pid === 'lmstudio' ? 'http://host.docker.internal:1234/v1'
+                            : '';
+          fields += `
+            <div class="field-row">
+              <label>Base URL</label>
+              <input type="url" data-field="base_url" value="${escapeAttr(baseUrl)}" placeholder="${defaultUrl}">
+            </div>
+          `;
+        }
+        if (meta.type === 'custom') {
+          fields += `
+            <div class="field-row">
+              <label>Model IDs (comma-separated)</label>
+              <input type="text" data-field="model_ids" value="${escapeAttr(modelIds)}" placeholder="my-model-7b, my-model-70b">
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="provider-head">
+            <div class="provider-icon">${meta.icon}</div>
+            <div style="flex:1; min-width:0">
+              <div class="provider-name">${meta.name}</div>
+              <div class="provider-desc">${meta.desc}</div>
+            </div>
+            <label class="switch" title="Enable / disable">
+              <input type="checkbox" data-field="enabled" ${enabled ? 'checked' : ''} onchange="onEnabledToggle(this)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          ${fields}
+          <div class="provider-actions">
+            <button type="button" class="btn" onclick="testConnection('${pid}')">Test Connection</button>
+            <button type="button" class="btn" onclick="refreshModels('${pid}')">Refresh Models</button>
+          </div>
+          <div class="test-result" data-role="test-result"></div>
+          <div class="model-list" data-role="model-list"></div>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    function renderDefaults() {
+      const provSel = document.getElementById('default-provider');
+      provSel.innerHTML = '';
+      // Only enabled providers are eligible as default.
+      const enabled = providerCatalog
+        .filter(p => (settingsCache.providers[p.id] || {}).enabled);
+      const candidates = enabled.length ? enabled : providerCatalog;
+      for (const p of candidates) {
+        const meta = PROVIDER_META[p.id] || { name: p.id };
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        // Native <option> can't render SVG; show plain name.
+        opt.textContent = meta.name;
+        provSel.appendChild(opt);
+      }
+      const currentDefault = settingsCache.default_provider || (candidates[0] && candidates[0].id) || '';
+      provSel.value = currentDefault;
+      onDefaultProviderChange(); // populate model dropdown
+    }
+
+    async function onDefaultProviderChange() {
+      const pid = document.getElementById('default-provider').value;
+      const modelSel = document.getElementById('default-model');
+      modelSel.innerHTML = '<option value="">Loading…</option>';
+      const models = await fetchModelsFor(pid);
+      modelSel.innerHTML = '';
+      if (!models.length) {
+        modelSel.innerHTML = '<option value="">(no models)</option>';
+        return;
+      }
+      // Sort by score desc so the recommended one is first.
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      sorted.forEach((m, idx) => {
+        const opt = document.createElement('option');
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        opt.value = id;
+        opt.textContent = idx === 0 ? `★ ${label} (recommended)` : label;
+        modelSel.appendChild(opt);
+      });
+      const desired = settingsCache.default_model || '';
+      if (desired && [...modelSel.options].some(o => o.value === desired)) {
+        modelSel.value = desired;
+      } else if (sorted[0]) {
+        // Auto-select the recommended one when no saved default matches.
+        modelSel.value = typeof sorted[0] === 'string' ? sorted[0] : sorted[0].id;
+      }
+    }
+
+    async function fetchModelsFor(pid, { force } = {}) {
+      if (!pid) return [];
+      if (!force && dynamicModelsCache[pid]) return dynamicModelsCache[pid];
+      const res = await apiFetch(`/api/ai/models/${pid}`);
+      if (!res || !res.ok) {
+        // Fall back to whatever the catalog had.
+        const cat = providerCatalog.find(p => p.id === pid);
+        return cat ? (cat.models || []) : [];
+      }
+      const data = await res.json();
+      const models = data.models || [];
+      dynamicModelsCache[pid] = models;
+      return models;
+    }
+
+    // ───────────── Events ─────────────
+    async function onEnabledToggle(input) {
+      const card = input.closest('.provider-card');
+      card.classList.toggle('is-enabled', input.checked);
+      // Mirror back into local cache so the defaults dropdown updates.
+      const pid = card.dataset.provider;
+      settingsCache.providers[pid] = settingsCache.providers[pid] || {};
+      settingsCache.providers[pid].enabled = input.checked;
+      renderDefaults();
+      // When enabling a provider that already has a key/url, auto-fetch live models.
+      if (input.checked) {
+        const cfg = settingsCache.providers[pid] || {};
+        const hasCreds =
+          (cfg.api_key && !String(cfg.api_key).startsWith('••••') ? true : false) ||
+          !!cfg.base_url ||
+          // Already-saved (masked) keys still count.
+          (typeof cfg.api_key === 'string' && cfg.api_key.startsWith('••••'));
+        if (hasCreds) {
+          // Fire-and-forget; don't block the UI.
+          refreshModels(pid).catch(() => {});
+        }
+      }
+    }
+
+    function toggleKeyVisibility(btn) {
+      const input = btn.parentElement.querySelector('input');
+      if (input.type === 'password') {
+        input.type = 'text'; btn.textContent = 'Hide';
+      } else {
+        input.type = 'password'; btn.textContent = 'Show';
+      }
+    }
+
+    async function testConnection(pid) {
+      // Save current edits first so the test uses what the user typed.
+      await saveSettings({ silent: true });
+      const card = document.querySelector(`.provider-card[data-provider="${pid}"]`);
+      const result = card.querySelector('[data-role="test-result"]');
+      result.className = 'test-result is-visible';
+      result.textContent = 'Testing…';
+      // Force a live refresh so we don't try to use a stale model id.
+      delete dynamicModelsCache[pid];
+      // Send NO model — let the backend auto-pick the best from the live list.
+      const res = await apiFetch('/api/ai/test', {
+        method: 'POST',
+        body: JSON.stringify({ provider: pid, model: '' }),
+      });
+      if (!res) return;
+      const data = await res.json();
+      if (data.status === 'ok') {
+        result.className = 'test-result ok is-visible';
+        result.innerHTML = `OK · <code>${escapeHtml(data.model || '')}</code> · ${escapeHtml(data.response || '')}`;
+        card.classList.remove('is-error');
+      } else {
+        result.className = 'test-result err is-visible';
+        result.innerHTML = `ERROR · ${escapeHtml(data.error || 'unknown')}`;
+        card.classList.add('is-error');
+      }
+    }
+
+    async function refreshModels(pid) {
+      const card = document.querySelector(`.provider-card[data-provider="${pid}"]`);
+      const list = card.querySelector('[data-role="model-list"]');
+      list.className = 'model-list is-visible';
+      list.textContent = 'Fetching live model list…';
+      // Save first so the backend sees the latest API key / base URL / model IDs.
+      await saveSettings({ silent: true });
+      // Bypass cache.
+      delete dynamicModelsCache[pid];
+      const models = await fetchModelsFor(pid, { force: true });
+      if (!models.length) {
+        list.textContent = '(no models found — check API key, endpoint, or pull a model locally)';
+        return;
+      }
+      // Sort by score desc; top 3 get a "★ Recommended" badge.
+      const sorted = [...models].sort((a, b) => (b.score || 0) - (a.score || 0));
+      list.innerHTML = sorted.map((m, idx) => {
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        const score = (typeof m === 'object' && m.score != null) ? m.score : '';
+        const badge = idx < 3 ? `<span class="recommended-badge">★ Recommended</span>` : '';
+        return `
+          <div class="model-row">
+            <div><code>${escapeHtml(id)}</code> ${escapeHtml(label !== id ? '— ' + label : '')}${badge}</div>
+            <span class="score">${score !== '' ? 'score ' + score : ''}</span>
+          </div>
+        `;
+      }).join('');
+      // Refresh the defaults dropdown so the new top-scoring model is offered.
+      onDefaultProviderChange();
+    }
+
+    // ───────────── Save ─────────────
+    function collectFormState() {
+      const out = { providers: {} };
+      document.querySelectorAll('.provider-card[data-provider]').forEach(card => {
+        const pid = card.dataset.provider;
+        const cfg = {};
+        card.querySelectorAll('[data-field]').forEach(el => {
+          const field = el.dataset.field;
+          if (el.type === 'checkbox') {
+            cfg[field] = el.checked;
+          } else {
+            cfg[field] = el.value;
+          }
+        });
+        out.providers[pid] = cfg;
+      });
+      out.default_provider = document.getElementById('default-provider').value || '';
+      out.default_model = document.getElementById('default-model').value || '';
+      return out;
+    }
+
+    async function saveSettings(opts = {}) {
+      const silent = !!opts.silent;
+      const btn = document.getElementById('save-btn');
+      if (!silent) {
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+      }
+      const payload = collectFormState();
+      const res = await apiFetch('/api/settings', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!silent) {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+      }
+      if (!res) return false;
+      if (!res.ok) {
+        if (!silent) showToast('Save failed', 'error');
+        return false;
+      }
+      // Refresh local cache (settings.json may have applied additional defaults
+      // and we want masked api_key values to reappear).
+      const refreshed = await apiFetch('/api/settings');
+      if (refreshed && refreshed.ok) {
+        settingsCache = await refreshed.json();
+      }
+      if (!silent) showToast('Settings saved');
+      return true;
+    }
+
+    // ───────────── Helpers ─────────────
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = (s == null ? '' : String(s));
+      return d.innerHTML;
+    }
+    function escapeAttr(s) {
+      return escapeHtml(s).replace(/"/g, '&quot;');
+    }
+
+    // ───────────── Boot ─────────────
+    loadSettings();
+  </script>
+</body>
+</html>

@@ -639,6 +639,180 @@ contact_body = """
 """
 
 # =================================================================
+# DYNAMIC CARDS — entries added via the admin panel (web or local)
+# =================================================================
+# Any content-data.js entry whose slug is NOT hardcoded above gets its
+# card generated here and prepended inside the section's list container
+# (content-data.js arrays are ordered newest-first, so new items lead).
+# Bilingual text uses <span data-lang="ja|en"> pairs toggled by the
+# existing I18n module in site/js/main.js (same mechanism as the legal
+# pages), so no i18n.js dictionary entry is needed per item.
+import html as _html
+import json as _json
+
+
+def _load_content_data():
+    """Evaluate site/js/content-data.js via Node (same as tools/*)."""
+    node_script = (
+        "const vm=require('vm');const fs=require('fs');"
+        "const code=fs.readFileSync('site/js/content-data.js','utf-8');"
+        "const ctx={window:{}};vm.createContext(ctx);vm.runInContext(code,ctx);"
+        "process.stdout.write(JSON.stringify(ctx.window.__GLV_CONTENT__));"
+    )
+    r = subprocess.run(
+        ["node", "-e", node_script],
+        capture_output=True, text=True, encoding="utf-8",
+    )
+    if r.returncode != 0:
+        print("  [!] Could not evaluate content-data.js via node:", (r.stderr or "").strip()[:200])
+        sys.exit(1)
+    return _json.loads(r.stdout)
+
+
+def _e(text):
+    return _html.escape(str(text or ""), quote=True)
+
+
+def _bi(item, field):
+    """Return (ja, en) for a bilingual field, falling back across languages."""
+    v = item.get(field) or {}
+    if isinstance(v, str):
+        return v, v
+    return (v.get("ja") or v.get("en") or ""), (v.get("en") or v.get("ja") or "")
+
+
+def _lang_spans(ja, en):
+    ja_e, en_e = _e(ja), _e(en)
+    if not en_e or en_e == ja_e:
+        return ja_e
+    return f'<span data-lang="ja">{ja_e}</span><span data-lang="en" hidden>{en_e}</span>'
+
+
+def _card_date(item):
+    d = str(item.get("date") or "")
+    m = re.match(r"^(\d{4})-(\d{2})", d)
+    if m:
+        return f"{m.group(1)} &middot; {m.group(2)}"
+    lbl = item.get("dateLabel") or {}
+    return _lang_spans(lbl.get("ja", ""), lbl.get("en", "")) or _e(d)
+
+
+def _plain(text):
+    return _e(re.sub(r"<[^>]+>", " ", str(text or "")).strip())
+
+
+def _insight_image(item):
+    thumb = item.get("thumbnail") or ""
+    if not thumb:
+        for m in item.get("media") or []:
+            if m.get("type") == "image" and m.get("src"):
+                thumb = m["src"]
+                break
+            if m.get("poster"):
+                thumb = m["poster"]
+                break
+    return thumb or "assets/images/insights/placeholder.png"
+
+
+def _dyn_insight_card(item, idx):
+    slug = _e(item.get("slug"))
+    ja_t, en_t = _bi(item, "title")
+    ja_x, en_x = _bi(item, "excerpt")
+    dc = f" reveal--d{idx % 3}" if idx % 3 else ""
+    return f"""
+      <article class="insight-card reveal{dc}">
+        <a class="insight-card__link" href="insights/{slug}.html" aria-label="記事を読む: {_plain(ja_t)}"></a>
+        <div class="insight-card__image" data-label="{_e(item.get('tag') or 'Insight')}">
+          <img src="{_e(_insight_image(item))}" alt="{_plain(ja_t)}" loading="lazy" decoding="async" />
+        </div>
+        <span class="insight-card__date">{_card_date(item)}</span>
+        <h3 class="insight-card__title">{_lang_spans(ja_t, en_t)}</h3>
+        <p class="insight-card__excerpt">{_lang_spans(ja_x, en_x)}</p>
+      </article>"""
+
+
+def _dyn_activity_row(item):
+    slug = _e(item.get("slug"))
+    ja_t, en_t = _bi(item, "title")
+    ja_x, en_x = _bi(item, "excerpt")
+    return f"""
+    <div class="activity-item reveal">
+      <a class="activity-item__link" href="speaking/{slug}.html" aria-label="詳細を見る: {_plain(ja_t)}"></a>
+      <span class="activity-item__date">{_card_date(item)}</span>
+      <div class="activity-item__body">
+        <h3>{_lang_spans(ja_t, en_t)}</h3>
+        <p>{_lang_spans(ja_x, en_x)}</p>
+      </div>
+      <span class="activity-item__tag">{_e(item.get('tag') or '')}</span>
+    </div>"""
+
+
+def _dyn_case_card(item, num, idx):
+    slug = _e(item.get("slug"))
+    ja_t, en_t = _bi(item, "title")
+    dc = f" reveal--d{idx % 3}" if idx % 3 else ""
+    meta_rows = []
+    labels = {"issue": ("labelIssue", "課題"), "work": ("labelWork", "支援内容"), "result": ("labelResult", "成果")}
+    for field, (label_key, label_ja) in labels.items():
+        ja_v, en_v = _bi(item, field)
+        if ja_v:
+            meta_rows.append(
+                f'<dt data-i18n="cases.{label_key}">{label_ja}</dt><dd>{_lang_spans(ja_v, en_v)}</dd>'
+            )
+    if not meta_rows:
+        ja_x, en_x = _bi(item, "excerpt")
+        if ja_x:
+            meta_rows.append(f"<dt>{_lang_spans('概要', 'Overview')}</dt><dd>{_lang_spans(ja_x, en_x)}</dd>")
+    meta = "\n          ".join(meta_rows)
+    return f"""
+      <article class="case-card reveal{dc}">
+        <a class="case-card__link" href="case-studies/{slug}.html" aria-label="Case {num} 詳細を見る: {_plain(ja_t)}"></a>
+        <span class="case-card__tag">{_e(item.get('tag') or '')}</span>
+        <span class="case-card__num">Case {num}</span>
+        <h3 class="case-card__title">{_lang_spans(ja_t, en_t)}</h3>
+        <dl class="case-card__meta">
+          {meta}
+        </dl>
+      </article>"""
+
+
+def _checked_inject(body, marker, cards_html, page_name):
+    if marker not in body:
+        print(f"  [!] Dynamic card injection failed: marker not found in {page_name}.")
+        sys.exit(1)
+    return body.replace(marker, marker + cards_html, 1)
+
+
+_CONTENT_DATA = _load_content_data()
+
+_new_insights = [it for it in _CONTENT_DATA.get("insights", []) if it.get("slug") not in set(_REGISTERED_SLUGS["insights"])]
+if _new_insights:
+    _cards = "".join(_dyn_insight_card(it, i) for i, it in enumerate(_new_insights))
+    insights_body = _checked_inject(insights_body, '<div class="insights-grid">', _cards, "insights.html")
+    for it in _new_insights:
+        register_slug("insights", it.get("slug"))
+    print(f"  [+] {len(_new_insights)} dynamic insight card(s) generated from content-data.js")
+
+_new_speaking = [it for it in _CONTENT_DATA.get("speaking", []) if it.get("slug") not in set(_REGISTERED_SLUGS["speaking"])]
+if _new_speaking:
+    _rows = "".join(_dyn_activity_row(it) for it in _new_speaking)
+    speaking_body = _checked_inject(speaking_body, '<div class="activity-list">', _rows, "speaking.html")
+    for it in _new_speaking:
+        register_slug("speaking", it.get("slug"))
+    print(f"  [+] {len(_new_speaking)} dynamic activity row(s) generated from content-data.js")
+
+_all_cases = _CONTENT_DATA.get("cases", [])
+_new_cases = [(i, it) for i, it in enumerate(_all_cases) if it.get("slug") not in set(_REGISTERED_SLUGS["cases"])]
+if _new_cases:
+    _cards = "".join(
+        _dyn_case_card(it, f"{len(_all_cases) - i:02d}", n) for n, (i, it) in enumerate(_new_cases)
+    )
+    cases_body = _checked_inject(cases_body, '<div class="case-grid">', _cards, "case-studies.html")
+    for _i, it in _new_cases:
+        register_slug("cases", it.get("slug"))
+    print(f"  [+] {len(_new_cases)} dynamic case card(s) generated from content-data.js")
+
+# =================================================================
 # WRITE FILES
 # =================================================================
 pages_to_write = {

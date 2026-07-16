@@ -1,0 +1,37 @@
+// Gloversal Admin — Cloudflare Worker
+// Completely separate from the public site's Pages project
+// (2026-gloversal-website). Deploying/redeploying this Worker can
+// never affect the live site.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gloversal-admin",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Serve files exactly as named — the admin frontend links pages
+    // as /admin/foo.html and must not be redirected to extensionless.
+    "html_handling": "none"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SETTINGS",
+      "id": "738fb9271c7444afbc5c71fb422f2193"
+    }
+  ],
+  "vars": {
+    // Repository that Cloudflare Pages deploys the public site from.
+    "GH_REPO": "rowbeatz/2026_Gloversal_WebSite",
+    "GH_BRANCH": "main",
+    "GH_WORKFLOW_FILE": "admin-build-deploy.yml"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Secrets (set via `wrangler secret put <NAME>`):
+  //   ADMIN_USER  — admin login username
+  //   ADMIN_PASS  — admin login password
+  //   JWT_SECRET  — HMAC key for session tokens
+  //   GH_TOKEN    — GitHub token with contents:write + actions:write on GH_REPO
+}

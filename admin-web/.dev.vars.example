@@ -1,0 +1,4 @@
+ADMIN_USER=admin
+ADMIN_PASS=change-me
+JWT_SECRET=random-32-plus-chars
+GH_TOKEN=github_pat_xxx
