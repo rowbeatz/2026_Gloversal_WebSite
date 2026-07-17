@@ -74,19 +74,26 @@ npx wrangler dev                 # http://localhost:8787
   でビルドが壊れない）。slug は strict kebab-case（パストラバーサル防止）。
 - **SSRF/鍵漏洩対策**: クラウドプロバイダの `base_url` は固定（custom/ollama/
   lmstudio のみ変更可）、プロバイダ呼び出しは `redirect: 'manual'`。
-- **レート制限**: IP ごと 15 分 8 回で 429（KV ベース、ベストエフォート）。
-  KV は原子的でないため並列総当たりには弱い — パスワード強度（約72bit）が
-  一次防御。より固くするなら Cloudflare Access（下記）。
+- **Cloudflare Access（有効化済み・一次防御）**: workers.dev ルートに
+  Cloudflare Access を適用済み。全リクエストがエッジでメール OTP 認証を要求し、
+  ポリシーは `rowbeatz@gmail.com` のみ許可。Worker 側でも Access JWT を検証
+  （`CF_ACCESS_TEAM_DOMAIN` + `CF_ACCESS_AUD`、`jose`）＝二層。ログイン導線は
+  「Access メール OTP →（アプリの username/password）」の二段。これにより KV
+  レート制限の非原子性・総当たり耐性の懸念は実質解消（未認証はアプリに到達不能）。
+  team domain = `gloversal.cloudflareaccess.com`。無効化は Worker → Domains →
+  該当ルートを Public に戻す（公開サイトには無影響）。
+- **全レスポンスにセキュリティヘッダ**: Worker が返す API/リダイレクトにも
+  nosniff / X-Frame-Options DENY / no-referrer / no-store / noindex を付与
+  （`_headers` は静的アセットのみ対象のため二重化）。
+- **レート制限**: IP ごと 15 分 8 回で 429（KV ベース）。Access が前段にあるため
+  総当たり経路自体が塞がれている。
 - `_headers`: CSP（`connect-src 'self'` でトークン持ち出しを遮断）+ noindex /
   no-store / X-Frame-Options DENY。robots.txt も全拒否。
-- **推奨（未実施）**: Cloudflare Zero Trust (Access) をこの Worker のルートに
-  被せる（メール OTP など）。公開サイト側には無影響。KV レート制限の非原子性・
-  総当たり耐性を一挙に解消する最短の追加防御。
-- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。現状は `gh` CLI の広域
-  classic PAT。**fine-grained PAT（リポジトリ `2026_Gloversal_WebSite` のみ、
-  Contents RW + Actions RW）への差し替えを推奨** — 漏洩時の影響を単一リポジトリ
-  に限定できる。差し替え: `gh auth token` の代わりに新 PAT を
-  `npx wrangler secret put GH_TOKEN` で投入。
+- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。**fine-grained PAT
+  （リポジトリ `2026_Gloversal_WebSite` のみ、Contents RW + Actions RW +
+  Metadata R）への差し替え済み/推奨** — 漏洩時の影響を単一リポジトリに限定。
+  差し替え手順: GitHub → Settings → Developer settings → Fine-grained tokens
+  で発行 → `<新PAT> | npx wrangler secret put GH_TOKEN`（`admin-web/` で実行）。
 
 ## ローカル版との違い
 
