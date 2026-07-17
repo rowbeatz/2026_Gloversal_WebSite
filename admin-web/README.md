@@ -89,11 +89,14 @@ npx wrangler dev                 # http://localhost:8787
   総当たり経路自体が塞がれている。
 - `_headers`: CSP（`connect-src 'self'` でトークン持ち出しを遮断）+ noindex /
   no-store / X-Frame-Options DENY。robots.txt も全拒否。
-- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。**fine-grained PAT
-  （リポジトリ `2026_Gloversal_WebSite` のみ、Contents RW + Actions RW +
-  Metadata R）への差し替え済み/推奨** — 漏洩時の影響を単一リポジトリに限定。
-  差し替え手順: GitHub → Settings → Developer settings → Fine-grained tokens
-  で発行 → `<新PAT> | npx wrangler secret put GH_TOKEN`（`admin-web/` で実行）。
+- `GH_TOKEN` は Worker Secret（書き込み専用ストア）。**fine-grained PAT に
+  差し替え済み**（2026-07-17）— 名前 `gloversal-admin-worker`、リポジトリ
+  `2026_Gloversal_WebSite` のみ、権限 Contents RW + Actions RW + Metadata R、
+  無期限。旧・広域 classic トークンはもう Worker では使っていない（`gh` CLI の
+  ローカル用途はそのまま）。検証済み: Contents read 200 / Actions dispatch 204 /
+  CI ビルド success。ローテーション手順: GitHub → Settings → Developer settings
+  → Fine-grained tokens で再発行 → `<新PAT> | npx wrangler secret put GH_TOKEN`
+  （`admin-web/` で実行）。
 
 ## ローカル版との違い
 
