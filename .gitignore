@@ -8,6 +8,7 @@ used_keys.txt
 admin/settings.json
 admin-web/.dev.vars
 admin-web/.wrangler/
+.secrets/
 
 # Source/workspace docs (not for deployment)
 *.zip
