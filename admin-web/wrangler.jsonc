@@ -24,7 +24,12 @@
     // Repository that Cloudflare Pages deploys the public site from.
     "GH_REPO": "rowbeatz/2026_Gloversal_WebSite",
     "GH_BRANCH": "main",
-    "GH_WORKFLOW_FILE": "admin-build-deploy.yml"
+    "GH_WORKFLOW_FILE": "admin-build-deploy.yml",
+    // Cloudflare Access (edge email-OTP gate on this workers.dev route).
+    // These are NOT secrets — the aud tag and team domain are public
+    // identifiers. Their presence turns on the Worker's Access-JWT check.
+    "CF_ACCESS_TEAM_DOMAIN": "https://gloversal.cloudflareaccess.com",
+    "CF_ACCESS_AUD": "926fe0b88b955c89341b847515791f037678fd0ced1fbe5e8df40e40e93076bf"
   },
   "observability": {
     "enabled": true
