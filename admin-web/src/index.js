@@ -15,6 +15,7 @@
    ============================================================= */
 
 import { Hono } from 'hono';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 const VALID_SECTIONS = new Set(['insights', 'speaking', 'cases']);
 const CONTENT_PATH = 'site/js/content-data.js';
@@ -899,6 +900,52 @@ app.onError((err, c) => {
   if (err instanceof ApiError) return jsonError(c, err.apiStatus, err.detail);
   console.error('unhandled:', err.stack || err.message);
   return jsonError(c, 500, err.message || 'Internal error');
+});
+
+/* ─── Security headers on every Worker response ───
+   `public/_headers` only decorates static-asset responses; API JSON and the
+   redirect routes are emitted by this Worker, so set the same protections here. */
+app.use('*', async (c, next) => {
+  await next();
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('Referrer-Policy', 'no-referrer');
+  c.header('Cache-Control', 'no-store');
+  c.header('X-Robots-Tag', 'noindex, nofollow');
+});
+
+/* ─── Cloudflare Access JWT validation (defense-in-depth) ───
+   When Access is enabled on the workers.dev route, Cloudflare's edge already
+   authenticates every request and injects a signed JWT. Validating it here
+   means the Worker also rejects any request that somehow reaches it without a
+   valid Access assertion. No-op until CF_ACCESS_TEAM_DOMAIN + CF_ACCESS_AUD
+   are configured (keeps local dev and the pre-Access state working). */
+let _accessJWKS = null;
+function accessJWKS(teamDomain) {
+  if (!_accessJWKS) {
+    _accessJWKS = createRemoteJWKSet(new URL(`${teamDomain.replace(/\/+$/, '')}/cdn-cgi/access/certs`));
+  }
+  return _accessJWKS;
+}
+
+app.use('*', async (c, next) => {
+  const team = c.env.CF_ACCESS_TEAM_DOMAIN;
+  const aud = c.env.CF_ACCESS_AUD;
+  if (!team || !aud) return next(); // Access not configured — edge gate absent, skip.
+
+  const token =
+    c.req.header('Cf-Access-Jwt-Assertion') ||
+    (c.req.header('Cookie') || '').match(/(?:^|;\s*)CF_Authorization=([^;]+)/)?.[1];
+  if (!token) return jsonError(c, 403, 'Cloudflare Access authentication required');
+  try {
+    await jwtVerify(token, accessJWKS(team), {
+      issuer: team.replace(/\/+$/, ''),
+      audience: aud,
+    });
+  } catch {
+    return jsonError(c, 403, 'Invalid Cloudflare Access token');
+  }
+  return next();
 });
 
 /* Root convenience redirects (static assets handle everything else). */
